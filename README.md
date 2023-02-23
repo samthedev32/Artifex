@@ -1,6 +1,6 @@
 # Artifex Cross-Platform 2D Library
 
-![PROCESS](https://progress-bar.dev/10?title="PROCESS  ")
+![PROCESS](https://progress-bar.dev/10?title=STATUS)
 
 ## About
 Artifect is a C++ Library for making 2D Games
