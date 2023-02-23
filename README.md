@@ -3,9 +3,10 @@
 ## About
 Artifect is a C++ Library for making 2D Games
 
-It is IN DEVELOPMENT, and is FREE and Open-Source.
+In it's Current Form, it uses [SDL2](www.libsdl.org) and [OpenGL](www.opengl.org), but in the future, it is possible that
+i'll switch to use the [win32 API](learn.microsoft.com/en-us/windows/win32/api/) and/or [X11 Windowing System](en.wikipedia.org/wiki/X_Window_System) alongside another mixer
 
-> "artifex" is a latin word that means "artist"
+> ["artifex"](https://translate.google.com/?sl=la&tl=en&text=artifex&op=translate) is a latin word that means "artist"
 
 ## Features
 - [x] Basic OpenGL Windowing
