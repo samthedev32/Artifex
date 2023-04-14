@@ -12,7 +12,7 @@ It uses [SDL2](www.libsdl.org) + [OpenGL](www.opengl.org) for Windowing + Render
 - [x] 2D Rendering
 - [x] Audio Player
 - [ ] 2D Physics Engine
-- [ ] Cross-Platform Support
+- [x] Cross-Platform Support (Windows, Linux, Web; other platforms coming soon!)
 - [ ] Basic UI Elements
 - [ ] Multiple Window Support (maybe?)
 
