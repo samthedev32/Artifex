@@ -1,333 +1,309 @@
 // Artifex Library
 #include <Artifex/Artifex.h>
 
-    void Artifex::apply()
-    {
-        // Change FrameBuffer
-        int fb;
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
-        if (fb != 0)
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+void Artifex::apply() {
+  // Change FrameBuffer
+  int fb;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
+  if (fb != 0)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Disable 3D Depth Testing
-        glDisable(GL_DEPTH_TEST);
+  // Disable 3D Depth Testing
+  glDisable(GL_DEPTH_TEST);
 
-        // Change ViewPort
-        int vp[4];
-        glGetIntegerv(GL_VIEWPORT, vp);
-        if (vp[2] != size[0] || vp[3] != size[1])
-            glViewport(0, 0, size[0], size[1]);
+  // Change ViewPort
+  int vp[4];
+  glGetIntegerv(GL_VIEWPORT, vp);
+  if (vp[2] != size[0] || vp[3] != size[1])
+    glViewport(0, 0, size[0], size[1]);
 
-        // Use Shader
-        s.use();
-        s.set("tex", 0);
-    }
+  // Use Shader
+  s.use();
+  s.set("tex", 0);
+}
 
-    vec2 Artifex::ratio()
-    {
-        if (dres)
-            return vec2(1.0f, (float)size[0] / (float)size[1]);
-        return vec2(1.0f, 1.0f);
-    }
+vec2 Artifex::ratio() {
+  if (dres)
+    return vec2(1.0f, (float)size[0] / (float)size[1]);
+  return vec2(1.0f, 1.0f);
+}
 
 // Constructors & Destructor
-Artifex::Artifex(std::string name, bool fullscreen, int w, int h) : Window(name, fullscreen, w, h), Mixer()
-{
-    // Init 2D Renderer
-    s = load::gls("2d");
+Artifex::Artifex(std::string name, bool fullscreen, int w, int h)
+    : Window(name, fullscreen, w, h), Mixer() {
+  // Init 2D Renderer
+  s = load::gls("2d");
 
-    float vertices[] = {
-        // positions      // texture coords
-        -1.0f, 1.0f, 0.0f, 1.0f,  // 0 top right
-        -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
-        1.0f, -1.0f, 1.0f, 0.0f,  // 3 top left
+  float vertices[] = {
+      // positions      // texture coords
+      -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
+      -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
+      1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left
 
-        -1.0f, 1.0f, 0.0f, 1.0f, // 1 bottom right
-        1.0f, -1.0f, 1.0f, 0.0f, // 2 bottom left
-        1.0f, 1.0f, 1.0f, 1.0f,  // 3 top left
-    };
+      -1.0f, 1.0f,  0.0f, 1.0f, // 1 bottom right
+      1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
+      1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
+  };
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
 
-    glBindVertexArray(VAO);
+  glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+  // position attribute
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  // texture coord attribute
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        (void *)(2 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
-    // Config OpenGL
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // Config OpenGL
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Init Text Renderer
-    tfont = load::ttf("ubuntu.png");
+  // Init Text Renderer
+  tfont = load::ttf("ubuntu.png");
 
-    // Set Up DeltaTime
-    uptime = 0;
-    now = time();
+  // Set Up DeltaTime
+  uptime = 0;
+  now = time();
 }
 
-Artifex::Artifex(std::string name, int w, int h) : Artifex(name, false, w, h)
-{
+Artifex::Artifex(std::string name, int w, int h) : Artifex(name, false, w, h) {}
+
+Artifex::~Artifex() {
+  glDeleteShader(s.id);
+  glDeleteBuffers(1, &VBO);
+  glDeleteVertexArrays(1, &VAO);
 }
 
-Artifex::~Artifex()
-{
-    glDeleteShader(s.id);
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
-}
+bool Artifex::update(vec3 color) {
+  // Update Time
+  past = now;
+  now = time();
+  deltaTime = (now - past) / 1000.0f;
 
-bool Artifex::update(vec3 color)
-{
-    // Update Time
-    past = now;
-    now = time();
-    deltaTime = (now - past) / 1000.0f;
+  uptime += (now - past);
 
-    uptime += (now - past);
-
-    return Window::update(color.r, color.g, color.b);
+  return Window::update(color.r, color.g, color.b);
 }
 
 /*  ----  Basic 2D Rendering  ----  */
 
 /* Draw Circle */
-void Artifex::circle(vec2 center, float radius, float cutradius, vec3 color)
-{
-    apply();
+void Artifex::circle(vec2 center, float radius, float cutradius, vec3 color) {
+  apply();
 
-    s.set("type", 3);
-    s.set("cutradius", cutradius);
-    s.set("color", color);
+  s.set("type", 3);
+  s.set("cutradius", cutradius);
+  s.set("color", color);
 
-    s.set("center", center);
-    s.set("size", vec2(radius, radius));
-    s.set("ratio", ratio());
+  s.set("center", center);
+  s.set("size", vec2(radius, radius));
+  s.set("ratio", ratio());
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+  glBindVertexArray(VAO);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 }
 
 /* Draw Color */
-void Artifex::rect(vec2 center, vec2 size, vec3 color, float scale)
-{
-    apply();
+void Artifex::rect(vec2 center, vec2 size, vec3 color, float scale) {
+  apply();
 
-    s.set("type", 0);
-    s.set("color", color);
+  s.set("type", 0);
+  s.set("color", color);
 
-    s.set("center", center);
-    s.set("size", vec2(size / 2) * scale);
-    s.set("ratio", ratio());
+  s.set("center", center);
+  s.set("size", vec2(size / 2) * scale);
+  s.set("ratio", ratio());
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(VAO);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 /* Draw Texture */
-void Artifex::rect(vec2 center, vec2 size, texture tex, float scale)
-{
-    apply();
+void Artifex::rect(vec2 center, vec2 size, texture tex, float scale) {
+  apply();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tex);
 
-    s.set("type", 1);
+  s.set("type", 1);
 
-    s.set("center", center);
-    s.set("size", size / 2.0f * scale);
-    s.set("ratio", ratio());
+  s.set("center", center);
+  s.set("size", size / 2.0f * scale);
+  s.set("ratio", ratio());
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(VAO);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 /* Draw Animation */
-void Artifex::rect(vec2 center, vec2 size, texture *texs, uint n, uint speed, float scale)
-{
-    rect(center, size, texs[now / speed % n], scale);
+void Artifex::rect(vec2 center, vec2 size, texture *texs, uint n, uint speed,
+                   float scale) {
+  rect(center, size, texs[now / speed % n], scale);
 }
 
 // Render Text
-void Artifex::text(vec2 center, float width, std::string text, vec3 color, float height)
-{
-    apply();
+void Artifex::text(vec2 center, float width, std::string text, vec3 color,
+                   float height) {
+  apply();
 
-    s.set("type", 2);
-    s.set("color", color);
-    s.set("ratio", ratio());
+  s.set("type", 2);
+  s.set("color", color);
+  s.set("ratio", ratio());
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tfont.data);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tfont.data);
 
-    float step = width / text.size();
-    float left = center.x - step * text.size() / 2;
+  float step = width / text.size();
+  float left = center.x - step * text.size() / 2;
 
-    // iterate through all characters
-    for (int i = 0; i < (int)text.size(); i++)
-    {
-        char c = text[i] - tfont.start;
+  // iterate through all characters
+  for (int i = 0; i < (int)text.size(); i++) {
+    char c = text[i] - tfont.start;
 
-        // Set Position
-        s.set("center", vec2(left + i * step, center.y));
-        s.set("size", vec2(step, step * height));
+    // Set Position
+    s.set("center", vec2(left + i * step, center.y));
+    s.set("size", vec2(step, step * height));
 
-        vec2 start = {(c % tfont.width) / (float)tfont.width, (c / tfont.height + 1) / (float)tfont.height};
-        vec2 csize = {1.0f / (float)tfont.width, 1.0f / (float)tfont.height};
+    vec2 start = {(c % tfont.width) / (float)tfont.width,
+                  (c / tfont.height + 1) / (float)tfont.height};
+    vec2 csize = {1.0f / (float)tfont.width, 1.0f / (float)tfont.height};
 
-        tfont.vertices[2] = start.x;
-        tfont.vertices[3] = 1 - start.y + csize.y;
-        tfont.vertices[6] = start.x;
-        tfont.vertices[7] = 1 - start.y;
-        tfont.vertices[10] = start.x + csize.x;
-        tfont.vertices[11] = 1 - start.y;
+    tfont.vertices[2] = start.x;
+    tfont.vertices[3] = 1 - start.y + csize.y;
+    tfont.vertices[6] = start.x;
+    tfont.vertices[7] = 1 - start.y;
+    tfont.vertices[10] = start.x + csize.x;
+    tfont.vertices[11] = 1 - start.y;
 
-        tfont.vertices[14] = start.x;
-        tfont.vertices[15] = 1 - start.y + csize.y;
-        tfont.vertices[18] = start.x + csize.x;
-        tfont.vertices[19] = 1 - start.y;
-        tfont.vertices[22] = start.x + csize.x;
-        tfont.vertices[23] = 1 - start.y + csize.y;
+    tfont.vertices[14] = start.x;
+    tfont.vertices[15] = 1 - start.y + csize.y;
+    tfont.vertices[18] = start.x + csize.x;
+    tfont.vertices[19] = 1 - start.y;
+    tfont.vertices[22] = start.x + csize.x;
+    tfont.vertices[23] = 1 - start.y + csize.y;
 
-        glBindBuffer(GL_ARRAY_BUFFER, tfont.VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(tfont.vertices), tfont.vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, tfont.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tfont.vertices), tfont.vertices,
+                 GL_STATIC_DRAW);
 
-        glBindVertexArray(tfont.VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
+    glBindVertexArray(tfont.VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+  }
 }
 
 /*  ----  User Inputs  ----  */
 
 /* Draw A Button */
-bool Artifex::button(vec2 center, vec2 size, std::string name, texture a, texture b)
-{
-    if (math::collide(cursor, center, size * ratio()))
-    {
-        if (input[name] && key("mouse") == false)
-        {
-            input[name] = false;
-            return true;
-        }
-        input[name] = key("mouse");
+bool Artifex::button(vec2 center, vec2 size, std::string name, texture a,
+                     texture b) {
+  if (math::collide(cursor, center, size * ratio())) {
+    if (input[name] && key("mouse") == false) {
+      input[name] = false;
+      return true;
     }
-    else
-        input[name] = false;
+    input[name] = key("mouse");
+  } else
+    input[name] = false;
 
-    rect(center, size, input[name] ? b : a);
-    return false;
+  rect(center, size, input[name] ? b : a);
+  return false;
 }
 
-bool Artifex::toggle(vec2 center, vec2 size, std::string name, texture a, texture b)
-{
-    if (math::collide(cursor, center, size * ratio()))
-    {
-        if (key("mouse") == true)
-        {
-            if (input[name] > 0)
-                input[name] = 2;
+bool Artifex::toggle(vec2 center, vec2 size, std::string name, texture a,
+                     texture b) {
+  if (math::collide(cursor, center, size * ratio())) {
+    if (key("mouse") == true) {
+      if (input[name] > 0)
+        input[name] = 2;
 
-            if (input[name] <= 0)
-                input[name] = -2;
-        }
-        else
-        {
-            if (input[name] == 2)
-                input[name] = -1;
+      if (input[name] <= 0)
+        input[name] = -2;
+    } else {
+      if (input[name] == 2)
+        input[name] = -1;
 
-            if (input[name] == -2)
-                input[name] = 1;
-        }
+      if (input[name] == -2)
+        input[name] = 1;
     }
-    else
-    {
-        if (input[name] > 0)
-            input[name] = 1;
-        if (input[name] <= 0)
-            input[name] = -1;
-    }
+  } else {
+    if (input[name] > 0)
+      input[name] = 1;
+    if (input[name] <= 0)
+      input[name] = -1;
+  }
 
-    rect(center, size, input[name] > 0 ? b : a);
+  rect(center, size, input[name] > 0 ? b : a);
 
-    return false;
+  return false;
 }
 
-bool Artifex::touch(vec2 center, vec2 size, texture a, texture b)
-{
-    if (key("mouse") && math::collide(cursor, center, size * ratio()))
-    {
-        rect(center, size, b);
-        return true;
-    }
+bool Artifex::touch(vec2 center, vec2 size, texture a, texture b) {
+  if (key("mouse") && math::collide(cursor, center, size * ratio())) {
+    rect(center, size, b);
+    return true;
+  }
 
-    rect(center, size, a);
-    return false;
+  rect(center, size, a);
+  return false;
 }
 
-vec2 Artifex::joystick(vec2 center, std::string name, float radius, float nob_radius, vec3 color, vec3 nob_color)
-{
-    circle(center, radius, 0.9f, color);
+vec2 Artifex::joystick(vec2 center, std::string name, float radius,
+                       float nob_radius, vec3 color, vec3 nob_color) {
+  circle(center, radius, 0.9f, color);
 
-    vec2 pos = center;
+  vec2 pos = center;
 
-    if (key("mouse"))
-    {
-        if (cursor.distance(center) <= radius && input[name] == false)
-            input[name] = true;
+  if (key("mouse")) {
+    if (cursor.distance(center) <= radius && input[name] == false)
+      input[name] = true;
 
-        if (input[name])
-            pos = cursor;
-    }
-    else
-        input[name] = false;
+    if (input[name])
+      pos = cursor;
+  } else
+    input[name] = false;
 
-    // Works - Don't touch it!
-    vec2 direction = (pos - center).normalize() * radius;
-    float distance = math::clamp(pos.distance(center) / radius, -1.0f, 1.0f);
+  // Works - Don't touch it!
+  vec2 direction = (pos - center).normalize() * radius;
+  float distance = math::clamp(pos.distance(center) / radius, -1.0f, 1.0f);
 
-    circle(center + direction * distance * ratio(), nob_radius, 0.0f, nob_color);
+  circle(center + direction * distance * ratio(), nob_radius, 0.0f, nob_color);
 
-    vec2 a = pos - center;
-    a.x = math::map(a.x, -radius, radius, -1, 1);
-    a.y = math::map(a.y, -radius, radius, -1, 1);
+  vec2 a = pos - center;
+  a.x = math::map(a.x, -radius, radius, -1, 1);
+  a.y = math::map(a.y, -radius, radius, -1, 1);
 
-    return math::clamp(a, vec2(-1.0f, -1), vec2(1.0f, 1.0f));
+  return math::clamp(a, vec2(-1.0f, -1), vec2(1.0f, 1.0f));
 }
 
 // Web Loop
 #ifdef __browser
-void emloop()
-{
-    loop();
-}
+void emloop() { loop(); }
 #endif
 
 // Main Function
-int main()
-{
-    // run setup, exit on setup-error
-    if (!setup())
-        LOG::ERROR("Setup Failed!");
+int main() {
+  // run setup, exit on setup-error
+  if (!setup())
+    LOG::ERROR("Setup Failed!");
 
 #ifdef __browser
-    // Run Web Main-Loop
-    emscripten_set_main_loop(emloop, 0, 1);
+  // Run Web Main-Loop
+  emscripten_set_main_loop(emloop, 0, 1);
 #else
-    // Run Local Main-Loop
-    while (loop())
-        ;
+  // Run Local Main-Loop
+  while (loop())
+    ;
 #endif
 
-    // Call optional "cleanup" function
-    if (cleanup)
-        cleanup();
-    return 0;
+  // Call optional "cleanup" function
+  if (cleanup)
+    cleanup();
+  return 0;
 }

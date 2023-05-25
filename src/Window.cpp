@@ -96,28 +96,32 @@ std::map<std::string, int> GLFW_STRING_SCANCODE = {
     {"f12", GLFW_KEY_F12},
 };
 
-Window::Window(std::string name, bool fullscreen, int w, int h) : size{w, h} {
+Window::Window(std::string name, bool fullscreen, int width, int height)
+    : width(width), height(height) {
+
   glfwInit();
 
   window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
   if (window == nullptr) {
-    LOG::ERROR("GLFW", "Failed to Create Window");
+    printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
     glfwTerminate();
-    return isInit = false;
+    exit(-1);
   }
 
+  // Init (Modern) OpenGL
   glfwMakeContextCurrent(window);
 
-  // Init Modern OpenGL
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Load OpenGL
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    LOG::ERROR("GLFW", "Failed to Initialize Renderer (OpenGL)");
-    return isInit = false;
+    printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(-1);
   }
 
   glfwSetWindowUserPointer(window, this);

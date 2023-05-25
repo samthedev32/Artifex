@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(CMAKE_PREFIX_PATH "/usr/lib;/usr/local/lib")
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+#set(CMAKE_PREFIX_PATH "/usr/lib;/usr/local/lib")
 
 find_package(glfw3 REQUIRED)
+link_libraries(glfw)
+include_directories("include")
 
 project(Artifex)
 
@@ -10,9 +13,9 @@ add_library(Artifex
     src/Artifex.cpp
 
     src/Window.cpp
-    )
 
-target_link_libraries(Artifex SHARED glfw)
-target_include_directories(Artifex PUBLIC include)
+    src/glad.c
+    src/stb_image.c
+)
 
 add_subdirectory(hello_world)

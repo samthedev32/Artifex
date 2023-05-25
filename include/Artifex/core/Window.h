@@ -16,7 +16,10 @@
 #warning Targeted OS is not recognized (may not work)
 #endif
 
+#include <GL/glad.h>
+
 #include <GLFW/glfw3.h>
+#include <map>
 #include <set>
 #include <string>
 
