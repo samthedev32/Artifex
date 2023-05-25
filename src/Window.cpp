@@ -1,11 +1,12 @@
 #include <Artifex/core/Window.h>
 
-Window::Window(std::string name, int width, int height)
+Window::Window(std::string name, uint width, uint height)
     : width(width), height(height) {
 
   // Decide if Fullscreened or not
-  if (width < 0 || height < 0)
-    width = 0, height = 0;
+  bool fs = false;
+  if (width == 0 || height == 0)
+    fs = true, width = 1, height = 1;
 
   // Init GLFW
   glfwInit();
@@ -46,7 +47,7 @@ Window::Window(std::string name, int width, int height)
   glfwSetScrollCallback(window, callback_scroll);
 
   // Make Fullscreen
-  fullscreen(width <= 0 || height <= 0);
+  fullscreen(fs);
 }
 
 Window::~Window() {
@@ -57,15 +58,6 @@ Window::~Window() {
 bool Window::update(float r, float g, float b) {
   // Update Window
   glfwSwapBuffers(window);
-
-  // Clear Screen
-  int fb;
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
-  if (fb != 0)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  glClearColor(r, g, b, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
 
   glfwPollEvents();
 
@@ -90,10 +82,11 @@ void Window::fullscreen(bool en) {
     glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0,
                          videoMode->width, videoMode->height, GLFW_DONT_CARE);
 
-  } else
+  } else {
     // Undo Fullscreen
     glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0], small_size[1],
                          GLFW_DONT_CARE);
+  }
 }
 
 void Window::vsync(int interval) { glfwSwapInterval(interval); }

@@ -26,7 +26,7 @@
 // OpenGL Windowing Class
 class Window {
 public:
-  Window(std::string name, int width = -1, int height = -1);
+  Window(std::string name, uint width = 0, uint height = 0);
   ~Window();
 
   bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);

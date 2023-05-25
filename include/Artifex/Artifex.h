@@ -25,13 +25,17 @@ public:
   long uptime;
   float deltaTime;
 
-  shader s;
+  // shader s;
 
   // Constructors & Destructor
 
-  Artifex(std::string name, bool fullscreen = true, int w = 0, int h = 0);
-  Artifex(std::string name, int w, int h);
+  Artifex(std::string name, uint width = 0, uint height = 0);
   ~Artifex();
+
+  bool update();
+
+  void clear(float red = 0.0f, float green = 0.0f, float blue = 0.0f,
+             GLbitfield buffers = GL_COLOR_BUFFER_BIT);
 
   //   bool update(vec3 color = vec3());
 

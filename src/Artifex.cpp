@@ -1,86 +1,98 @@
 #include <Artifex/Artifex.h>
 
-void Artifex::apply() {
-  // Change FrameBuffer
-  int fb;
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
-  if (fb != 0)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+Artifex::Artifex(std::string name, uint width, uint height)
+    : Window(name, width, height) {}
 
-  // Disable 3D Depth Testing
-  glDisable(GL_DEPTH_TEST);
+Artifex::~Artifex() {}
 
-  // Change ViewPort
-  int vp[4];
-  glGetIntegerv(GL_VIEWPORT, vp);
-  if (vp[2] != width || vp[3] != height)
-    glViewport(0, 0, width, height);
+bool Artifex::update() { return Window::update(); }
 
-  // Use Shader
-  s.use();
-  s.set("tex", 0);
+void Artifex::clear(float red, float green, float blue, GLbitfield buffers) {
+  glClearColor(red, green, blue, 1.0f);
+  glClear(buffers);
 }
 
-float Artifex::ratio() { return (float)width / (float)height; }
+// void Artifex::apply() {
+//   // Change FrameBuffer
+//   int fb;
+//   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
+//   if (fb != 0)
+//     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-// Constructors & Destructor
-Artifex::Artifex(std::string name, int width, int height)
-    : Window(name, width, height) {
-  // Init 2D Renderer
-  s = load::gls("2d");
+//   // Disable 3D Depth Testing
+//   glDisable(GL_DEPTH_TEST);
 
-  float vertices[] = {
-      // positions      // texture coords
-      -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
-      -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
-      1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left
+//   // Change ViewPort
+//   int vp[4];
+//   glGetIntegerv(GL_VIEWPORT, vp);
+//   if (vp[2] != width || vp[3] != height)
+//     glViewport(0, 0, width, height);
 
-      -1.0f, 1.0f,  0.0f, 1.0f, // 1 bottom right
-      1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
-      1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
-  };
+//   // Use Shader
+//   s.use();
+//   s.set("tex", 0);
+// }
 
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
+// float Artifex::ratio() { return (float)width / (float)height; }
 
-  glBindVertexArray(VAO);
+// // Constructors & Destructor
+// Artifex::Artifex(std::string name, int width, int height)
+//     : Window(name, width, height) {
+//   // Init 2D Renderer
+//   s = load::gls("2d");
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+//   float vertices[] = {
+//       // positions      // texture coords
+//       -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
+//       -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
+//       1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left
 
-  // position attribute
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  // texture coord attribute
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                        (void *)(2 * sizeof(float)));
-  glEnableVertexAttribArray(1);
+//       -1.0f, 1.0f,  0.0f, 1.0f, // 1 bottom right
+//       1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
+//       1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
+//   };
 
-  // Config OpenGL
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//   glGenVertexArrays(1, &VAO);
+//   glGenBuffers(1, &VBO);
 
-  // Set Up DeltaTime
-  uptime = 0;
-  now = time();
-}
+//   glBindVertexArray(VAO);
 
-Artifex::~Artifex() {
-  glDeleteShader(s.id);
-  glDeleteBuffers(1, &VBO);
-  glDeleteVertexArrays(1, &VAO);
-}
+//   glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-bool Artifex::update(vec3 color) {
-  // Update Time
-  past = now;
-  now = time();
-  deltaTime = (now - past) / 1000.0f;
+//   // position attribute
+//   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void
+//   *)0); glEnableVertexAttribArray(0);
+//   // texture coord attribute
+//   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+//                         (void *)(2 * sizeof(float)));
+//   glEnableVertexAttribArray(1);
 
-  uptime += (now - past);
+//   // Config OpenGL
+//   glEnable(GL_BLEND);
+//   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  return Window::update(color.r, color.g, color.b);
-}
+//   // Set Up DeltaTime
+//   uptime = 0;
+//   now = time();
+// }
+
+// Artifex::~Artifex() {
+//   glDeleteShader(s.id);
+//   glDeleteBuffers(1, &VBO);
+//   glDeleteVertexArrays(1, &VAO);
+// }
+
+// bool Artifex::update(vec3 color) {
+//   // Update Time
+//   past = now;
+//   now = time();
+//   deltaTime = (now - past) / 1000.0f;
+
+//   uptime += (now - past);
+
+//   return Window::update(color.r, color.g, color.b);
+// }
 
 /*  ----  Basic 2D Rendering  ----  */
 
