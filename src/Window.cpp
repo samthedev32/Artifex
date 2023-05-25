@@ -20,7 +20,7 @@ Window::Window(std::string name, uint width, uint height)
   if (window == nullptr) {
     printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
     glfwTerminate();
-    exit(-1);
+    throw "Window Creation Failed";
   }
 
   // Make OpenGL Context
@@ -36,7 +36,7 @@ Window::Window(std::string name, uint width, uint height)
     printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
     glfwDestroyWindow(window);
     glfwTerminate();
-    exit(-1);
+    throw "OpenGL Load Failed";
   }
 
   // Set Window User Pointer to *this*
