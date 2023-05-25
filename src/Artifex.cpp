@@ -29,8 +29,8 @@ vec2 Artifex::ratio() {
 }
 
 // Constructors & Destructor
-Artifex::Artifex(std::string name, bool fullscreen, int w, int h)
-    : Window(name, fullscreen, w, h), Mixer() {
+Artifex::Artifex(std::string name, int width, int height)
+    : Window(name, width, height) {
   // Init 2D Renderer
   s = load::gls("2d");
 
@@ -72,8 +72,6 @@ Artifex::Artifex(std::string name, bool fullscreen, int w, int h)
   uptime = 0;
   now = time();
 }
-
-Artifex::Artifex(std::string name, int w, int h) : Artifex(name, false, w, h) {}
 
 Artifex::~Artifex() {
   glDeleteShader(s.id);
