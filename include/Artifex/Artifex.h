@@ -27,8 +27,6 @@ public:
 
   shader s;
 
-  bool dres = true;
-
   // Constructors & Destructor
 
   Artifex(std::string name, bool fullscreen = true, int w = 0, int h = 0);

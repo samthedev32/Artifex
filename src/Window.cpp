@@ -69,7 +69,7 @@ bool Window::update(float r, float g, float b) {
   return !glfwWindowShouldClose(window);
 }
 
-void Window::exit(bool sure) { glfwWindowShouldClose(window, sure); }
+void Window::exit(bool sure) { glfwSetWindowShouldClose(window, sure); }
 
 bool Window::key(std::string k) {
   return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
