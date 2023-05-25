@@ -8,6 +8,8 @@ Window::Window(std::string name, uint width, uint height)
   if (width == 0 || height == 0)
     fs = true, width = 1, height = 1;
 
+  small_size[0] = width, small_size[1] = height;
+
   // Init GLFW
   glfwInit();
 
