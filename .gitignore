@@ -1,7 +1,3 @@
 build/
 .vscode/
 .cache/
-
-.gitignore
-.github/
-LICENSE
