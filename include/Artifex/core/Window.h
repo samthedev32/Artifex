@@ -32,6 +32,9 @@ public:
   bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);
   void exit(bool sure = true);
 
+  void fullscreen(bool en = true);
+  void vsync(int interval = 1);
+
   bool key(std::string k);
 
 public:
@@ -41,7 +44,7 @@ public:
 
 private:
   GLFWwindow *window = nullptr;
-  GLFWmonitor *monitor = nullptr;
+  int small_size[2];
 
   std::set<int> keyboard;
 

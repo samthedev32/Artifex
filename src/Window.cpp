@@ -3,27 +3,32 @@
 Window::Window(std::string name, int width, int height)
     : width(width), height(height) {
 
+  // Decide if Fullscreened or not
   if (width < 0 || height < 0)
     width = 0, height = 0;
 
+  // Init GLFW
   glfwInit();
 
+  // Create Window
   window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
+  // Exit if Window Creation Failed
   if (window == nullptr) {
     printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
     glfwTerminate();
     exit(-1);
   }
 
-  // Init (Modern) OpenGL
+  // Make OpenGL Context
   glfwMakeContextCurrent(window);
 
+  // Init (Modern) OpenGL
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  // Load OpenGL
+  // Load OpenGL (exit if failed)
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
     glfwDestroyWindow(window);
@@ -31,6 +36,7 @@ Window::Window(std::string name, int width, int height)
     exit(-1);
   }
 
+  // Set Window User Pointer to *this*
   glfwSetWindowUserPointer(window, this);
 
   // Set Callbacks
@@ -39,8 +45,7 @@ Window::Window(std::string name, int width, int height)
   glfwSetCursorPosCallback(window, callback_cursor);
   glfwSetScrollCallback(window, callback_scroll);
 
-  glfwSwapInterval(0);
-
+  // Make Fullscreen
   fullscreen(width <= 0 || height <= 0);
 }
 
@@ -70,6 +75,28 @@ bool Window::update(float r, float g, float b) {
 }
 
 void Window::exit(bool sure) { glfwSetWindowShouldClose(window, sure); }
+
+void Window::fullscreen(bool en) {
+  if (en) {
+    // Save Window Size
+    small_size[0] = width;
+    small_size[1] = height;
+
+    // Get Monitor
+    GLFWmonitor *monitor = glfwGetWindowMonitor(window);
+    const GLFWvidmode *videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    // Make Fullscreen
+    glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0,
+                         videoMode->width, videoMode->height, GLFW_DONT_CARE);
+
+  } else
+    // Undo Fullscreen
+    glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0], small_size[1],
+                         GLFW_DONT_CARE);
+}
+
+void Window::vsync(int interval) { glfwSwapInterval(interval); }
 
 bool Window::key(std::string k) {
   return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
