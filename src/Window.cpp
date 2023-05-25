@@ -1,183 +1,165 @@
 #include <Artifex/core/Window.h>
 
-/* Initalize Window */
-Window::Window(std::string name, bool fullscreen, int w, int h) : size{w, h}
-{
-    // Init Windowing Library
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        fprintf(stderr, "window(%s); failed to initalize: %s\n", name.c_str(), SDL_GetError());
-        exit(-1);
-    }
+std::map<std::string, int> GLFW_STRING_SCANCODE = {
+    // Letters
+    {"a", GLFW_KEY_A},
+    {"b", GLFW_KEY_B},
+    {"c", GLFW_KEY_C},
+    {"d", GLFW_KEY_D},
+    {"e", GLFW_KEY_E},
+    {"f", GLFW_KEY_F},
+    {"g", GLFW_KEY_G},
+    {"h", GLFW_KEY_H},
+    {"i", GLFW_KEY_I},
+    {"j", GLFW_KEY_J},
+    {"k", GLFW_KEY_K},
+    {"l", GLFW_KEY_L},
+    {"m", GLFW_KEY_M},
+    {"n", GLFW_KEY_N},
+    {"o", GLFW_KEY_O},
+    {"p", GLFW_KEY_P},
+    {"q", GLFW_KEY_Q},
+    {"r", GLFW_KEY_R},
+    {"s", GLFW_KEY_S},
+    {"t", GLFW_KEY_T},
+    {"u", GLFW_KEY_U},
+    {"v", GLFW_KEY_V},
+    {"w", GLFW_KEY_W},
+    {"x", GLFW_KEY_X},
+    {"y", GLFW_KEY_Y},
+    {"z", GLFW_KEY_Z},
 
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+    // Numbers
+    {"0", GLFW_KEY_0},
+    {"1", GLFW_KEY_1},
+    {"2", GLFW_KEY_2},
+    {"3", GLFW_KEY_3},
+    {"4", GLFW_KEY_4},
+    {"5", GLFW_KEY_5},
+    {"6", GLFW_KEY_6},
+    {"7", GLFW_KEY_7},
+    {"8", GLFW_KEY_8},
+    {"9", GLFW_KEY_9},
 
-// Add PC Flags (for fullscreen)
-#if defined(__pc)
-    flags |= (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_FOCUS) * fullscreen;
-#endif
+    // Enter
+    {"return", GLFW_KEY_ENTER},
+    {"enter", GLFW_KEY_ENTER},
+    {"\n", GLFW_KEY_ENTER},
 
-    // Create Window
-    window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size[0], size[1], flags);
-    if (window == NULL)
-    {
-        fprintf(stderr, "window(%s); failed to create window: %s\n", name.c_str(), SDL_GetError());
-        exit(-1);
-    }
+    // Escape
+    {"escape", GLFW_KEY_ESCAPE},
+    {"esc", GLFW_KEY_ESCAPE},
 
-    // Init OpenGL
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_MAJOR);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, GL_MINOR);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, GL_PROFILE);
+    // Backspace
+    {"backspace", GLFW_KEY_BACKSPACE},
+    {"\b", GLFW_KEY_BACKSPACE},
 
-    context = SDL_GL_CreateContext(window);
-    if (context == NULL)
-    {
-        fprintf(stderr, "window(%s); failed to create opengl context: %s\n", name.c_str(), SDL_GetError());
-        exit(-1);
-    }
+    // Tab
+    {"tab", GLFW_KEY_TAB},
+    {"\t", GLFW_KEY_TAB},
 
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-    {
-        fprintf(stderr, "window(%s); failed to initalize opengl\n", name.c_str());
-        exit(-1);
-    }
+    // Space
+    {"space", GLFW_KEY_SPACE},
+    {" ", GLFW_KEY_SPACE},
 
-    // Configure Window
-    SDL_GL_SetSwapInterval(SWAP_INTERVAL); //< Set Swap Interval (default: 1 = vsync)
+    // Control Keys
+    {"ctrl", GLFW_KEY_LEFT_CONTROL},
+    {"control", GLFW_KEY_LEFT_CONTROL},
+    {"shift", GLFW_KEY_LEFT_SHIFT},
+    {"alt", GLFW_KEY_LEFT_ALT},
+    {"super", GLFW_KEY_LEFT_SUPER},
 
-    SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT); //< Set Min Window Size (default: 320 * 240)
-    SDL_ShowCursor((SDL_bool)!fullscreen);                   //< Show/Hide Cursor (controlled by fullscreen)
+    {"lctrl", GLFW_KEY_LEFT_CONTROL},
+    {"lshift", GLFW_KEY_LEFT_SHIFT},
+    {"lalt", GLFW_KEY_LEFT_ALT},
+    {"lgui", GLFW_KEY_LEFT_SUPER},
+    {"lsuper", GLFW_KEY_LEFT_SUPER},
 
-    SDL_SetRelativeMouseMode((SDL_bool)fullscreen); //< Set Relative Cursor (controlled by fullscreen)
-    SDL_GetWindowSize(window, &size[0], &size[1]);  //< Get Window Size
-    keyboardState = SDL_GetKeyboardState(NULL);     //< Get Keyboard State
+    {"rctrl", GLFW_KEY_RIGHT_CONTROL},
+    {"rshift", GLFW_KEY_RIGHT_SHIFT},
+    {"ralt", GLFW_KEY_RIGHT_ALT},
+    {"rgui", GLFW_KEY_RIGHT_SUPER},
+    {"rsuper", GLFW_KEY_RIGHT_SUPER},
+
+    // Function Keys
+    {"f1", GLFW_KEY_F1},
+    {"f2", GLFW_KEY_F2},
+    {"f3", GLFW_KEY_F3},
+    {"f4", GLFW_KEY_F4},
+    {"f5", GLFW_KEY_F5},
+    {"f6", GLFW_KEY_F6},
+    {"f7", GLFW_KEY_F7},
+    {"f8", GLFW_KEY_F8},
+    {"f9", GLFW_KEY_F9},
+    {"f10", GLFW_KEY_F10},
+    {"f11", GLFW_KEY_F11},
+    {"f12", GLFW_KEY_F12},
+};
+
+Window::Window(std::string name, bool fullscreen, int w, int h) : size{w, h} {
+  glfwInit();
+
+  window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+
+  if (window == nullptr) {
+    LOG::ERROR("GLFW", "Failed to Create Window");
+    glfwTerminate();
+    return isInit = false;
+  }
+
+  glfwMakeContextCurrent(window);
+
+  // Init Modern OpenGL
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  // Load OpenGL
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    LOG::ERROR("GLFW", "Failed to Initialize Renderer (OpenGL)");
+    return isInit = false;
+  }
+
+  glfwSetWindowUserPointer(window, this);
+
+  // Set Callbacks
+  glfwSetFramebufferSizeCallback(window, callback_resize);
+  glfwSetKeyCallback(window, callback_key);
+  glfwSetCursorPosCallback(window, callback_cursor);
+  glfwSetScrollCallback(window, callback_scroll);
+
+  glfwSwapInterval(0);
+
+  fullscreen(fullscreen_);
 }
 
-/* Destroy Window */
-Window::~Window()
-{
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+Window::~Window() {
+  glfwDestroyWindow(window);
+  glfwTerminate();
 }
 
-/* Update The Window */
-bool Window::update(float r, float g, float b)
-{
-    // Update Window
-    SDL_GL_SwapWindow(window);
+bool Window::update(float r, float g, float b) {
+  // Update Window
+  glfwSwapBuffers(window);
 
-    // Clear Screen
-    int fb;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
-    if (fb != 0)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  // Clear Screen
+  int fb;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
+  if (fb != 0)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+  glClearColor(r, g, b, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
 
-    // Poll Events
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            shouldClose = true;
-            break;
+  glfwPollEvents();
 
-        case SDL_MOUSEBUTTONDOWN:
-            if (event.button.button == SDL_BUTTON_LEFT)
-                mouseState[0] = true;
-            if (event.button.button == SDL_BUTTON_RIGHT)
-                mouseState[1] = true;
-            if (event.button.button == SDL_BUTTON_MIDDLE)
-                mouseState[2] = true;
-            break;
+  glfwGetFramebufferSize(window, &width, &height);
 
-        case SDL_MOUSEBUTTONUP:
-            if (event.button.button == SDL_BUTTON_LEFT)
-                mouseState[0] = false;
-            if (event.button.button == SDL_BUTTON_RIGHT)
-                mouseState[1] = false;
-            if (event.button.button == SDL_BUTTON_MIDDLE)
-                mouseState[2] = false;
-            break;
-
-        case SDL_MOUSEWHEEL:
-            if (event.wheel.y > 0) // scroll up
-            {
-                scroll.y += 1;
-            }
-            else if (event.wheel.y < 0) // scroll down
-            {
-                scroll.y -= 1;
-            }
-
-            if (event.wheel.x > 0) // scroll right
-            {
-                scroll.x += 1;
-            }
-            else if (event.wheel.x < 0) // scroll left
-            {
-                scroll.x -= 1;
-            }
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    // Get Window Size
-    SDL_GetWindowSize(window, &size[0], &size[1]);
-
-    // Get Keyboard State
-    keyboardState = SDL_GetKeyboardState(NULL);
-
-    // Get Cursor Pos
-    int m[2];
-    if (!SDL_GetRelativeMouseMode())
-    {
-        SDL_GetMouseState(&m[0], &m[1]);
-        cursor.x = (m[0] * 2.0f) / (float)size[0] - 1.0f;
-        cursor.y = (m[1] * -2.0f) / (float)size[1] + 1.0f;
-    }
-    else
-    {
-        SDL_GetRelativeMouseState(&m[0], &m[1]);
-        cursor.x = -m[1];
-        cursor.y = m[0];
-    }
-
-    return !shouldClose;
+  return !glfwWindowShouldClose(window);
 }
 
-/* Kill Window */
-void Window::exit(bool sure)
-{
-    shouldClose = sure;
-}
+void Window::exit(bool sure) { glfwWindowShouldClose(window, sure); }
 
-/*  ----  Keyboard & Mouse  ----  */
-
-/* Get Key State */
-bool Window::key(std::string k)
-{
-    // Lowercase Key Name
-    k = string::lowercase(k);
-
-    if (k == "lmouse" || k == "left")
-        return mouseState[0];
-    else if (k == "rmouse" || k == "right")
-        return mouseState[1];
-    else if (k == "mmouse" || k == "middle")
-        return mouseState[2];
-    else if (k == "mouse")
-        return (key("left") || key("right"));
-
-    if (__keycode.count(k) <= 0 || keyboardState == NULL)
-        return false;
-
-    return keyboardState[__keycode[k]];
+bool Window::key(std::string k) {
+  return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
 }
