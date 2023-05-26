@@ -110,7 +110,8 @@ uint Artifex::shader(std::string vertex, std::string fragment,
     return shaders.size();
 }
 
-uint Artifex::texture(uint *data, uint width, uint height, uint nrChannels) {
+uint Artifex::texture(unsigned char *data, uint width, uint height,
+                      uint nrChannels) {
     // Exit if invalid
     if (data == nullptr || width == 0 || height == 0 || nrChannels == 0 ||
         nrChannels > 4) {
