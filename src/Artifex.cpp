@@ -13,7 +13,7 @@ Artifex::~Artifex() {
     textures.clear();
 
     // Free Shaders
-    for (auto id : shaders)
+    for (uint id : shaders)
         glDeleteShader(id);
     shaders.clear();
 }
@@ -29,7 +29,11 @@ uint Artifex::shader(std::string vertex, std::string fragment,
                      std::string geometry) {
     // Exit if no Shader Code
     if (fragment == "" || vertex == "") {
-        printf("ERROR: No Shader Resource\n");
+        printf("ERROR: No Shader Resource (%s)\n",
+               fragment == "" && vertex == ""
+                   ? "neither"
+                   : (vertex == "" ? "vertex" : "fragment"));
+
         return 0;
     }
 
@@ -106,6 +110,7 @@ uint Artifex::shader(std::string vertex, std::string fragment,
         return 0;
     }
 
+    // Add to list + return ID
     shaders.push_back(id);
     return shaders.size();
 }
@@ -157,6 +162,7 @@ uint Artifex::texture(unsigned char *data, uint width, uint height,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    // Add to list + return ID
     textures.push_back(id);
     return textures.size();
 }

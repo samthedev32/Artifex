@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-#set(CMAKE_PREFIX_PATH "/usr/lib;/usr/local/lib")
 
 find_package(glfw3 REQUIRED)
 link_libraries(glfw)
@@ -18,4 +17,4 @@ add_library(Artifex
     src/stb_image.c
 )
 
-add_subdirectory(hello_world)
+add_subdirectory(hello_artifex)
