@@ -12,7 +12,7 @@ It uses [GLFW](www.glfw.org) + [OpenGL](www.opengl.org) for Windowing + Renderin
 - [ ] 2D Rendering
 - [ ] Audio Player
 - [ ] 2D Physics Engine
-- [x] Cross-Platform Support (Windows, Linux, Web)
+- [ ] Cross-Platform Support (Windows, Linux, Web)
 - [ ] Basic UI Elements
 - [ ] Multiple Window Support
 
