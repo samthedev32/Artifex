@@ -18,6 +18,6 @@ It uses [GLFW](www.glfw.org) + [OpenGL](www.opengl.org) for Windowing + Renderin
 
 ## How To Use
 
-I use [Visual Studio Codium](https://vscodium.com/) with the [clangd](https://open-vsx.org/extension/llvm-vs-code-extensions/vscode-clangd), [CMake](https://open-vsx.org/extension/twxs/cmake), [CMake IntelliSense](https://open-vsx.org/extension/KylinIdeTeam/cmake-intellisence) and [CMake Tools](https://open-vsx.org/extension/ms-vscode/cmake-tools) extensions
+I use [Visual Studio Codium](https://vscodium.com/) with the following extensions: [clangd](https://open-vsx.org/extension/llvm-vs-code-extensions/vscode-clangd), [CMake](https://open-vsx.org/extension/twxs/cmake), [CMake IntelliSense](https://open-vsx.org/extension/KylinIdeTeam/cmake-intellisence), [CMake Tools](https://open-vsx.org/extension/ms-vscode/cmake-tools), [Todo Tree](https://open-vsx.org/vscode/item?itemName=Gruntfuggly.todo-tree)
 
 > Coming Soon!
