@@ -6,7 +6,17 @@
 Artifex::Artifex(std::string name, uint width, uint height)
     : Window(name, width, height) {}
 
-Artifex::~Artifex() {}
+Artifex::~Artifex() {
+    // Free Textures
+    if (textures.size() > 0)
+        glDeleteTextures(textures.size(), textures.data());
+    textures.clear();
+
+    // Free Shaders
+    for (auto id : shaders)
+        glDeleteShader(id);
+    shaders.clear();
+}
 
 bool Artifex::update() { return Window::update(); }
 
