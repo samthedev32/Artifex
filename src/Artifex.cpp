@@ -100,6 +100,56 @@ uint Artifex::shader(std::string vertex, std::string fragment,
     return shaders.size();
 }
 
+uint Artifex::texture(uint *data, uint width, uint height, uint nrChannels) {
+    // Exit if invalid
+    if (data == nullptr || width == 0 || height == 0 || nrChannels == 0 ||
+        nrChannels > 4) {
+        printf("ERROR: Invalid Texture\n");
+        return 0;
+    }
+
+    uint id;
+
+    // Generate Empty Texture
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+
+    // Select Color Mode
+    uint mode = GL_RGB;
+    switch (nrChannels) {
+    case 1:
+        mode = GL_RED;
+        break;
+
+    case 2:
+        mode = GL_RG;
+        break;
+
+    default:
+    case 3:
+        mode = GL_RGB;
+        break;
+
+    case 4:
+        mode = GL_RGBA;
+        break;
+    }
+
+    // Create Texture
+    glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode,
+                 GL_UNSIGNED_BYTE, data);
+
+    // Generate MipMap & Set Parameters
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    textures.push_back(id);
+    return textures.size();
+}
+
 // Private
 
 float Artifex::ratio() { return (float)width / (float)height; }
