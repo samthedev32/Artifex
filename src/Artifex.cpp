@@ -8,8 +8,8 @@ Artifex::~Artifex() {}
 bool Artifex::update() { return Window::update(); }
 
 void Artifex::clear(float red, float green, float blue, GLbitfield buffers) {
-  glClearColor(red, green, blue, 1.0f);
-  glClear(buffers);
+    glClearColor(red, green, blue, 1.0f);
+    glClear(buffers);
 }
 
 // void Artifex::apply() {

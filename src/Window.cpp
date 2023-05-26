@@ -3,98 +3,100 @@
 Window::Window(std::string name, uint width, uint height)
     : width(width), height(height) {
 
-  // Decide if Fullscreened or not
-  bool fs = false;
-  if (width == 0 || height == 0)
-    fs = true, width = 1, height = 1;
+    // Decide if Fullscreened or not
+    bool fs = false;
+    if (width == 0 || height == 0)
+        fs = true, width = 1, height = 1;
 
-  small_size[0] = width, small_size[1] = height;
+    small_size[0] = width, small_size[1] = height;
 
-  // Init GLFW
-  glfwInit();
+    // Init GLFW
+    glfwInit();
 
-  // Create Window
-  window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+    // Create Window
+    window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
-  // Exit if Window Creation Failed
-  if (window == nullptr) {
-    printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
-    glfwTerminate();
-    throw "Window Creation Failed";
-  }
+    // Exit if Window Creation Failed
+    if (window == nullptr) {
+        printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
+        glfwTerminate();
+        throw "Window Creation Failed";
+    }
 
-  // Make OpenGL Context
-  glfwMakeContextCurrent(window);
+    // Make OpenGL Context
+    glfwMakeContextCurrent(window);
 
-  // Init (Modern) OpenGL
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // Init (Modern) OpenGL
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  // Load OpenGL (exit if failed)
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    throw "OpenGL Load Failed";
-  }
+    // Load OpenGL (exit if failed)
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        throw "OpenGL Load Failed";
+    }
 
-  // Set Window User Pointer to *this*
-  glfwSetWindowUserPointer(window, this);
+    // Set Window User Pointer to *this*
+    glfwSetWindowUserPointer(window, this);
 
-  // Set Callbacks
-  glfwSetFramebufferSizeCallback(window, callback_resize);
-  glfwSetKeyCallback(window, callback_key);
-  glfwSetCursorPosCallback(window, callback_cursor);
-  glfwSetScrollCallback(window, callback_scroll);
+    // Set Callbacks
+    glfwSetFramebufferSizeCallback(window, callback_resize);
+    glfwSetKeyCallback(window, callback_key);
+    glfwSetCursorPosCallback(window, callback_cursor);
+    glfwSetScrollCallback(window, callback_scroll);
 
-  // Make Fullscreen
-  fullscreen(fs);
+    // Make Fullscreen
+    fullscreen(fs);
 }
 
 Window::~Window() {
-  glfwDestroyWindow(window);
-  glfwTerminate();
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 bool Window::update(float r, float g, float b) {
-  // Update Window
-  glfwSwapBuffers(window);
+    // Update Window
+    glfwSwapBuffers(window);
 
-  glfwPollEvents();
+    glfwPollEvents();
 
-  glfwGetFramebufferSize(window, &width, &height);
+    glfwGetFramebufferSize(window, &width, &height);
 
-  return !glfwWindowShouldClose(window);
+    return !glfwWindowShouldClose(window);
 }
 
 void Window::exit(bool sure) { glfwSetWindowShouldClose(window, sure); }
 
 void Window::fullscreen(bool en) {
-  if (en) {
-    // Save Window Size
-    small_size[0] = width;
-    small_size[1] = height;
+    if (en) {
+        // Save Window Size
+        small_size[0] = width;
+        small_size[1] = height;
 
-    // Get Monitor
-    GLFWmonitor *monitor = glfwGetWindowMonitor(window);
-    const GLFWvidmode *videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        // Get Monitor
+        GLFWmonitor *monitor = glfwGetWindowMonitor(window);
+        const GLFWvidmode *videoMode =
+            glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-    // Make Fullscreen
-    glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0,
-                         videoMode->width, videoMode->height, GLFW_DONT_CARE);
+        // Make Fullscreen
+        glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0,
+                             videoMode->width, videoMode->height,
+                             GLFW_DONT_CARE);
 
-  } else {
-    // Undo Fullscreen
-    glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0], small_size[1],
-                         GLFW_DONT_CARE);
-  }
+    } else {
+        // Undo Fullscreen
+        glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0],
+                             small_size[1], GLFW_DONT_CARE);
+    }
 }
 
 void Window::vsync(int interval) { glfwSwapInterval(interval); }
 
 bool Window::key(std::string k) {
-  return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
+    return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
 }
 
 std::map<std::string, int> GLFW_STRING_SCANCODE = {
@@ -185,31 +187,31 @@ std::map<std::string, int> GLFW_STRING_SCANCODE = {
 };
 
 void Window::callback_resize(GLFWwindow *window, int w, int h) {
-  Window *self = (Window *)glfwGetWindowUserPointer(window);
-  self->width = w;
-  self->height = h;
+    Window *self = (Window *)glfwGetWindowUserPointer(window);
+    self->width = w;
+    self->height = h;
 }
 
 void Window::callback_key(GLFWwindow *window, int key, int scancode, int action,
                           int mods) {
-  Window *self = (Window *)glfwGetWindowUserPointer(window);
+    Window *self = (Window *)glfwGetWindowUserPointer(window);
 
-  if (action == GLFW_PRESS)
-    self->keyboard.insert(scancode);
-  else
-    self->keyboard.erase(scancode);
+    if (action == GLFW_PRESS)
+        self->keyboard.insert(scancode);
+    else
+        self->keyboard.erase(scancode);
 }
 
 void Window::callback_cursor(GLFWwindow *window, double x, double y) {
-  Window *self = (Window *)glfwGetWindowUserPointer(window);
+    Window *self = (Window *)glfwGetWindowUserPointer(window);
 
-  self->cursor[0] = (x * 2.0f) / (double)self->width - 1.0f;
-  self->cursor[1] = (y * -2.0f) / (double)self->height + 1.0f;
+    self->cursor[0] = (x * 2.0f) / (double)self->width - 1.0f;
+    self->cursor[1] = (y * -2.0f) / (double)self->height + 1.0f;
 }
 
 void Window::callback_scroll(GLFWwindow *window, double x, double y) {
-  Window *self = (Window *)glfwGetWindowUserPointer(window);
+    Window *self = (Window *)glfwGetWindowUserPointer(window);
 
-  self->scroll[0] = x;
-  self->scroll[1] = y;
+    self->scroll[0] = x;
+    self->scroll[1] = y;
 }
