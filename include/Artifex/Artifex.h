@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Artifex/core/Window.h>
+
+#include <vector>
 // #include <Artifex/core/mixer.h>
 
 // Artifex - A Light-Weight, Cross-Platform 2D Game Engine
@@ -14,6 +16,13 @@ class Artifex : public Window {
     void clear(float red = 0.0f, float green = 0.0f, float blue = 0.0f,
                GLbitfield buffers = GL_COLOR_BUFFER_BIT);
 
+    // Resource Loading
+
+    uint shader(std::string vertex, std::string fragment,
+                std::string geometry = "");
+
+    uint texture(uint *data, uint width, uint height);
+
     // TODO: Resource Managament, Rendering
 
   public:
@@ -26,6 +35,8 @@ class Artifex : public Window {
     uint VAO, VBO;
 
     std::map<std::string, int> input;
+
+    std::vector<uint> shaders;
 
   private:
     float ratio();
