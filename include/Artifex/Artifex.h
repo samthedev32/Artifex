@@ -21,7 +21,7 @@ class Artifex : public Window {
     uint shader(std::string vertex, std::string fragment,
                 std::string geometry = "");
 
-    uint texture(uint *data, uint width, uint height, uint nrChannels);
+    uint texture(unsigned char *data, uint width, uint height, uint nrChannels);
 
     // TODO: Resource Managament, Rendering
 
