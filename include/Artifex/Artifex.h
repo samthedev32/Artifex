@@ -4,31 +4,8 @@
 // #include <Artifex/core/mixer.h>
 
 // Artifex - A Light-Weight, Cross-Platform 2D Game Engine
-class Artifex : public Window //, public Mixer
-{
-private:
-  long past, now; //< The Previous Update's Time
-
-  uint VAO, VBO; //< The Rendering Vertex-Array-Object and Vertex-Buffer-Object
-  // font tfont;
-
-  std::map<std::string, int>
-      input; //< Temporary Variables for Buttons and Interactables
-
-  // Apply 2D Renderer
-  void apply();
-
-  // Get Screen Ratio Multiplyer
-  float ratio();
-
+class Artifex : public Window {
 public:
-  long uptime;
-  float deltaTime;
-
-  // shader s;
-
-  // Constructors & Destructor
-
   Artifex(std::string name, uint width = 0, uint height = 0);
   ~Artifex();
 
@@ -37,6 +14,24 @@ public:
   void clear(float red = 0.0f, float green = 0.0f, float blue = 0.0f,
              GLbitfield buffers = GL_COLOR_BUFFER_BIT);
 
+  // TODO: Resource Managament, Rendering
+
+public:
+  long uptime;
+  float deltaTime;
+
+private:
+  long past, now;
+
+  uint VAO, VBO;
+
+  std::map<std::string, int> input;
+
+  // Apply 2D Renderer
+  void apply();
+
+  // Get Screen Ratio Multiplyer
+  float ratio();
   //   bool update(vec3 color = vec3());
 
   //   // Basic 2D Rendering
