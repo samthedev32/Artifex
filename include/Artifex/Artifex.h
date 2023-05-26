@@ -17,6 +17,7 @@ class Artifex : public Window {
                GLbitfield buffers = GL_COLOR_BUFFER_BIT);
 
     // Resource Loading
+
     uint shader(std::string vertex, std::string fragment,
                 std::string geometry = "");
 
