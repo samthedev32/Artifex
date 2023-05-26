@@ -4,9 +4,8 @@ Window::Window(std::string name, uint width, uint height)
     : width(width), height(height) {
 
     // Decide if Fullscreened or not
-    bool fs = false;
     if (width == 0 || height == 0)
-        fs = true, width = 1, height = 1;
+        width = 1, height = 1;
 
     small_size[0] = width, small_size[1] = height;
 
@@ -47,9 +46,6 @@ Window::Window(std::string name, uint width, uint height)
     glfwSetKeyCallback(window, callback_key);
     glfwSetCursorPosCallback(window, callback_cursor);
     glfwSetScrollCallback(window, callback_scroll);
-
-    // Make Fullscreen
-    fullscreen(fs);
 }
 
 Window::~Window() {
