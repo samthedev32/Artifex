@@ -23,6 +23,8 @@ class Artifex : public Window {
 
     uint texture(unsigned char *data, uint width, uint height, uint nrChannels);
 
+    uint mesh(std::vector<float> &vertices, std::vector<float> &indices);
+
     // TODO: Resource Managament, Rendering
 
   public:
@@ -38,6 +40,7 @@ class Artifex : public Window {
 
     std::vector<uint> shaders;
     std::vector<uint> textures;
+    std::vector<std::tuple<uint, uint, uint>> meshes;
 
   private:
     float ratio();

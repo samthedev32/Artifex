@@ -13,6 +13,8 @@ add_library(Artifex
 
     src/Window.cpp
 
+    src/load.cpp
+
     src/glad.c
     src/stb_image.c
 )
