@@ -31,168 +31,55 @@ Mesh mesh(std::string path);
 // Load In Resources
 namespace load {
 
-/* Load Shader (.VS / .FS) */
-Shader shader(std::string path, std::string vertex = "",
-              std::string fragment = "") {
-    Shader out;
-
-    // TODO: Geometry Shader Support
-
-    if (path != "" && hashing && loaded_shader.count(path) > 0)
-        // Already Hashed
-        out = loaded_shader[path];
-    else {
-        std::string vs_raw, fs_raw;
-        const char *vc, *fc;
-
-        if ((path == "") && (vertex == "" || fragment == "")) {
-            LOG::WARNING("No Shader Sources: " + path);
-            return out;
-        }
-
-        // Load From File
-        if (path != "") {
-            // Open Files
-            std::ifstream vs_f(PATH_SHADER + path + ".vs");
-            std::ifstream fs_f(PATH_SHADER + path + ".fs");
-
-            if (!vs_f.is_open() || !fs_f.is_open()) {
-                LOG::WARNING("Can't Open Shader File(s): " + path);
-                return out;
-            }
-
-            // Copy Files
-            std::string line;
-            while (getline(vs_f, line))
-                vs_raw += line + "\n";
-            while (getline(fs_f, line))
-                fs_raw += line + "\n";
-
-            vs_f.close();
-            fs_f.close();
-
-            vc = vs_raw.c_str();
-            fc = fs_raw.c_str();
-        } else {
-            vc = vertex.c_str();
-            fc = fragment.c_str();
-        }
-
-        // Compile & Load Shader
-        uint vs, fs;
-
-        int success;
-        char infoLog[1024];
-
-        // ---- Compile Vertex Shader
-        vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, &vc, NULL);
-        glCompileShader(vs);
-
-        // Check if compilation was successfull
-        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(vs, 1024, NULL, infoLog);
-
-            LOG::WARNING("Can't Compile Vertex Shader: " + path + "\n" +
-                         std::string(infoLog));
-
-            return out;
-        }
-
-        // ---- Compile Fragment Shader
-        fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, &fc, NULL);
-        glCompileShader(fs);
-
-        // Check if compilation was successful
-        glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(fs, 1024, NULL, infoLog);
-
-            LOG::WARNING("Can't Compile Fragment Shader: " + path + "\n" +
-                         std::string(infoLog));
-
-            glDeleteShader(vs);
-            return out;
-        }
-
-        // ---- Create Shader Program
-        out.id = glCreateProgram();
-        glAttachShader(out.id, vs);
-        glAttachShader(out.id, fs);
-
-        glLinkProgram(out.id);
-
-        // Delete unnecessary shaders
-        glDeleteShader(vs);
-        glDeleteShader(fs);
-
-        // Check if linking was successful
-        glGetProgramiv(out.id, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(out.id, 1024, NULL, infoLog);
-
-            LOG::WARNING("Can't Link Shaders: " + path + "\n" +
-                         std::string(infoLog));
-            return out;
-        }
-
-        loaded_shader[path] = out;
-        LOG::DEBUG("Loaded Shader: " + path);
-    }
-
-    return out;
-}
-
 /* Load Font (.TTF) */
-font ttf(std::string path, int width = 16, int height = 16, int start = 32) {
-    font out;
+// font ttf(std::string path, int width = 16, int height = 16, int start = 32) {
+//     font out;
 
-    if (hashing && loaded_font.count(path) > 0)
-        // Already Hashed
-        out = loaded_font[path];
-    else {
-        // Load Data (texture)
-        std::string old = PATH_TEXTURE;
-        PATH_TEXTURE = PATH_FONT;
-        out.data = image(path);
-        PATH_TEXTURE = old;
+//     if (hashing && loaded_font.count(path) > 0)
+//         // Already Hashed
+//         out = loaded_font[path];
+//     else {
+//         // Load Data (texture)
+//         std::string old = PATH_TEXTURE;
+//         PATH_TEXTURE = PATH_FONT;
+//         out.data = image(path);
+//         PATH_TEXTURE = old;
 
-        // Load OpenGL
-        glGenVertexArrays(1, &out.VAO);
-        glGenBuffers(1, &out.VBO);
-        glGenBuffers(1, &out.EBO);
+//         // Load OpenGL
+//         glGenVertexArrays(1, &out.VAO);
+//         glGenBuffers(1, &out.VBO);
+//         glGenBuffers(1, &out.EBO);
 
-        glBindVertexArray(out.VAO);
+//         glBindVertexArray(out.VAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, out.VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(out.vertices), out.vertices,
-                     GL_STATIC_DRAW);
+//         glBindBuffer(GL_ARRAY_BUFFER, out.VBO);
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(out.vertices), out.vertices,
+//                      GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, out.EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(out.indices), out.indices,
-                     GL_STATIC_DRAW);
+//         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, out.EBO);
+//         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(out.indices),
+//         out.indices,
+//                      GL_STATIC_DRAW);
 
-        // position attribute
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                              (void *)0);
-        glEnableVertexAttribArray(0);
-        // texture coord attribute
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                              (void *)(2 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+//         // position attribute
+//         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+//                               (void *)0);
+//         glEnableVertexAttribArray(0);
+//         // texture coord attribute
+//         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+//                               (void *)(2 * sizeof(float)));
+//         glEnableVertexAttribArray(1);
 
-        out.width = width;
-        out.height = height;
-        out.start = start;
+//         out.width = width;
+//         out.height = height;
+//         out.start = start;
 
-        loaded_font[path] = out;
-        LOG::DEBUG("Loaded Font: " + path);
-    }
+//         loaded_font[path] = out;
+//         LOG::DEBUG("Loaded Font: " + path);
+//     }
 
-    return out;
-}
+//     return out;
+// }
 
 // Load Material Library (.mtl)
 std::map<std::string, Material> material(std::string path) {
