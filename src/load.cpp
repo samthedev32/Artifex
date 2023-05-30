@@ -151,7 +151,6 @@ Texture texture(std::string path) {
     uint mode;
     switch (nrChannels) {
     default:
-    case 0:
     case 3:
         mode = GL_RGB;
         break;
@@ -197,11 +196,31 @@ Material material(std::string path) {
 
     std::string line;
     while (getline(file, line)) {
-        char op[32];
+        char op[8];
 
-        sscanf(line.c_str(), "%s", op);
+        sscanf(line.c_str(), "%7s", op);
 
-        switch (op[0]) {}
+        if (!strcmp(op, "newmtl")) {
+            // New Material
+        } else if (!strcmp(op, "Ka")) {
+            // Ambient Color
+        } else if (!strcmp(op, "Kd")) {
+            // Diffuse Color
+        } else if (!strcmp(op, "Ks")) {
+            // Specular Color
+        } else if (!strcmp(op, "Ns")) {
+            // Specular Exponent
+        } else if (!strcmp(op, "Ni")) {
+            // Optical Density
+        } else if (!strcmp(op, "d")) {
+            // Density - Transparencity
+        } else if (!strcmp(op, "Tr")) {
+            // Transparencity
+        } else if (!strcmp(op, "Tf")) {
+            // Transmission Filter
+        } else if (!strcmp(op, "illum")) {
+            // Illumination Mode
+        }
     }
 
     return out;
@@ -218,20 +237,32 @@ Mesh mesh(std::string path) {
 
     std::string line;
     while (getline(file, line)) {
-        char c[9];
-        sscanf(line.c_str(), "%8s", (char *)&c);
+        char op[8];
 
-        std::string index(c);
+        sscanf(line.c_str(), "%7s", op);
 
-        switch (c[0]) {
-        default:
-        case '#':
-            // Comment
-            break;
-
-        case 'v': {
-            int x, y, z, w;
-        } break;
+        if (!strcmp(op, "v")) {
+            // Vertex (Position)
+            float x, y, z, w = 1.0f;
+            sscanf(line.c_str(), "%*s %f %f %f %f", &x, &y, &z, &w);
+        } else if (!strcmp(op, "vt")) {
+            // Vertex Texture
+            float u, v = 0.0f, w = 0.0f;
+            sscanf(line.c_str(), "%*s %f %f %f", &u, &v, &w);
+        } else if (!strcmp(op, "vn")) {
+            // Vertex Normal
+            float x, y, z;
+            sscanf(line.c_str(), "%*s %f %f %f", &x, &y, &z);
+        } else if (!strcmp(op, "vp")) {
+            // Parameter Space Vertices
+            float u, v = 0.0f, w = 0.0f;
+            sscanf(line.c_str(), "%*s %f %f %f", &u, &v, &w);
+        } else if (!strcmp(op, "f")) {
+            // Face
+            // TODO
+        } else if (!strcmp(op, "l")) {
+            // Line Element
+            // TODO
         }
     }
 
