@@ -1,6 +1,7 @@
 #include <GL/load.h>
 
 #include <GL/glad.h>
+#include <cstring>
 #include <fstream>
 #include <random>
 
@@ -15,23 +16,10 @@ bool checkShader(Shader s, std::string err, uint type = GL_COMPILE_STATUS) {
     glGetShaderiv(s, type, &success);
     if (!success) {
         glGetShaderInfoLog(s, 1024, NULL, infoLog);
-        printf("%s: \n%s", err.c_str(), infoLog);
+        printf("%s: \n%s\n", err.c_str(), infoLog);
     }
 
     return success;
-}
-
-std::string split(std::string source, uint part) {
-    std::string out;
-    uint c = 0;
-    for (int i = 0; i < source.size(); i++) {
-        if (c < part) {
-            if (source[i] == ' ' || source[i] == '\t' || source[i] == '\n')
-                c++;
-        } else {
-            // TODO: Fix String Splitting
-        }
-    }
 }
 
 // Load Functions
@@ -45,47 +33,37 @@ Shader shader(std::string path) {
         return out;
     }
 
-    std::string vertex, geometry, fragment, compute, unknown;
+    std::string vertex, geometry, fragment;
 
     std::string line;
     uint shader_type = 0;
     while (getline(file, line)) {
-        if (line == "#vertex") {
+        char buf[10];
+        sscanf(line.c_str(), "%9s", buf);
+
+        if (!strcmp(buf, "#vertex"))
             shader_type = 1;
-        } else if (line == "#geometry") {
+        else if (!strcmp(buf, "#geometry"))
             shader_type = 2;
-        } else if (line == "#fragment") {
+        else if (!strcmp(buf, "#fragment"))
             shader_type = 3;
-        } else if (line == "#compute") {
-            shader_type = 4;
-        } else {
+        else
             switch (shader_type) {
             case 1:
-                // Vertex Shader
                 vertex += line + "\n";
                 break;
 
             case 2:
-                // Geometry Shader
                 geometry += line + "\n";
                 break;
 
             case 3:
-                // Fragment Shader
                 fragment += line + "\n";
                 break;
 
-            case 4:
-                // Compute Shader
-                compute += line + "\n";
-                break;
-
             default:
-                // Unknown
-                unknown += line + "\n";
                 break;
             }
-        }
     }
 
     // Get RAW Codes
@@ -93,36 +71,52 @@ Shader shader(std::string path) {
     const char *geo = geometry.c_str();
     const char *frag = fragment.c_str();
 
-    bool hasVertex, hasGeometry, hasFragment;
+    const uint minSize = 16;
+
+    bool hasVertex = vertex.size() > minSize;
+    bool hasGeometry = geometry.size() > minSize;
+    bool hasFragment = fragment.size() > minSize;
 
     // Compile & Link Shaders
     uint vs, gs, fs;
 
     // ---- Compile Vertex Shader
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vert, NULL);
-    glCompileShader(vs);
+    if (hasVertex) {
+        vs = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vs, 1, &vert, NULL);
+        glCompileShader(vs);
 
-    checkShader(vs, "Vertex Shader Compilation Failed");
+        hasVertex = checkShader(vs, "Vertex Shader Compilation Failed");
+    }
 
     // ---- Compile Geometry Shader
-    gs = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderSource(gs, 1, &geo, NULL);
-    glCompileShader(gs);
+    if (hasGeometry) {
+        gs = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(gs, 1, &geo, NULL);
+        glCompileShader(gs);
 
-    checkShader(vs, "Geometry Shader Compilation Failed");
+        hasGeometry = checkShader(gs, "Geometry Shader Compilation Failed");
+    }
 
     // ---- Compile Fragment Shader
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &frag, NULL);
-    glCompileShader(fs);
+    if (hasFragment) {
+        fs = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fs, 1, &frag, NULL);
+        glCompileShader(fs);
 
-    checkShader(vs, "Fragment Shader Compilation Failed");
+        hasFragment = checkShader(fs, "Fragment Shader Compilation Failed");
+    }
+
+    if (!hasVertex || !hasFragment) {
+        printf("Not enough Shaders\n");
+        return out;
+    }
 
     // ---- Link Shader Programs
     out = glCreateProgram();
     glAttachShader(out, vs);
-    glAttachShader(out, gs);
+    if (hasGeometry)
+        glAttachShader(out, gs);
     glAttachShader(out, fs);
 
     glLinkProgram(out);
@@ -131,7 +125,8 @@ Shader shader(std::string path) {
 
     // Delete unnecessary shaders
     glDeleteShader(vs);
-    glDeleteShader(gs);
+    if (hasGeometry)
+        glDeleteShader(gs);
     glDeleteShader(fs);
 
     return out;
@@ -201,13 +196,46 @@ Material material(std::string path) {
     }
 
     std::string line;
-    uint shader_type = 0;
     while (getline(file, line)) {
+        char op[32];
+
+        sscanf(line.c_str(), "%s", op);
+
+        switch (op[0]) {}
     }
+
+    return out;
 }
 
 Mesh mesh(std::string path) {
-    // TODO
+    Mesh out;
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        printf("No Mesh File\n");
+        return out;
+    }
+
+    std::string line;
+    while (getline(file, line)) {
+        char c[9];
+        sscanf(line.c_str(), "%8s", (char *)&c);
+
+        std::string index(c);
+
+        switch (c[0]) {
+        default:
+        case '#':
+            // Comment
+            break;
+
+        case 'v': {
+            int x, y, z, w;
+        } break;
+        }
+    }
+
+    return out;
 }
 
 } // namespace GL::LOAD
