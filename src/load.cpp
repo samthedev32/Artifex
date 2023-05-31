@@ -22,6 +22,16 @@ bool checkShader(Shader s, std::string err, uint type = GL_COMPILE_STATUS) {
     return success;
 }
 
+uint count(char *s, char d) {
+    uint c = 0;
+    while (*s) {
+        if (*s == d)
+            c++;
+        s++;
+    }
+    return c;
+}
+
 // Load Functions
 
 Shader shader(std::string path) {
@@ -237,31 +247,41 @@ Mesh mesh(std::string path) {
 
     std::string line;
     while (getline(file, line)) {
-        char op[8];
+        char index[8];
+        char data[129];
 
-        sscanf(line.c_str(), "%7s", op);
+        sscanf(line.c_str(), "%7s %128s", index, data);
 
-        if (!strcmp(op, "v")) {
-            // Vertex (Position)
+        if (!strcmp(index, "v")) {
+            // Vertex (x, y, z, [w])
             float x, y, z, w = 1.0f;
-            sscanf(line.c_str(), "%*s %f %f %f %f", &x, &y, &z, &w);
-        } else if (!strcmp(op, "vt")) {
-            // Vertex Texture
+            sscanf(data, "%f %f %f %f", &x, &y, &z, &w);
+        } else if (!strcmp(index, "vt")) {
+            // Vertex Texture (u, v, [w])
             float u, v = 0.0f, w = 0.0f;
-            sscanf(line.c_str(), "%*s %f %f %f", &u, &v, &w);
-        } else if (!strcmp(op, "vn")) {
-            // Vertex Normal
+            sscanf(data, "%f %f %f", &u, &v, &w);
+        } else if (!strcmp(index, "vn")) {
+            // Vertex Normal (x, y, z)
             float x, y, z;
-            sscanf(line.c_str(), "%*s %f %f %f", &x, &y, &z);
-        } else if (!strcmp(op, "vp")) {
-            // Parameter Space Vertices
+            sscanf(data, "%f %f %f", &x, &y, &z);
+        } else if (!strcmp(index, "vp")) {
+            // Parameter Space Vertices (u, [v, w])
             float u, v = 0.0f, w = 0.0f;
-            sscanf(line.c_str(), "%*s %f %f %f", &u, &v, &w);
-        } else if (!strcmp(op, "f")) {
-            // Face
-            // TODO
-        } else if (!strcmp(op, "l")) {
-            // Line Element
+            sscanf(data, "%f %f %f", &u, &v, &w);
+        } else if (!strcmp(index, "f")) {
+            // Face (v[/vt/vn] v[/vt/vn] v[/vt/vn] ...)
+            float v[3], t[3], n[3];
+            if (sscanf(data, "%f/%f/%f %f/%f/%f %f/%f/%f", &v[0], &t[0], &n[0],
+                       &v[1], &t[1], &n[1], &v[2], &t[2], &n[2]) != 9)
+                if (sscanf(data, "%f//%f %f//%f %f//%f", &v[0], &n[0], &v[1],
+                           &n[1], &v[2], &n[2]) != 6)
+                    if (sscanf(data, "%f/%f %f/%f %f/%f", &v[0], &t[0], &v[1],
+                               &t[1], &v[2], &t[2]) != 6)
+                        if (sscanf(data, "%f %f %f", &v[0], &v[1], &v[2]) != 3)
+                            printf("Failed to read Face Line\n");
+
+        } else if (!strcmp(index, "l")) {
+            // Line Element (v1 v2 v3 ...)
             // TODO
         }
     }
