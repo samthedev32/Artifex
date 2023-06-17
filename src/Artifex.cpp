@@ -1,5 +1,10 @@
 #include <Artifex/Artifex.h>
+#include <GL/stb_image.h>
+
+#include <stdio.h>
+#include <string.h>
 #include <string>
+#include <time.h>
 
 // Public
 
@@ -8,42 +13,162 @@ Artifex::Artifex(std::string name, uint width, uint height)
 
 Artifex::~Artifex() {
     // Free Textures
-    if (textures.size() > 0)
-        glDeleteTextures(textures.size(), textures.data());
-    textures.clear();
+    if (texture.size() > 0)
+        glDeleteTextures(texture.size(), texture.data());
+    texture.clear();
 
     // Free Shaders
-    for (uint id : shaders)
+    for (uint id : shader)
         glDeleteShader(id);
-    shaders.clear();
+    shader.clear();
+
+    // Delete Buffers
+    GLuint buffers[] = {VAO, VBO};
+    glDeleteBuffers(2, buffers);
 }
 
-bool Artifex::update() { return Window::update(); }
+bool Artifex::update(float r, float g, float b) {
+    // Update Screen
+    bool running = Window::update();
 
-void Artifex::clear(float red, float green, float blue, GLbitfield buffers) {
-    glClearColor(red, green, blue, 1.0f);
-    glClear(buffers);
+    // Clear Screen
+    glClearColor(r, g, b, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Timing
+    past = now;
+    now = time();
+    deltaTime = now - past;
+
+    return running;
 }
 
-uint Artifex::shader(std::string vertex, std::string fragment,
-                     std::string geometry) {
+float Artifex::time() {
+    struct timespec res;
+    clock_gettime(CLOCK_MONOTONIC, &res);
+    return (1000.0f * res.tv_sec + (double)res.tv_nsec / 1e6) / 1000.0f;
+}
+
+// ---- Resource Loading
+
+bool stb_is_image_supported(const char *ext) {
+    static const char *supported[] = {
+        ".png", ".jpg", ".jpeg", ".bmp", ".gif", // TODO: Add more if needed
+    };
+
+    if (ext != NULL)
+        // Check if the extension is in the list of supported extensions
+        for (size_t i = 0; i < sizeof(supported) / sizeof(supported[0]); ++i)
+            if (!strcmp(ext, supported[i]))
+                return true;
+
+    return false;
+}
+
+uint16_t Artifex::load(const char *path, uint8_t type) {
+    // Determine File Type
+    if (type == AX_TYPE_AUTO) {
+        const char *ext = strrchr(path, '.');
+
+        if (!strcmp(ext, ".glsl"))
+            type = AX_TYPE_SHADER;
+        else if (stb_is_image_supported(ext))
+            type = AX_TYPE_TEXTURE;
+    }
+
+    uint16_t id = 0;
+
+    switch (type) {
+        // Failed to determine File Type
+    default: {
+        id = 0;
+    } break;
+
+        // Shader
+    case AX_TYPE_SHADER: {
+        FILE *f = fopen(path, "r");
+
+        if (f) {
+            uint8_t current = 0;
+            std::string vertex, fragment, geometry;
+
+            char line[256];
+            while (fgets(line, sizeof(line), f)) {
+                char index[10], parameter[10];
+                sscanf(line, "%9s %9s", index, parameter);
+
+                if (!strcmp(index, "#shader")) {
+                    if (!strcmp(parameter, "vertex"))
+                        current = 1;
+                    else if (!strcmp(parameter, "fragment"))
+                        current = 2;
+                    else if (!strcmp(parameter, "geometry"))
+                        current = 3;
+                    else
+                        fprintf(stderr, "Invalid Shader Parameter: %s\n",
+                                parameter);
+                } else {
+                    switch (current) {
+                    default:
+                        break;
+
+                    case 1:
+                        vertex += line;
+                        break;
+
+                    case 2:
+                        fragment += line;
+                        break;
+
+                    case 3:
+                        geometry += line;
+                        break;
+                    }
+                }
+            }
+
+            fclose(f);
+
+            id =
+                load_shader(vertex.c_str(), fragment.c_str(), geometry.c_str());
+        } else
+            fprintf(stderr, "Failed to open Shader File: %s\n", path);
+    } break;
+
+        // Image
+    case AX_TYPE_TEXTURE: {
+        int width, height, channels;
+        unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
+
+        if (data)
+            id = load_texture(data, width, height, channels);
+        else
+            fprintf(stderr, "Failed to load Image: %s\n", path);
+    } break;
+    }
+
+    return id;
+}
+
+uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
+                              const char *geometry) {
     // Exit if no Shader Code
-    if (fragment == "" || vertex == "") {
-        printf("ERROR: No Shader Resource (%s)\n",
-               fragment == "" && vertex == ""
-                   ? "neither"
-                   : (vertex == "" ? "vertex" : "fragment"));
-
+    const size_t minSize = 8;
+    if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
+        fprintf(stderr, "No Shader Resource(s)\n");
         return 0;
     }
 
     // Get Raw Codes
-    const char *vert_s = vertex.c_str();
-    const char *frag_s = fragment.c_str();
-    const char *geo_s = geometry == "" ? nullptr : geometry.c_str();
+    const char *vert_s = vertex;
+    const char *frag_s = fragment;
+    const char *geo_s = NULL;
 
-    uint vert, frag, geo, id;
-    bool isGeo = geo_s != nullptr;
+    if (strlen(geometry) >= minSize)
+        geo_s = geometry;
+
+    GLuint vert, frag, geo, id;
+    bool isGeo = geo_s != NULL;
 
     int success;
     char infoLog[1024];
@@ -56,7 +181,7 @@ uint Artifex::shader(std::string vertex, std::string fragment,
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vert, 1024, NULL, infoLog);
-        printf("ERROR: Failed to compile Vertex Shader:\n%s", infoLog);
+        fprintf(stderr, "Failed to compile Vertex Shader:\n%s", infoLog);
         return 0;
     }
 
@@ -69,7 +194,7 @@ uint Artifex::shader(std::string vertex, std::string fragment,
     if (!success) {
         glGetShaderInfoLog(frag, 1024, NULL, infoLog);
         glDeleteShader(vert);
-        printf("ERROR: Failed to compile Fragment Shader:\n%s", infoLog);
+        fprintf(stderr, "Failed to compile Fragment Shader:\n%s", infoLog);
         return 0;
     }
 
@@ -82,7 +207,7 @@ uint Artifex::shader(std::string vertex, std::string fragment,
         glGetShaderiv(geo, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(geo, 1024, NULL, infoLog);
-            printf("ERROR: Failed to compile Geometry Shader:\n%s", infoLog);
+            fprintf(stderr, "Failed to compile Geometry Shader:\n%s", infoLog);
             isGeo = false;
         }
     }
@@ -106,32 +231,34 @@ uint Artifex::shader(std::string vertex, std::string fragment,
     glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(id, 1024, NULL, infoLog);
-        printf("ERROR: Failed to link Shaders:\n%s", infoLog);
+        fprintf(stderr, "Failed to link Shaders:\n%s", infoLog);
         return 0;
     }
+
+    fprintf(stdout, "Loaded Shader\n");
 
     // Add to list + return ID
-    shaders.push_back(id);
-    return shaders.size();
+    shader.push_back(id);
+    return shader.size();
 }
 
-uint Artifex::texture(unsigned char *data, uint width, uint height,
-                      uint nrChannels) {
+uint16_t Artifex::load_texture(unsigned char *data, int width, int height,
+                               int nrChannels) {
     // Exit if invalid
-    if (data == nullptr || width == 0 || height == 0 || nrChannels == 0 ||
-        nrChannels > 4) {
-        printf("ERROR: Invalid Texture\n");
+    if (data == NULL || (width == 0 || height == 0) ||
+        (nrChannels < 1 || nrChannels > 4)) {
+        fprintf(stderr, "Invalid Texture\n");
         return 0;
     }
 
-    uint id;
+    GLuint id;
 
     // Generate Empty Texture
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
 
     // Select Color Mode
-    uint mode = GL_RGB;
+    GLuint mode = GL_RGB;
     switch (nrChannels) {
     case 1:
         mode = GL_RED;
@@ -162,10 +289,16 @@ uint Artifex::texture(unsigned char *data, uint width, uint height,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    fprintf(stdout, "Loaded Texture\n");
+
     // Add to list + return ID
-    textures.push_back(id);
-    return textures.size();
+    texture.push_back(id);
+    return texture.size();
 }
+
+// ---- Rendering
+
+// TODO
 
 // Private
 

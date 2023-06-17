@@ -6,13 +6,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Source Files
 set(SOURCES
     src/Artifex.cpp
-
     src/Window.cpp
 
-    src/load.cpp
-
-    src/glad.c
-    src/stb_image.c
+    src/GL/glad.c
+    src/GL/stb_image.c
 )
 
 # Libraries

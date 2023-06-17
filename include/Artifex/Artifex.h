@@ -2,8 +2,14 @@
 
 #include <Artifex/core/Window.h>
 
+#include <stdint.h>
 #include <vector>
+
 // #include <Artifex/core/mixer.h>
+
+#define AX_TYPE_AUTO 0
+#define AX_TYPE_SHADER 1
+#define AX_TYPE_TEXTURE 2
 
 // Artifex - A Light-Weight, Cross-Platform 2D Game Engine
 class Artifex : public Window {
@@ -11,36 +17,37 @@ class Artifex : public Window {
     Artifex(std::string name, uint width = 0, uint height = 0);
     ~Artifex();
 
-    bool update();
+    bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);
 
-    void clear(float red = 0.0f, float green = 0.0f, float blue = 0.0f,
-               GLbitfield buffers = GL_COLOR_BUFFER_BIT);
+    float time();
 
-    // Resource Loading
+    // ---- Resource Loading
 
-    uint shader(std::string vertex, std::string fragment,
-                std::string geometry = "");
+    // Load Resource
+    uint16_t load(const char *path, uint8_t type = AX_TYPE_AUTO);
 
-    uint texture(unsigned char *data, uint width, uint height, uint nrChannels);
+    // Load Shader
+    uint16_t load_shader(const char *vertex, const char *fragment,
+                         const char *geometry = "");
 
-    uint mesh(std::vector<float> &vertices, std::vector<float> &indices);
+    // Load Texture
+    uint16_t load_texture(unsigned char *data, int width, int height,
+                          int channels);
 
-    // TODO: Resource Managament, Rendering
+    // ---- Rendering
 
   public:
-    long uptime;
     float deltaTime;
 
   private:
-    long past, now;
+    float past, now;
 
-    uint VAO, VBO;
+    GLuint VAO, VBO;
 
     std::map<std::string, int> input;
 
-    std::vector<uint> shaders;
-    std::vector<uint> textures;
-    std::vector<std::tuple<uint, uint, uint>> meshes;
+    std::vector<GLuint> shader;
+    std::vector<GLuint> texture;
 
   private:
     float ratio();
