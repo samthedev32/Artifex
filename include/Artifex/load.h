@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-namespace Artifex {
-
 // Resource Loader & Manager
 class ResourceManager {
   public:
@@ -46,5 +44,3 @@ std::vector<Material> material(std::string path);
 
 // Load Mesh
 Mesh mesh(std::string path);
-
-} // namespace Artifex

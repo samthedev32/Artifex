@@ -5,8 +5,6 @@
 #include <fstream>
 #include <random>
 
-namespace Artifex {
-
 ResourceManager::ResourceManager() {
     // TODO: Init Resource Loader
 }
@@ -55,5 +53,3 @@ unsigned int ResourceManager::load_mesh(std::string path) {
     // TODO
     return 0;
 }
-
-} // namespace Artifex

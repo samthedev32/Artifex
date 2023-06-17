@@ -1,10 +1,10 @@
-#include "GL/load.h"
 #include <Artifex/Artifex.h>
+#include <Artifex/load.h>
 
 int main() {
     Artifex ax("Hello Artifex", 720, 480);
 
-    GL::LOAD::shader("shader/2d.glsl");
+    // GL::LOAD::shader("shader/2d.glsl");
 
     while (ax.update()) {
         // TODO: Rendering
