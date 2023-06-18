@@ -46,6 +46,8 @@ Window::Window(std::string name, uint width, uint height)
     glfwSetKeyCallback(window, callback_key);
     glfwSetCursorPosCallback(window, callback_cursor);
     glfwSetScrollCallback(window, callback_scroll);
+
+    vsync(0);
 }
 
 Window::~Window() {

@@ -8,6 +8,8 @@ set(SOURCES
     src/Artifex.cpp
     src/Window.cpp
 
+    src/types/shader.cpp
+
     src/GL/glad.c
 )
 

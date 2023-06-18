@@ -1,10 +1,12 @@
 #pragma once
 
 #include <Artifex/core/Window.h>
+#include <Artifex/types/shader.hpp>
 
 #include <mathutil/vector.hpp>
 
 #include <stdint.h>
+#include <unordered_map>
 #include <vector>
 
 // #include <Artifex/core/mixer.h>
@@ -38,17 +40,21 @@ class Artifex : public Window {
 
     // ---- Rendering
 
+    void rect(vec2 center, vec2 size, vec3 color, float rotation = 0.0f);
+    void rect(vec2 center, vec2 size, uint16_t tex, float rotation = 0.0f);
+
   public:
     float deltaTime;
 
   private:
     float past, now;
 
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, EBO;
 
     std::map<std::string, int> input;
 
-    std::vector<GLuint> shader;
+    std::vector<Shader> shader;
+
     std::vector<GLuint> texture;
 
   private:

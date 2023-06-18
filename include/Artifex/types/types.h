@@ -1,20 +1,11 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <vector>
-#include <string>
 #include <map>
-
-// Include OpenGL if needed
-#ifndef __gl_h_
-#include <GL/glad.h>
-#endif
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
 
 // C types
 typedef unsigned long int ulong;
@@ -26,16 +17,13 @@ typedef unsigned int uint;
 #define degs(r) (r * 180.0f / M_PI) //< convert radians to degrees
 
 // Include Types
-#include <artifex/types/vector.h>
-#include <artifex/types/matrix.h>
-#include <artifex/types/shader.h>
+#include <Artifex/types/shader.h>
 
 // OpenGL Texture ID
 typedef uint texture;
 
 // Text Font
-struct font
-{
+struct font {
     texture data; //< Font Data
     int width, height;
     float start;
@@ -47,19 +35,12 @@ struct font
 
     float vertices[24] = {
         // positions      // texture coords
-        -1.0f, 1.0f, 0.0f, 1.0f,  // 0 top right
+        -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
         -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
-        1.0f, -1.0f, 1.0f, 0.0f,  // 3 top left
+        1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left
 
-        -1.0f, 1.0f, 0.0f, 1.0f, // 1 bottom right
-        1.0f, -1.0f, 1.0f, 0.0f, // 2 bottom left
-        1.0f, 1.0f, 1.0f, 1.0f,  // 3 top left
+        -1.0f, 1.0f,  0.0f, 1.0f, // 1 bottom right
+        1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
+        1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
     };
-};
-
-// Audio Source
-struct audio
-{
-    Mix_Chunk *source = NULL;
-    int ch = -1;
 };

@@ -8,10 +8,65 @@
 #include <string>
 #include <time.h>
 
+// Pre-Definitions
+extern const char *default_shader_code[2];
+
 // Public
 
 Artifex::Artifex(std::string name, uint width, uint height)
-    : Window(name, width, height) {}
+    : Window(name, width, height) {
+    stbi_set_flip_vertically_on_load(true);
+
+    // Load Default Rect
+    float vertices[] = {
+        // positions      // texture coords
+        -1.0f, 1.0f,  0.0f, 1.0f, // top right
+        -1.0f, -1.0f, 0.0f, 0.0f, // bottom right
+        1.0f,  -1.0f, 1.0f, 0.0f, // bottom left
+        1.0f,  1.0f,  1.0f, 1.0f  // top left
+    };
+
+    uint indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                          (void *)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Config OpenGL
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+
+    // Load 2D Shader
+    load_shader(default_shader_code[0], default_shader_code[1]);
+
+    // Load Texture
+    unsigned char data[3] = {255, 0, 0};
+    load_texture(data, 1, 1, 3);
+
+    past = now = time();
+}
 
 Artifex::~Artifex() {
     // Free Textures
@@ -20,8 +75,8 @@ Artifex::~Artifex() {
     texture.clear();
 
     // Free Shaders
-    for (uint id : shader)
-        glDeleteShader(id);
+    for (auto s : shader)
+        glDeleteShader(s.id);
     shader.clear();
 
     // Delete Buffers
@@ -243,8 +298,8 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
     fprintf(stdout, "Loaded Shader\n");
 
     // Add to list + return ID
-    shader.push_back(id);
-    return shader.size();
+    shader.push_back(Shader(id));
+    return shader.size() - 0;
 }
 
 uint16_t Artifex::load_texture(unsigned char *data, int width, int height,
@@ -298,13 +353,130 @@ uint16_t Artifex::load_texture(unsigned char *data, int width, int height,
 
     // Add to list + return ID
     texture.push_back(id);
-    return texture.size();
+    return texture.size() - 1;
 }
 
 // ---- Rendering
 
-// TODO
+void Artifex::rect(vec2 center, vec2 size, vec3 color, float rotation) {
+    shader[0].use();
+
+    shader[0].set("type", 0);
+    shader[0].set("color", color);
+
+    shader[0].set("center", center);
+    shader[0].set("size", vec2(size / 2.0f));
+    shader[0].set("ratio", ratio());
+
+    shader[0].set("rotation", rotation);
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Artifex::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture[tex]);
+
+    shader[0].use();
+
+    shader[0].set("type", 1);
+
+    shader[0].set("center", center);
+    shader[0].set("size", vec2(size / 2.0f));
+    shader[0].set("ratio", ratio());
+
+    shader[0].set("rotation", rotation);
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
 
 // Private
 
 float Artifex::ratio() { return (float)width / (float)height; }
+
+// Definitions
+const char *default_shader_code[] = {
+    "#version 300 es\n"
+
+    "layout(location = 0) in vec2 aPos;\n"
+    "layout(location = 1) in vec2 aTexCoord;\n"
+
+    "out vec2 TexCoord;\n"
+    "out vec2 FragPos;\n"
+
+    "uniform vec2 center;\n"
+    "uniform vec2 size;\n"
+    "uniform float rotation;\n"
+
+    "uniform float ratio;\n"
+
+    "void main() {\n"
+    "float rads = radians(-rotation);\n"
+    "vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);\n"
+
+    "float x = cos(rads) * (point.x) - sin(rads) * (point.y) + center.x;\n"
+    "float y = sin(rads) * (point.x) + cos(rads) * (point.y) + center.y;\n"
+
+    "y *= ratio;\n"
+
+    "TexCoord = aTexCoord;\n"
+    "FragPos = vec2(aPos.x, aPos.y);\n"
+    "gl_Position = vec4(x, y, 0.0, 1.0);\n"
+    "}",
+
+    "#version 300 es\n"
+    "precision mediump float;\n"
+    "out vec4 FragColor;\n"
+
+    "in vec2 TexCoord;\n"
+    "in vec2 FragPos;\n"
+
+    "uniform int type;\n"
+
+    "uniform sampler2D tex;\n"
+    "uniform vec3 color;\n"
+
+    "uniform float cutradius;\n"
+
+    "void main() {\n"
+    "    switch (type) {\n"
+    "    case 0:\n"
+    // Color
+    "        FragColor = vec4(color.rgb, 1.0);\n"
+    "        break;\n"
+
+    "    case 1:\n"
+    // Texture
+    "        FragColor = texture(tex, TexCoord);\n"
+    "        break;\n"
+
+    "    case 2:\n"
+    // Text
+    "        FragColor = vec4(color.rgb, length(texture(tex, TexCoord).rgb));\n"
+    "        break;\n"
+
+    "    case 3:\n"
+    // Circle
+    "        vec2 val = FragPos;\n"
+
+    "       float R = 1.0f;\n"
+    "       float R2 = cutradius;\n"
+    "       float dist = sqrt(dot(val, val));\n"
+
+    "       if (dist >= R || dist <= R2)\n"
+    "             discard;\n"
+
+    "float sm = smoothstep(R, R - 0.01, dist);\n"
+    "float sm2 = smoothstep(R2, R2 + 0.01, dist);\n"
+    "float alpha = sm * sm2;\n"
+
+    "FragColor = vec4(color.xyz, 1.0);\n"
+    "break;\n"
+
+    "default:\n"
+    "FragColor = vec4(color.xyz, 0.0);\n"
+    "break;\n"
+    "}\n"
+    "}"};
