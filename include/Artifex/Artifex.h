@@ -2,6 +2,8 @@
 
 #include <Artifex/core/Window.h>
 
+#include <mathutil/vector.hpp>
+
 #include <stdint.h>
 #include <vector>
 

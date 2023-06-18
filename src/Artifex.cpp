@@ -1,4 +1,6 @@
 #include <Artifex/Artifex.h>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <GL/stb_image.h>
 
 #include <stdio.h>
@@ -34,6 +36,9 @@ bool Artifex::update(float r, float g, float b) {
     // Clear Screen
     glClearColor(r, g, b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Update GL
+    glViewport(0, 0, width, height);
 
     // Timing
     past = now;

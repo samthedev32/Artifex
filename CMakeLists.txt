@@ -9,12 +9,12 @@ set(SOURCES
     src/Window.cpp
 
     src/GL/glad.c
-    src/GL/stb_image.c
 )
 
 # Libraries
 set(LIBRARIES
     glfw
+    mathutil
 )
 
 # Project
@@ -24,5 +24,5 @@ add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
-
+add_subdirectory(mathutil)
 add_subdirectory(hello_artifex)
