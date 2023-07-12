@@ -17,7 +17,7 @@ typedef unsigned int uint;
 #define degs(r) (r * 180.0f / M_PI) //< convert radians to degrees
 
 // Include Types
-#include <Artifex/types/shader.h>
+#include <Artifex/types/shader.hpp>
 
 // OpenGL Texture ID
 typedef uint texture;

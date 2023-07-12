@@ -1,7 +1,8 @@
 #pragma once
 
 namespace Construct {
-// Construct Layout
+
+// Layout Constructor Class
 struct Layout {};
 
 Layout create();

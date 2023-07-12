@@ -1,4 +1,4 @@
-#include <Artifex/core/Window.h>
+#include <Artifex/core/Window.hpp>
 
 Window::Window(std::string name, uint width, uint height)
     : width(width), height(height) {

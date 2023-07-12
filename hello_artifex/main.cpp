@@ -1,4 +1,4 @@
-#include <Artifex/Artifex.h>
+#include <Artifex/Artifex.hpp>
 
 int main() {
     Artifex ax("Hello Artifex", 720, 480);

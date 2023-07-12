@@ -1,4 +1,5 @@
-#include <Artifex/Artifex.h>
+#include "mathutil/log.h"
+#include <Artifex/Artifex.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <GL/stb_image.h>
@@ -165,8 +166,8 @@ uint16_t Artifex::load(const char *path, uint8_t type) {
                     else if (!strcmp(parameter, "geometry"))
                         current = 3;
                     else
-                        fprintf(stderr, "Invalid Shader Parameter: %s\n",
-                                parameter);
+                        log_warning("Artifex::load::shader",
+                                    "Invalid Parameter: %s", parameter);
                 } else {
                     switch (current) {
                     default:
@@ -192,7 +193,7 @@ uint16_t Artifex::load(const char *path, uint8_t type) {
             id =
                 load_shader(vertex.c_str(), fragment.c_str(), geometry.c_str());
         } else
-            fprintf(stderr, "Failed to open Shader File: %s\n", path);
+            log_error("Artifex::load::shader", "Failed to Open File");
     } break;
 
         // Image
@@ -200,10 +201,7 @@ uint16_t Artifex::load(const char *path, uint8_t type) {
         int width, height, channels;
         unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
 
-        if (data)
-            id = load_texture(data, width, height, channels);
-        else
-            fprintf(stderr, "Failed to load Image: %s\n", path);
+        id = load_texture(data, width, height, channels);
     } break;
     }
 
@@ -215,7 +213,7 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
     // Exit if no Shader Code
     const size_t minSize = 8;
     if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
-        fprintf(stderr, "No Shader Resource(s)\n");
+        log_error("Artifex::load_shader", "No Shader Resources");
         return 0;
     }
 
@@ -241,7 +239,8 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vert, 1024, NULL, infoLog);
-        fprintf(stderr, "Failed to compile Vertex Shader:\n%s", infoLog);
+        log_error("Artifex::load_shader",
+                  "Failed to Compile Vertex Shader:\n%s", infoLog);
         return 0;
     }
 
@@ -254,7 +253,8 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
     if (!success) {
         glGetShaderInfoLog(frag, 1024, NULL, infoLog);
         glDeleteShader(vert);
-        fprintf(stderr, "Failed to compile Fragment Shader:\n%s", infoLog);
+        log_error("Artifex::load_shader",
+                  "Failed to Compile Fragment Shader:\n%s", infoLog);
         return 0;
     }
 
@@ -267,7 +267,8 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
         glGetShaderiv(geo, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(geo, 1024, NULL, infoLog);
-            fprintf(stderr, "Failed to compile Geometry Shader:\n%s", infoLog);
+            log_error("Artifex::load_shader",
+                      "Failed to Compile Geometry Shader:\n%s", infoLog);
             isGeo = false;
         }
     }
@@ -291,11 +292,12 @@ uint16_t Artifex::load_shader(const char *vertex, const char *fragment,
     glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(id, 1024, NULL, infoLog);
-        fprintf(stderr, "Failed to link Shaders:\n%s", infoLog);
+        log_error("Artifex::load_shader", "Failed to Link Shaders:\n%s",
+                  infoLog);
         return 0;
     }
 
-    fprintf(stdout, "Loaded Shader\n");
+    log_system("Artifex::load_shader", "Loaded Shader", infoLog);
 
     // Add to list + return ID
     shader.push_back(Shader(id));
@@ -307,7 +309,7 @@ uint16_t Artifex::load_texture(unsigned char *data, int width, int height,
     // Exit if invalid
     if (data == NULL || (width == 0 || height == 0) ||
         (nrChannels < 1 || nrChannels > 4)) {
-        fprintf(stderr, "Invalid Texture\n");
+        log_error("Artifex::load_texture", "Invalid Texture");
         return 0;
     }
 
@@ -349,7 +351,7 @@ uint16_t Artifex::load_texture(unsigned char *data, int width, int height,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    fprintf(stdout, "Loaded Texture\n");
+    log_system("Artifex::load_texture", "Loaded Texture");
 
     // Add to list + return ID
     texture.push_back(id);
@@ -392,12 +394,19 @@ void Artifex::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+// Draw Circle (Colored)
+void Artifex::circle(vec2 center, float diameter, vec3 color) {}
+
+// Draw Circle (Textured)
+void Artifex::circle(vec2 center, float diameter, uint16_t tex, vec2 offset) {}
+
 // Private
 
 float Artifex::ratio() { return (float)width / (float)height; }
 
 // Definitions
 const char *default_shader_code[] = {
+    // Vertex Shader
     "#version 300 es\n"
 
     "layout(location = 0) in vec2 aPos;\n"
@@ -426,12 +435,16 @@ const char *default_shader_code[] = {
     "gl_Position = vec4(x, y, 0.0, 1.0);\n"
     "}",
 
+    // Fragment Shader
     "#version 300 es\n"
     "precision mediump float;\n"
     "out vec4 FragColor;\n"
 
     "in vec2 TexCoord;\n"
     "in vec2 FragPos;\n"
+
+    "uniform int isTextured;\n"
+    "uniform int shape;\n"
 
     "uniform int type;\n"
 
@@ -442,23 +455,25 @@ const char *default_shader_code[] = {
 
     "void main() {\n"
     "    switch (type) {\n"
-    "    case 0:\n"
+
     // Color
+    "    default:\n"
+    "    case 0:\n"
     "        FragColor = vec4(color.rgb, 1.0);\n"
     "        break;\n"
 
-    "    case 1:\n"
     // Texture
+    "    case 1:\n"
     "        FragColor = texture(tex, TexCoord);\n"
     "        break;\n"
 
-    "    case 2:\n"
     // Text
+    "    case 2:\n"
     "        FragColor = vec4(color.rgb, length(texture(tex, TexCoord).rgb));\n"
     "        break;\n"
 
-    "    case 3:\n"
     // Circle
+    "    case 3:\n"
     "        vec2 val = FragPos;\n"
 
     "       float R = 1.0f;\n"
@@ -468,15 +483,11 @@ const char *default_shader_code[] = {
     "       if (dist >= R || dist <= R2)\n"
     "             discard;\n"
 
-    "float sm = smoothstep(R, R - 0.01, dist);\n"
-    "float sm2 = smoothstep(R2, R2 + 0.01, dist);\n"
-    "float alpha = sm * sm2;\n"
+    "       float sm = smoothstep(R, R - 0.01, dist);\n"
+    "       float sm2 = smoothstep(R2, R2 + 0.01, dist);\n"
+    "       float alpha = sm * sm2;\n"
 
-    "FragColor = vec4(color.xyz, 1.0);\n"
-    "break;\n"
-
-    "default:\n"
-    "FragColor = vec4(color.xyz, 0.0);\n"
-    "break;\n"
-    "}\n"
+    "       FragColor = vec4(color.xyz, 1.0);\n"
+    "       break;\n"
+    "   }\n"
     "}"};
