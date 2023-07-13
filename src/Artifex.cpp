@@ -9,6 +9,9 @@
 Artifex::Artifex(std::string name, int width, int height)
     : Window(name, width, height), load(this), render(this) {
 
+    load.init();
+    render.init();
+
     past = now = time();
 }
 
@@ -18,9 +21,7 @@ bool Artifex::update(float r, float g, float b) {
     // Update Screen
     bool running = Window::update();
 
-    // Clear Screen
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    render.clear(r, g, b);
 
     // Update GL
     glViewport(0, 0, width, height);

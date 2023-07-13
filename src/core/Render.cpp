@@ -6,7 +6,9 @@
 
 extern const char *default_shader_code[2];
 
-Render::Render(Artifex *ax) : ax(ax) {
+Render::Render(Artifex *ax) : ax(ax) {}
+
+void Render::init() {
     // Load Default Rect
     float vertices[] = {
         // positions      // texture coords
@@ -72,6 +74,12 @@ Render::~Render() {
     glDeleteBuffers(2, buffers);
 }
 
+void Render::clear(float r, float g, float b) {
+    // Clear Screen
+    glClearColor(r, g, b, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
 void Render::line(vec2 a, vec2 b, vec3 color) {
     // TODO
 }
@@ -84,7 +92,7 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
 
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(size / 2.0f));
-    ax->shader[0].set("ratio", (float)ax->width / (float)ax->height);
+    ax->shader[0].set("ratio", ax->ratio());
 
     ax->shader[0].set("rotation", rotation);
 
@@ -102,7 +110,7 @@ void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
 
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(size / 2.0f));
-    ax->shader[0].set("ratio", (float)ax->width / (float)ax->height);
+    ax->shader[0].set("ratio", ax->ratio());
 
     ax->shader[0].set("rotation", rotation);
 
@@ -119,7 +127,7 @@ void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
 
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(radius, radius));
-    ax->shader[0].set("ratio", (float)ax->width / (float)ax->height);
+    ax->shader[0].set("ratio", ax->ratio());
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
@@ -137,7 +145,7 @@ void Render::circle(vec2 center, float radius, uint16_t tex, vec2 offset,
 
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(radius, radius));
-    ax->shader[0].set("ratio", (float)ax->width / (float)ax->height);
+    ax->shader[0].set("ratio", ax->ratio());
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);

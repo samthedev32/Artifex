@@ -5,7 +5,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <GL/stb_image.h>
 
-Load::Load(Artifex *ax) : ax(ax) { stbi_set_flip_vertically_on_load(true); }
+Load::Load(Artifex *ax) : ax(ax) {}
+
+void Load::init() { stbi_set_flip_vertically_on_load(true); }
 
 Load::~Load() {
     // Free Textures
@@ -118,7 +120,7 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     // Exit if no Shader Code
     const size_t minSize = 8;
     if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
-        log_error("Load::load_shader", "No Shader Resources");
+        log_error("Load::shader", "No Shader Resources");
         return 0;
     }
 
@@ -144,7 +146,7 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vert, 1024, NULL, infoLog);
-        log_error("Load::load_shader", "Failed to Compile Vertex Shader:\n%s",
+        log_error("Load::shader", "Failed to Compile Vertex Shader:\n%s",
                   infoLog);
         return 0;
     }
@@ -158,7 +160,7 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     if (!success) {
         glGetShaderInfoLog(frag, 1024, NULL, infoLog);
         glDeleteShader(vert);
-        log_error("Load::load_shader", "Failed to Compile Fragment Shader:\n%s",
+        log_error("Load::shader", "Failed to Compile Fragment Shader:\n%s",
                   infoLog);
         return 0;
     }
@@ -172,8 +174,8 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
         glGetShaderiv(geo, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(geo, 1024, NULL, infoLog);
-            log_error("Load::load_shader",
-                      "Failed to Compile Geometry Shader:\n%s", infoLog);
+            log_error("Load::shader", "Failed to Compile Geometry Shader:\n%s",
+                      infoLog);
             isGeo = false;
         }
     }
@@ -197,14 +199,14 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(id, 1024, NULL, infoLog);
-        log_error("Load::load_shader", "Failed to Link Shaders:\n%s", infoLog);
+        log_error("Load::shader", "Failed to Link Shaders:\n%s", infoLog);
         return 0;
     }
 
-    log_system("Load::load_shader", "Loaded Shader", infoLog);
+    log_system("Load::shader", "Loaded Shader", infoLog);
 
     // Add to list + return ID
-    ax->shader.push_back(Shader(id)); // bug
+    ax->shader.push_back(Shader(id));
     return ax->shader.size() - 0;
 }
 
@@ -213,7 +215,7 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
     // Exit if invalid
     if (data == NULL || (width == 0 || height == 0) ||
         (nrChannels < 1 || nrChannels > 4)) {
-        log_error("Load::load_texture", "Invalid Texture");
+        log_error("Load::texture", "Invalid Texture");
         return 0;
     }
 
@@ -255,7 +257,7 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    log_system("Load::load_texture", "Loaded Texture");
+    log_system("Load::texture", "Loaded Texture");
 
     // Add to list + return ID
     ax->texture.push_back(id);

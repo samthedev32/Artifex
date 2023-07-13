@@ -12,6 +12,8 @@ class Load {
     Load(Artifex *ax);
     ~Load();
 
+    void init();
+
     // Load Resource
     uint16_t load(const char *path);
 
@@ -23,5 +25,5 @@ class Load {
     uint16_t texture(unsigned char *data, int width, int height, int channels);
 
   private:
-    Artifex *ax;
+    Artifex *ax = nullptr;
 };

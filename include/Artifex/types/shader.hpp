@@ -13,7 +13,7 @@ struct Shader {
     std::unordered_map<std::string, uint> uniforms;
 
   public:
-    Shader(GLuint id);
+    Shader(GLuint id = 0);
 
     // The Shader Program ID
     GLuint id;

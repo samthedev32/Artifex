@@ -8,12 +8,15 @@
 
 class Artifex;
 
+// OpenGL Renderer
 class Render {
   public:
     Render(Artifex *ax);
     ~Render();
 
-    bool update(int width, int height);
+    void init();
+
+    void clear(float r, float g, float b);
 
     // Draw Line
     void line(vec2 a, vec2 b, vec3 color);
@@ -35,7 +38,7 @@ class Render {
     void text(vec2 center, float width, vec3 color, float rotation = 0.0f);
 
   private:
-    Artifex *ax;
+    Artifex *ax = nullptr;
 
     GLuint VAO, VBO, EBO;
 };

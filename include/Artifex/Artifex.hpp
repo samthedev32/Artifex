@@ -18,9 +18,10 @@ class Artifex : public Window {
     bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);
 
     float time();
+    float ratio();
 
-    Render render;
     Load load;
+    Render render;
 
   public:
     float deltaTime;
@@ -32,7 +33,4 @@ class Artifex : public Window {
     float past, now;
 
     std::unordered_map<std::string, int> input;
-
-  private:
-    float ratio();
 };
