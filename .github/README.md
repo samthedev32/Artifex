@@ -11,9 +11,12 @@ Uses...
 
 ### Setup
 
-#### Linux (Arch Based)
+#### Linux (Debian Based)
 
-Coming Soon!
+> Install Physics Engine
+```bash
+sudo apt install libbox2d-dev
+```
 
 #### Windows
 

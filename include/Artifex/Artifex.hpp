@@ -5,9 +5,14 @@
 #include <Artifex/core/Load.hpp>
 #include <Artifex/core/Render.hpp>
 
+#include <box2d/box2d.h>
+
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
+
+// TODO: Integrate Box2D Physics Engine
+// TODO: Custom Physics Engine
 
 // 2D Game Engine
 class Artifex : public Window {
