@@ -9,13 +9,13 @@
 class Artifex;
 
 // OpenGL Renderer
-class Render {
+struct Render {
   public:
-    Render(Artifex *ax);
-    ~Render();
-
     // Initialize Renderer
-    void init();
+    void init(Artifex *artifex);
+
+    // DeInitialize Renderer
+    void deinit();
 
     // Clear Screen
     void clear(float r, float g, float b);

@@ -6,9 +6,9 @@
 
 extern const char *default_shader_code[2];
 
-Render::Render(Artifex *ax) : ax(ax) {}
+void Render::init(Artifex *artifex) {
+    ax = artifex;
 
-void Render::init() {
     // Load Default Rect
     float vertices[] = {
         // positions      // texture coords
@@ -58,7 +58,7 @@ void Render::init() {
     ax->load.texture(data, 1, 1, 3);
 }
 
-Render::~Render() {
+void Render::deinit() {
     // Free Textures
     if (ax->texture.size() > 0)
         glDeleteTextures(ax->texture.size(), ax->texture.data());

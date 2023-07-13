@@ -5,11 +5,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <GL/stb_image.h>
 
-Load::Load(Artifex *ax) : ax(ax) {}
+void Load::init(Artifex *artifex) {
+    ax = artifex;
+    stbi_set_flip_vertically_on_load(true);
+}
 
-void Load::init() { stbi_set_flip_vertically_on_load(true); }
-
-Load::~Load() {
+void Load::deinit() {
     // Free Textures
     if (ax->texture.size() > 0)
         glDeleteTextures(ax->texture.size(), ax->texture.data());

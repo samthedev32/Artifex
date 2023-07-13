@@ -8,13 +8,13 @@
 class Artifex;
 
 // OpenGL Resource Loader
-class Load {
+struct Load {
   public:
-    Load(Artifex *ax);
-    ~Load();
-
     // Initialize Loader
-    void init();
+    void init(Artifex *artifex);
+
+    // DeInitialize Loader
+    void deinit();
 
     // Load Resource
     uint16_t load(const char *path);

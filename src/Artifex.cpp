@@ -7,15 +7,18 @@
 #include <time.h>
 
 Artifex::Artifex(std::string name, int width, int height)
-    : Window(name, width, height), load(this), render(this) {
+    : Window(name, width, height) {
 
-    load.init();
-    render.init();
+    load.init(this);
+    render.init(this);
 
     past = now = time();
 }
 
-Artifex::~Artifex() {}
+Artifex::~Artifex() {
+    render.deinit();
+    load.deinit();
+}
 
 bool Artifex::update(float r, float g, float b) {
     // Update Screen
