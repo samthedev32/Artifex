@@ -1,6 +1,6 @@
 #pragma once
 
-#include <artifex/types/types.hpp>
+#include <Artifex/types/types.hpp>
 
 #include <chrono>
 #include <fstream>
