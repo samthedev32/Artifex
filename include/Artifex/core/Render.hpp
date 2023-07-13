@@ -14,8 +14,10 @@ class Render {
     Render(Artifex *ax);
     ~Render();
 
+    // Initialize Renderer
     void init();
 
+    // Clear Screen
     void clear(float r, float g, float b);
 
     // Draw Line

@@ -7,11 +7,13 @@
 
 class Artifex;
 
+// OpenGL Resource Loader
 class Load {
   public:
     Load(Artifex *ax);
     ~Load();
 
+    // Initialize Loader
     void init();
 
     // Load Resource
