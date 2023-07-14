@@ -33,8 +33,8 @@ struct Render {
     void circle(vec2 center, float radius, vec3 color, float cutradius = 0.0f);
 
     // Draw Circle (Textured)
-    void circle(vec2 center, float radius, uint16_t tex, vec2 offset = 0.0f,
-                float cutradius = 0.0f);
+    void circle(vec2 center, float radius, uint16_t tex, float rotation = 0.0f,
+                float cutradius = 0.0f, vec2 offset = 0.0f);
 
     // Draw Text
     void text(vec2 center, float width, vec3 color, float rotation = 0.0f);

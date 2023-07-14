@@ -4,6 +4,9 @@
 
 #include <cstring>
 
+#define GL_RECT 0
+#define GL_CIRCLE 1
+
 extern const char *default_shader_code[2];
 
 void Render::init(Artifex *artifex) {
@@ -87,14 +90,17 @@ void Render::line(vec2 a, vec2 b, vec3 color) {
 void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
     ax->shader[0].use();
 
-    ax->shader[0].set("type", 0);
-    ax->shader[0].set("color", color);
-
+    // Vertex
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(size / 2.0f));
     ax->shader[0].set("ratio", ax->ratio());
-
     ax->shader[0].set("rotation", rotation);
+
+    // Fragment
+    ax->shader[0].set("type", GL_RECT);
+    ax->shader[0].set("isTextured", 0);
+
+    ax->shader[0].set("color", color);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -106,13 +112,17 @@ void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
 
     ax->shader[0].use();
 
-    ax->shader[0].set("type", 1);
-
+    // Vertex
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(size / 2.0f));
     ax->shader[0].set("ratio", ax->ratio());
-
     ax->shader[0].set("rotation", rotation);
+
+    // Fragment
+    ax->shader[0].set("type", GL_RECT);
+    ax->shader[0].set("isTextured", 1);
+
+    ax->shader[0].set("tex", 0);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -121,31 +131,42 @@ void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
 void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
     ax->shader[0].use();
 
-    ax->shader[0].set("type", 3);
-    ax->shader[0].set("cutradius", cutradius);
-    ax->shader[0].set("color", color);
-
+    // Vertex
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(radius, radius));
     ax->shader[0].set("ratio", ax->ratio());
+    ax->shader[0].set("rotation", 0);
+
+    // Fragment
+    ax->shader[0].set("type", GL_CIRCLE);
+    ax->shader[0].set("isTextured", 0);
+
+    ax->shader[0].set("color", color);
+    ax->shader[0].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Render::circle(vec2 center, float radius, uint16_t tex, vec2 offset,
-                    float cutradius) {
+void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
+                    float cutradius, vec2 offset) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ax->texture[tex]);
 
     ax->shader[0].use();
 
-    ax->shader[0].set("type", 3);
-    ax->shader[0].set("cutradius", cutradius);
-
+    // Vertex
     ax->shader[0].set("center", center);
     ax->shader[0].set("size", vec2(radius, radius));
     ax->shader[0].set("ratio", ax->ratio());
+    ax->shader[0].set("rotation", rotation);
+
+    // Fragment
+    ax->shader[0].set("type", GL_CIRCLE);
+    ax->shader[0].set("isTextured", 1);
+
+    ax->shader[0].set("tex", 0);
+    ax->shader[0].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
@@ -193,9 +214,7 @@ const char *default_shader_code[] = {
     "in vec2 TexCoord;\n"
     "in vec2 FragPos;\n"
 
-    "uniform int isTextured;\n"
-    "uniform int shape;\n"
-
+    "uniform bool isTextured;\n"
     "uniform int type;\n"
 
     "uniform sampler2D tex;\n"
@@ -204,27 +223,20 @@ const char *default_shader_code[] = {
     "uniform float cutradius;\n"
 
     "void main() {\n"
-    "    switch (type) {\n"
+    "   switch (type) {\n"
 
-    // Color
-    "    default:\n"
-    "    case 0:\n"
-    "        FragColor = vec4(color.rgb, 1.0);\n"
-    "        break;\n"
+    // Rect
+    "   default:\n"
+    "   case 0:\n"
+    "       if (isTextured)\n"
+    "           FragColor = texture(tex, TexCoord);\n"
+    "       else\n"
+    "           FragColor = vec4(color.rgb, 1.0);\n"
+    "       break;\n"
 
-    // Texture
-    "    case 1:\n"
-    "        FragColor = texture(tex, TexCoord);\n"
-    "        break;\n"
-
-    // Text
-    "    case 2:\n"
-    "        FragColor = vec4(color.rgb, length(texture(tex, TexCoord).rgb));\n"
-    "        break;\n"
-
-    // Circle
-    "    case 3:\n"
-    "        vec2 val = FragPos;\n"
+    // Sphere
+    "   case 1:\n"
+    "       vec2 val = FragPos;\n"
 
     "       float R = 1.0f;\n"
     "       float R2 = cutradius;\n"
@@ -237,7 +249,17 @@ const char *default_shader_code[] = {
     "       float sm2 = smoothstep(R2, R2 + 0.01, dist);\n"
     "       float alpha = sm * sm2;\n"
 
-    "       FragColor = vec4(color.xyz, 1.0);\n"
+    "       if (isTextured)\n"
+    "           FragColor = texture(tex, TexCoord);\n"
+    "       else\n"
+    "           FragColor = vec4(color.xyz, 1.0);\n"
     "       break;\n"
+
+    // Text
+    // "    case 2:\n"
+    // "        FragColor = vec4(color.rgb, length(texture(tex,
+    // TexCoord).rgb));\n"
+    // "        break;\n"
+
     "   }\n"
     "}"};

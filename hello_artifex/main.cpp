@@ -5,9 +5,8 @@ int main() {
 
     ax.load.load("../../hello_artifex/milk.png");
 
-    while (ax.update(1.0f, 0.4f, 0.0f)) {
-        ax.render.rect(vec2(), vec2(1.0f, 1.0f), 1, ax.time() * 90);
-        ax.render.circle(vec2(), 0.04f, vec3(1.0f, 0.4f, 0.0f));
+    while (ax.update(0.04f, 0.04f, 0.00f)) {
+        ax.render.circle(vec2(), 0.4f, 1, ax.time() * 90.0f);
     }
 
     return 0;
