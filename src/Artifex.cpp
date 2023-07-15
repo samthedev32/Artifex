@@ -11,6 +11,7 @@ Artifex::Artifex(std::string name, int width, int height)
 
     load.init(this);
     render.init(this);
+    ui.init(this);
 
     past = now = time();
 }
@@ -18,13 +19,14 @@ Artifex::Artifex(std::string name, int width, int height)
 Artifex::~Artifex() {
     render.deinit();
     load.deinit();
+    ui.deinit();
 }
 
-bool Artifex::update(float r, float g, float b) {
+bool Artifex::update(vec3 clearColor) {
     // Update Screen
     bool running = Window::update();
 
-    render.clear(r, g, b);
+    render.clear(clearColor.r, clearColor.g, clearColor.b);
 
     // Update GL
     glViewport(0, 0, width, height);

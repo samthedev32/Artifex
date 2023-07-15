@@ -2,6 +2,7 @@
 #pragma once
 
 // Detect OS
+#include <unordered_map>
 #if defined(__linux)
 #define __pc
 #elif defined(__WIN32)
@@ -17,11 +18,14 @@
 #endif
 
 #include <GL/glad.h>
+#include <mathutil/common.hpp>
 
 #include <GLFW/glfw3.h>
 #include <map>
 #include <set>
 #include <string>
+
+// TODO: make mouse use "vec2"
 
 // OpenGL Windowing Class
 class Window {
@@ -51,7 +55,7 @@ class Window {
     bool mouseState[3];
 
   private:
-    std::map<std::string, int> GLFW_STRING_SCANCODE;
+    std::unordered_map<std::string, int> GLFW_STRING_SCANCODE;
 
     static void callback_resize(GLFWwindow *window, int w, int h);
     static void callback_key(GLFWwindow *window, int key, int scancode,

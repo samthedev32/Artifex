@@ -1,6 +1,5 @@
-// Basic 2D Shader
-
 #shader vertex
+
 #version 300 es
 
 layout(location = 0) in vec2 aPos;
@@ -13,24 +12,24 @@ uniform vec2 center;
 uniform vec2 size;
 uniform float rotation;
 
-uniform vec2 ratio;
+uniform float ratio;
 
 void main() {
-    float rads = radians(-rotation);
-    vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
+	float rads = radians(-rotation);
+	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
-    float x = cos(rads) * (point.x) - sin(rads) * (point.y) + center.x;
-    float y = sin(rads) * (point.x) + cos(rads) * (point.y) + center.y;
+	float x = cos(rads) * (point.x) - sin(rads) * (point.y) + center.x;
+	float y = sin(rads) * (point.x) + cos(rads) * (point.y) + center.y;
 
-    x *= ratio.x;
-    y *= ratio.y;
+	y *= ratio;
 
-    TexCoord = aTexCoord;
-    FragPos = vec2(aPos.x, aPos.y);
-    gl_Position = vec4(x, y, 0.0, 1.0);
+	TexCoord = aTexCoord;
+	FragPos = vec2(aPos.x, aPos.y);
+	gl_Position = vec4(x, y, 0.0, 1.0);
 }
 
 #shader fragment
+
 #version 300 es
 precision mediump float;
 out vec4 FragColor;
@@ -38,50 +37,43 @@ out vec4 FragColor;
 in vec2 TexCoord;
 in vec2 FragPos;
 
+uniform bool isTextured;
 uniform int type;
 
 uniform sampler2D tex;
 uniform vec3 color;
 
 uniform float cutradius;
+uniform float corner;
 
 void main() {
-	switch(type) {
-		case 0:
-			// Color
-			FragColor = vec4(color.rgb, 1.0);
-			break;
+	switch (type) {
+		default:
+		case 0:	// Rect
+			if (isTextured)
+				FragColor = texture(tex, TexCoord);
+			else
+				FragColor = vec4(color.rgb, 1.0);
+		break;
 
-		case 1:
-			// Texture
-			FragColor = texture(tex, TexCoord);
-			break;
-
-		case 2:
-		// Text
-			FragColor = vec4(color.rgb, length(texture(tex, TexCoord).rgb));
-			break;
-
-		case 3:
-			// Circle
+		case 1: // Circle
 			vec2 val = FragPos;
 
-			float R = 1.0f;
+			float R = 1.0f + 0.5 * corner;
 			float R2 = cutradius;
 			float dist = sqrt(dot(val, val));
 
-			if(dist >= R || dist <= R2)
+			if (dist >= R || dist <= R2)
 				discard;
 
 			float sm = smoothstep(R, R - 0.01, dist);
 			float sm2 = smoothstep(R2, R2 + 0.01, dist);
 			float alpha = sm * sm2;
 
-			FragColor = vec4(color.xyz, 1.0);
-			break;
-
-		default:
-			FragColor = vec4(color.xyz, 0.0);
-			break;
+			if (isTextured)
+				FragColor = texture(tex, TexCoord);
+			else
+				FragColor = vec4(color.xyz, 1.0);
+		break;
 	}
 }

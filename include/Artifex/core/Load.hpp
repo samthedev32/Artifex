@@ -27,5 +27,6 @@ struct Load {
     uint16_t texture(unsigned char *data, int width, int height, int channels);
 
   private:
+    bool initialized = false;
     Artifex *ax = nullptr;
 };

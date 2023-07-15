@@ -11,6 +11,7 @@ set(SOURCES
     src/core/Window.cpp
     src/core/Render.cpp
     src/core/Load.cpp
+    src/core/UI.cpp
 
     src/types/shader.cpp
 

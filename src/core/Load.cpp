@@ -6,11 +6,20 @@
 #include <GL/stb_image.h>
 
 void Load::init(Artifex *artifex) {
+    if (initialized)
+        return;
+
     ax = artifex;
+
     stbi_set_flip_vertically_on_load(true);
+
+    initialized = true;
 }
 
 void Load::deinit() {
+    if (!initialized)
+        return;
+
     // Free Textures
     if (ax->texture.size() > 0)
         glDeleteTextures(ax->texture.size(), ax->texture.data());
@@ -20,6 +29,8 @@ void Load::deinit() {
     for (auto s : ax->shader)
         glDeleteShader(s.id);
     ax->shader.clear();
+
+    initialized = false;
 }
 
 bool stb_is_image_supported(const char *ext) {

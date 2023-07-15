@@ -4,6 +4,7 @@
 
 #include <Artifex/core/Load.hpp>
 #include <Artifex/core/Render.hpp>
+#include <Artifex/core/UI.hpp>
 
 #include <box2d/box2d.h>
 
@@ -20,13 +21,14 @@ class Artifex : public Window {
     Artifex(std::string name, int width = 0, int height = 0);
     ~Artifex();
 
-    bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);
+    bool update(vec3 clearColor);
 
     float time();
     float ratio();
 
     Load load;
     Render render;
+    UI ui;
 
   public:
     float deltaTime;

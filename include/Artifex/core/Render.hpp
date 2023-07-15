@@ -40,6 +40,7 @@ struct Render {
     void text(vec2 center, float width, vec3 color, float rotation = 0.0f);
 
   private:
+    bool initialized = false;
     Artifex *ax = nullptr;
 
     GLuint VAO, VBO, EBO;

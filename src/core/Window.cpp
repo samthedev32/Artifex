@@ -17,7 +17,8 @@ Window::Window(std::string name, uint width, uint height)
 
     // Exit if Window Creation Failed
     if (window == nullptr) {
-        printf("ERROR: Failed to Create Window (%i)\n", glfwGetError(nullptr));
+        log_error("Window::Window", "Failed to Create Window: %i",
+                  glfwGetError(nullptr));
         glfwTerminate();
         throw "Window Creation Failed";
     }
@@ -32,7 +33,7 @@ Window::Window(std::string name, uint width, uint height)
 
     // Load OpenGL (exit if failed)
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        printf("ERROR: Failed to Load OpenGL (%u)\n", glGetError());
+        log_error("Window::Window", "Failed to init OpenGL: %u", glGetError());
         glfwDestroyWindow(window);
         glfwTerminate();
         throw "OpenGL Load Failed";
@@ -151,6 +152,11 @@ std::map<std::string, int> GLFW_STRING_SCANCODE = {
 
     {"space", GLFW_KEY_SPACE},
     {" ", GLFW_KEY_SPACE},
+
+    {"up", GLFW_KEY_UP},
+    {"down", GLFW_KEY_DOWN},
+    {"right", GLFW_KEY_RIGHT},
+    {"left", GLFW_KEY_LEFT},
 
     {"ctrl", GLFW_KEY_LEFT_CONTROL},
     {"control", GLFW_KEY_LEFT_CONTROL},
