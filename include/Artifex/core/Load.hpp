@@ -1,17 +1,15 @@
-// The Resource-Loading Library for Artifex
 #pragma once
-
-// #include <Artifex/core/utility.hpp>
 
 #include <cstdint>
 
-class Artifex;
+namespace Artifex {
 
-// OpenGL Resource Loader
+class Engine;
+
 struct Load {
   public:
     // Initialize Loader
-    void init(Artifex *artifex);
+    void init(Engine *artifex);
 
     // DeInitialize Loader
     void deinit();
@@ -28,5 +26,7 @@ struct Load {
 
   private:
     bool initialized = false;
-    Artifex *ax = nullptr;
+    Engine *ax = nullptr;
 };
+
+} // namespace Artifex

@@ -1,7 +1,9 @@
-#include <Artifex/Artifex.hpp>
+#include <Artifex/Engine.hpp>
+
+using namespace Artifex;
 
 int main() {
-    Artifex ax("Hello Artifex", 720, 480);
+    Engine ax("Hello Artifex", 720, 480);
 
     ax.load.load("../../hello_artifex/milk.png");
 

@@ -6,20 +6,18 @@
 #include <Artifex/core/Render.hpp>
 #include <Artifex/core/UI.hpp>
 
-#include <box2d/box2d.h>
-
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
 
-// TODO: Integrate Box2D Physics Engine
-// TODO: Custom Physics Engine
+// TODO: physics
 
-// 2D Game Engine
-class Artifex : public Window {
+namespace Artifex {
+
+class Engine : public Window {
   public:
-    Artifex(std::string name, int width = 0, int height = 0);
-    ~Artifex();
+    Engine(std::string name, int width = 0, int height = 0);
+    ~Engine();
 
     bool update(vec3 clearColor);
 
@@ -41,3 +39,5 @@ class Artifex : public Window {
 
     std::unordered_map<std::string, int> input;
 };
+
+} // namespace Artifex

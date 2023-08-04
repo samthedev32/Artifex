@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iostream>
 
+namespace Artifex {
+
 #ifdef __windows
 #undef ERROR
 #endif
@@ -305,3 +307,5 @@ void SDL_FlipSurface(SDL_Surface *surface) {
 
     SDL_UnlockSurface(surface);
 }
+
+} // namespace Artifex

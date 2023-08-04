@@ -6,13 +6,15 @@
 #include <cstdint>
 #include <vector>
 
-class Artifex;
+namespace Artifex {
+
+class Engine;
 
 // OpenGL Renderer
 struct Render {
   public:
     // Initialize Renderer
-    void init(Artifex *artifex);
+    void init(Engine *artifex);
 
     // DeInitialize Renderer
     void deinit();
@@ -41,7 +43,9 @@ struct Render {
 
   private:
     bool initialized = false;
-    Artifex *ax = nullptr;
+    Engine *ax = nullptr;
 
     GLuint VAO, VBO, EBO;
 };
+
+} // namespace Artifex

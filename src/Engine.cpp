@@ -1,4 +1,4 @@
-#include <Artifex/Artifex.hpp>
+#include <Artifex/Engine.hpp>
 #include <mathutil/log.hpp>
 
 #include <stdio.h>
@@ -6,7 +6,9 @@
 #include <string>
 #include <time.h>
 
-Artifex::Artifex(std::string name, int width, int height)
+using namespace Artifex;
+
+Engine::Engine(std::string name, int width, int height)
     : Window(name, width, height) {
 
     load.init(this);
@@ -16,13 +18,13 @@ Artifex::Artifex(std::string name, int width, int height)
     past = now = time();
 }
 
-Artifex::~Artifex() {
+Engine::~Engine() {
     render.deinit();
     load.deinit();
     ui.deinit();
 }
 
-bool Artifex::update(vec3 clearColor) {
+bool Engine::update(vec3 clearColor) {
     // Update Screen
     bool running = Window::update();
 
@@ -39,7 +41,7 @@ bool Artifex::update(vec3 clearColor) {
     return running;
 }
 
-float Artifex::time() {
+float Engine::time() {
     struct timespec res;
     clock_gettime(CLOCK_MONOTONIC, &res);
     return (1000.0f * res.tv_sec + (double)res.tv_nsec / 1e6) / 1000.0f;
@@ -47,4 +49,4 @@ float Artifex::time() {
 
 // Private
 
-float Artifex::ratio() { return (float)width / (float)height; }
+float Engine::ratio() { return (float)width / (float)height; }

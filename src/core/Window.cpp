@@ -1,5 +1,7 @@
 #include <Artifex/core/Window.hpp>
 
+using namespace Artifex;
+
 Window::Window(std::string name, uint width, uint height)
     : width(width), height(height) {
 

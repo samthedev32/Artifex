@@ -7,6 +7,8 @@
 
 #include <GL/glad.h>
 
+namespace Artifex {
+
 struct Shader {
   private:
     // Hash-Mapped Uniform Locations
@@ -38,3 +40,5 @@ struct Shader {
     // Set 4 by 4 Matrix Uniform
     void set(std::string n, mat4 mat);
 };
+
+} // namespace Artifex

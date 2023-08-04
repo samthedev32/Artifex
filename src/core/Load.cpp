@@ -1,11 +1,13 @@
 #include <Artifex/core/Load.hpp>
 
-#include <Artifex/Artifex.hpp>
+#include <Artifex/Engine.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <GL/stb_image.h>
 
-void Load::init(Artifex *artifex) {
+using namespace Artifex;
+
+void Load::init(Engine *artifex) {
     if (initialized)
         return;
 

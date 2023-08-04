@@ -1,13 +1,15 @@
 #include <Artifex/core/Render.hpp>
 
-#include <Artifex/Artifex.hpp>
+#include <Artifex/Engine.hpp>
 
 #include <cstring>
+
+using namespace Artifex;
 
 #define GL_RECT 0
 #define GL_CIRCLE 1
 
-void Render::init(Artifex *artifex) {
+void Render::init(Engine *artifex) {
     if (initialized)
         return;
 

@@ -5,12 +5,14 @@
 #include <string>
 #include <unordered_map>
 
-class Artifex;
+namespace Artifex {
+
+class Engine;
 
 struct UI {
   public:
     // Initialize UI
-    void init(Artifex *artifex);
+    void init(Engine *artifex);
 
     // DeInitialize UI
     void deinit();
@@ -34,7 +36,9 @@ struct UI {
 
   private:
     bool initialized = false;
-    Artifex *ax;
+    Engine *ax;
 
     std::unordered_map<std::string, int> input;
 };
+
+} // namespace Artifex

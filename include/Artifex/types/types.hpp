@@ -7,31 +7,23 @@
 #include <string>
 #include <vector>
 
-// C types
-typedef unsigned long int ulong;
-typedef unsigned short int ushort;
-typedef unsigned int uint;
-
-// Radian-Degree Conversion Functions
-#define rads(d) (d * M_PI / 180.0f) //< convert degrees to radians
-#define degs(r) (r * 180.0f / M_PI) //< convert radians to degrees
-
-// Include Types
 #include <Artifex/types/shader.hpp>
 
+namespace Artifex {
+
 // OpenGL Texture ID
-typedef uint texture;
+typedef GLuint Texture;
 
 // Text Font
-struct font {
-    texture data; //< Font Data
-    int width, height;
+struct Font {
+    Texture data; //< Font Data
+    uint8_t width, height;
     float start;
 
     vec2 VERT[6];
     vec2 UV[6];
 
-    uint VAO, VBO; //< Rendering Data
+    GLuint VAO, VBO; //< Rendering Data
 
     float vertices[24] = {
         // positions      // texture coords
@@ -44,3 +36,5 @@ struct font {
         1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
     };
 };
+
+} // namespace Artifex

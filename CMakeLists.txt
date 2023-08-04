@@ -5,7 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Source Files
 set(SOURCES
-    src/Artifex.cpp
+    src/Engine.cpp
 
     # Core
     src/core/Window.cpp

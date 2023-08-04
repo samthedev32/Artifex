@@ -3,6 +3,8 @@
 
 #include <artifex/core/load.hpp>
 
+namespace Artifex {
+
 class Mixer {
   private:
   public:
@@ -42,3 +44,5 @@ bool Mixer::position(std::string name, int angle, int distance) {
 
 // TODO: Set Position
 // Mix_SetPosition(channel, angle, distance * strength);
+
+} // namespace Artifex

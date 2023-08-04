@@ -1,5 +1,7 @@
 #include <Artifex/types/shader.hpp>
 
+using namespace Artifex;
+
 Shader::Shader(GLuint id) : id(id) {}
 
 // Use This Shader

@@ -27,7 +27,8 @@
 
 // TODO: make mouse use "vec2"
 
-// OpenGL Windowing Class
+namespace Artifex {
+
 class Window {
   public:
     Window(std::string name, uint width = 0, uint height = 0);
@@ -63,3 +64,5 @@ class Window {
     static void callback_cursor(GLFWwindow *window, double x, double y);
     static void callback_scroll(GLFWwindow *window, double x, double y);
 };
+
+} // namespace Artifex

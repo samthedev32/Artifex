@@ -1,8 +1,10 @@
 #include <Artifex/core/UI.hpp>
 
-#include <Artifex/Artifex.hpp>
+#include <Artifex/Engine.hpp>
 
-void UI::init(Artifex *artifex) {
+using namespace Artifex;
+
+void UI::init(Engine *artifex) {
     if (initialized)
         return;
 
