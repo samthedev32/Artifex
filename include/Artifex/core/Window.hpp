@@ -68,8 +68,6 @@ class Window {
     bool mouseState[3];
 
   private:
-    std::unordered_map<std::string, int> GLFW_STRING_SCANCODE;
-
     static void callback_resize(GLFWwindow *window, int w, int h);
     static void callback_key(GLFWwindow *window, int key, int scancode,
                              int action, int mods);

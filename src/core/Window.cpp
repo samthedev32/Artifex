@@ -1,4 +1,5 @@
 #include <Artifex/core/Window.hpp>
+#include <GLFW/glfw3.h>
 
 using namespace Artifex;
 
@@ -54,16 +55,14 @@ Window::Window(std::string name, int width, int height)
 }
 
 Window::~Window() {
-    glfwDestroyWindow(window);
+    if (window)
+        glfwDestroyWindow(window);
     glfwTerminate();
 }
 
 bool Window::update() {
-    // Update Window
     glfwSwapBuffers(window);
-
     glfwPollEvents();
-
     glfwGetFramebufferSize(window, &width, &height);
 
     return !glfwWindowShouldClose(window);
@@ -79,14 +78,14 @@ void Window::fullscreen(bool en) {
 
         // Get Monitor
         GLFWmonitor *monitor = glfwGetWindowMonitor(window);
-        const GLFWvidmode *videoMode =
-            glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if (!monitor)
+            monitor = glfwGetPrimaryMonitor();
+
+        const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
 
         // Make Fullscreen
-        glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0,
-                             videoMode->width, videoMode->height,
-                             GLFW_DONT_CARE);
-
+        glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width,
+                             videoMode->height, GLFW_DONT_CARE);
     } else {
         // Undo Fullscreen
         glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0],
@@ -95,10 +94,6 @@ void Window::fullscreen(bool en) {
 }
 
 void Window::vsync(int interval) { glfwSwapInterval(interval); }
-
-bool Window::key(std::string k) {
-    return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
-}
 
 std::map<std::string, int> GLFW_STRING_SCANCODE = {
     {"a", GLFW_KEY_A},
@@ -191,6 +186,10 @@ std::map<std::string, int> GLFW_STRING_SCANCODE = {
     {"f11", GLFW_KEY_F11},
     {"f12", GLFW_KEY_F12},
 };
+
+bool Window::key(std::string k) {
+    return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0;
+}
 
 void Window::callback_resize(GLFWwindow *window, int w, int h) {
     Window *self = (Window *)glfwGetWindowUserPointer(window);
