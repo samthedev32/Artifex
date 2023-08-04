@@ -9,7 +9,7 @@ class Engine;
 class Physics {
   public:
     // Initialize Physics Engine
-    void init(Engine *artifex);
+    void init(Engine *pEngine);
 
     // DeInitialize Loader
     void deinit();
@@ -26,7 +26,7 @@ class Physics {
 
   private:
     bool initialized = false;
-    Engine *ax = nullptr;
+    Engine *engine = nullptr;
 };
 
 } // namespace Artifex

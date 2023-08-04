@@ -36,8 +36,6 @@ class Engine : public Window {
 
   private:
     float past, now;
-
-    std::unordered_map<std::string, int> input;
 };
 
 } // namespace Artifex

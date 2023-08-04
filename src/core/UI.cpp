@@ -4,12 +4,12 @@
 
 using namespace Artifex;
 
-void UI::init(Engine *artifex) {
+void UI::init(Engine *pEngine) {
     if (initialized)
         return;
 
     // TODO
-    ax = artifex;
+    engine = pEngine;
 
     initialized = true;
 }

@@ -9,11 +9,11 @@ using namespace Artifex;
 #define GL_RECT 0
 #define GL_CIRCLE 1
 
-void Render::init(Engine *artifex) {
+void Render::init(Engine *pEngine) {
     if (initialized)
         return;
 
-    ax = artifex;
+    engine = pEngine;
 
     // Load Default Rect
     float vertices[] = {
@@ -58,12 +58,12 @@ void Render::init(Engine *artifex) {
 
     // Load 2D Shader
     // TODO: default shader
-    // ax->load.shader(default_shader_code[0], default_shader_code[1]);
-    ax->load.load("../../hello_artifex/shader/2d.glsl");
+    // engine->load.shader(default_shader_code[0], default_shader_code[1]);
+    engine->load.load("../../hello_artifex/shader/2d.glsl");
 
     // Load Texture
     unsigned char data[3] = {255, 0, 0};
-    ax->load.texture(data, 1, 1, 3);
+    engine->load.texture(data, 1, 1, 3);
 
     initialized = true;
 }
@@ -73,14 +73,14 @@ void Render::deinit() {
         return;
 
     // Free Textures
-    if (ax->texture.size() > 0)
-        glDeleteTextures(ax->texture.size(), ax->texture.data());
-    ax->texture.clear();
+    if (engine->texture.size() > 0)
+        glDeleteTextures(engine->texture.size(), engine->texture.data());
+    engine->texture.clear();
 
     // Free Shaders
-    for (auto s : ax->shader)
+    for (auto s : engine->shader)
         glDeleteShader(s.id);
-    ax->shader.clear();
+    engine->shader.clear();
 
     // Delete Buffers
     GLuint buffers[] = {VAO, VBO};
@@ -100,19 +100,19 @@ void Render::line(vec2 a, vec2 b, vec3 color) {
 }
 
 void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
-    ax->shader[0].use();
+    engine->shader[0].use();
 
     // Vertex
-    ax->shader[0].set("center", center);
-    ax->shader[0].set("size", vec2(size / 2.0f));
-    ax->shader[0].set("ratio", ax->ratio());
-    ax->shader[0].set("rotation", rotation);
+    engine->shader[0].set("center", center);
+    engine->shader[0].set("size", vec2(size / 2.0f));
+    engine->shader[0].set("ratio", engine->ratio());
+    engine->shader[0].set("rotation", rotation);
 
     // Fragment
-    ax->shader[0].set("type", GL_RECT);
-    ax->shader[0].set("isTextured", 0);
+    engine->shader[0].set("type", GL_RECT);
+    engine->shader[0].set("isTextured", 0);
 
-    ax->shader[0].set("color", color);
+    engine->shader[0].set("color", color);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -120,41 +120,41 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
 
 void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, ax->texture[tex]);
+    glBindTexture(GL_TEXTURE_2D, engine->texture[tex]);
 
-    ax->shader[0].use();
+    engine->shader[0].use();
 
     // Vertex
-    ax->shader[0].set("center", center);
-    ax->shader[0].set("size", vec2(size / 2.0f));
-    ax->shader[0].set("ratio", ax->ratio());
-    ax->shader[0].set("rotation", rotation);
+    engine->shader[0].set("center", center);
+    engine->shader[0].set("size", vec2(size / 2.0f));
+    engine->shader[0].set("ratio", engine->ratio());
+    engine->shader[0].set("rotation", rotation);
 
     // Fragment
-    ax->shader[0].set("type", GL_RECT);
-    ax->shader[0].set("isTextured", 1);
+    engine->shader[0].set("type", GL_RECT);
+    engine->shader[0].set("isTextured", 1);
 
-    ax->shader[0].set("tex", 0);
+    engine->shader[0].set("tex", 0);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
-    ax->shader[0].use();
+    engine->shader[0].use();
 
     // Vertex
-    ax->shader[0].set("center", center);
-    ax->shader[0].set("size", vec2(radius, radius));
-    ax->shader[0].set("ratio", ax->ratio());
-    ax->shader[0].set("rotation", 0);
+    engine->shader[0].set("center", center);
+    engine->shader[0].set("size", vec2(radius, radius));
+    engine->shader[0].set("ratio", engine->ratio());
+    engine->shader[0].set("rotation", 0);
 
     // Fragment
-    ax->shader[0].set("type", GL_CIRCLE);
-    ax->shader[0].set("isTextured", 0);
+    engine->shader[0].set("type", GL_CIRCLE);
+    engine->shader[0].set("isTextured", 0);
 
-    ax->shader[0].set("color", color);
-    ax->shader[0].set("cutradius", cutradius);
+    engine->shader[0].set("color", color);
+    engine->shader[0].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
@@ -163,22 +163,22 @@ void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
 void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
                     float cutradius, vec2 offset) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, ax->texture[tex]);
+    glBindTexture(GL_TEXTURE_2D, engine->texture[tex]);
 
-    ax->shader[0].use();
+    engine->shader[0].use();
 
     // Vertex
-    ax->shader[0].set("center", center);
-    ax->shader[0].set("size", vec2(radius, radius));
-    ax->shader[0].set("ratio", ax->ratio());
-    ax->shader[0].set("rotation", rotation);
+    engine->shader[0].set("center", center);
+    engine->shader[0].set("size", vec2(radius, radius));
+    engine->shader[0].set("ratio", engine->ratio());
+    engine->shader[0].set("rotation", rotation);
 
     // Fragment
-    ax->shader[0].set("type", GL_CIRCLE);
-    ax->shader[0].set("isTextured", 1);
+    engine->shader[0].set("type", GL_CIRCLE);
+    engine->shader[0].set("isTextured", 1);
 
-    ax->shader[0].set("tex", 0);
-    ax->shader[0].set("cutradius", cutradius);
+    engine->shader[0].set("tex", 0);
+    engine->shader[0].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);

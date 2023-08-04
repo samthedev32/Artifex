@@ -9,7 +9,7 @@ class Engine;
 struct Load {
   public:
     // Initialize Loader
-    void init(Engine *artifex);
+    void init(Engine *pEngine);
 
     // DeInitialize Loader
     void deinit();
@@ -26,7 +26,7 @@ struct Load {
 
   private:
     bool initialized = false;
-    Engine *ax = nullptr;
+    Engine *engine = nullptr;
 };
 
 } // namespace Artifex

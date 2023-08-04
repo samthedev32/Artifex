@@ -14,7 +14,7 @@ class Engine;
 struct Render {
   public:
     // Initialize Renderer
-    void init(Engine *artifex);
+    void init(Engine *pEngine);
 
     // DeInitialize Renderer
     void deinit();
@@ -43,7 +43,7 @@ struct Render {
 
   private:
     bool initialized = false;
-    Engine *ax = nullptr;
+    Engine *engine = nullptr;
 
     GLuint VAO, VBO, EBO;
 };

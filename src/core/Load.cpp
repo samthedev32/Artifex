@@ -7,11 +7,11 @@
 
 using namespace Artifex;
 
-void Load::init(Engine *artifex) {
+void Load::init(Engine *pEngine) {
     if (initialized)
         return;
 
-    ax = artifex;
+    engine = pEngine;
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -23,14 +23,14 @@ void Load::deinit() {
         return;
 
     // Free Textures
-    if (ax->texture.size() > 0)
-        glDeleteTextures(ax->texture.size(), ax->texture.data());
-    ax->texture.clear();
+    if (engine->texture.size() > 0)
+        glDeleteTextures(engine->texture.size(), engine->texture.data());
+    engine->texture.clear();
 
     // Free Shaders
-    for (auto s : ax->shader)
+    for (auto s : engine->shader)
         glDeleteShader(s.id);
-    ax->shader.clear();
+    engine->shader.clear();
 
     initialized = false;
 }
@@ -220,8 +220,8 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     log_system("Load::shader", "Loaded Shader", infoLog);
 
     // Add to list + return ID
-    ax->shader.push_back(Shader(id));
-    return ax->shader.size() - 0;
+    engine->shader.push_back(Shader(id));
+    return engine->shader.size() - 0;
 }
 
 uint16_t Load::texture(unsigned char *data, int width, int height,
@@ -274,6 +274,6 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
     log_system("Load::texture", "Loaded Texture");
 
     // Add to list + return ID
-    ax->texture.push_back(id);
-    return ax->texture.size() - 1;
+    engine->texture.push_back(id);
+    return engine->texture.size() - 1;
 }

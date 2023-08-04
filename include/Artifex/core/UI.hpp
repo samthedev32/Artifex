@@ -12,7 +12,7 @@ class Engine;
 struct UI {
   public:
     // Initialize UI
-    void init(Engine *artifex);
+    void init(Engine *pEngine);
 
     // DeInitialize UI
     void deinit();
@@ -36,7 +36,7 @@ struct UI {
 
   private:
     bool initialized = false;
-    Engine *ax;
+    Engine *engine;
 
     std::unordered_map<std::string, int> input;
 };
