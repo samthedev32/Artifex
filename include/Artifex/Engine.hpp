@@ -19,23 +19,39 @@ class Engine : public Window {
     Engine(std::string name, int width = 0, int height = 0);
     ~Engine();
 
+    // Update Engine & Window
     bool update(vec3 clearColor);
 
+    // Get Current Time (s)
     float time();
-    float ratio();
 
+    // Get Ratio of Window (width/height)
+    inline float ratio() { return (float)width / (float)height; }
+
+    // Resource Loader
     Load load;
+
+    // Basic Shape Renderer
     Render render;
+
+    // UI Renderer
     UI ui;
 
   public:
+    // Time when frame started
+    float now;
+
+    // Duration of Last Frame
     float deltaTime;
 
+    // Loaded Shaders
     std::vector<Shader> shader;
+
+    // Loaded Textures
     std::vector<GLuint> texture;
 
   private:
-    float past, now;
+    float past;
 };
 
 } // namespace Artifex

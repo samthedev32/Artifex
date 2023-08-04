@@ -31,21 +31,33 @@ namespace Artifex {
 
 class Window {
   public:
-    Window(std::string name, uint width = 0, uint height = 0);
+    // Create Window
+    Window(std::string name, int width = 0, int height = 0);
+
+    // Destroy Window
     ~Window();
 
-    bool update(float r = 0.0f, float g = 0.0f, float b = 0.0f);
+    // Update Window
+    bool update();
+
+    // Close Window
     void exit(bool sure = true);
 
+    // Enable/Disable Fullscreen Mode
     void fullscreen(bool en = true);
+
+    // Enable/Disable VSync
     void vsync(int interval = 1);
 
+    // Get Key State
     bool key(std::string k);
 
   public:
+    // Current Width & Height of Window
     int width, height;
 
-    double cursor[2], scroll[2];
+    // Cursor & Scroll Positions
+    vec2 cursor, scroll;
 
   private:
     GLFWwindow *window = nullptr;

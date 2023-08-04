@@ -18,14 +18,14 @@ void main() {
 	float rads = radians(-rotation);
 	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
-	float x = cos(rads) * (point.x) - sin(rads) * (point.y) + center.x;
-	float y = sin(rads) * (point.x) + cos(rads) * (point.y) + center.y;
+	vec2 pos = center;
 
-	y *= ratio;
+	pos.x += (cos(rads) * (point.x) - sin(rads) * (point.y));
+	pos.y += (sin(rads) * (point.x) + cos(rads) * (point.y)) * ratio;
 
 	TexCoord = aTexCoord;
 	FragPos = vec2(aPos.x, aPos.y);
-	gl_Position = vec4(x, y, 0.0, 1.0);
+	gl_Position = vec4(pos.x, pos.y, 0.0, 1.0);
 }
 
 #shader fragment

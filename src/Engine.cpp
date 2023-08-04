@@ -46,7 +46,3 @@ float Engine::time() {
     clock_gettime(CLOCK_MONOTONIC, &res);
     return (1000.0f * res.tv_sec + (double)res.tv_nsec / 1e6) / 1000.0f;
 }
-
-// Private
-
-float Engine::ratio() { return (float)width / (float)height; }

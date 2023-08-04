@@ -2,11 +2,11 @@
 
 using namespace Artifex;
 
-Window::Window(std::string name, uint width, uint height)
+Window::Window(std::string name, int width, int height)
     : width(width), height(height) {
 
     // Decide if Fullscreened or not
-    if (width == 0 || height == 0)
+    if (width <= 0 || height <= 0)
         width = 1, height = 1;
 
     small_size[0] = width, small_size[1] = height;
@@ -58,7 +58,7 @@ Window::~Window() {
     glfwTerminate();
 }
 
-bool Window::update(float r, float g, float b) {
+bool Window::update() {
     // Update Window
     glfwSwapBuffers(window);
 
@@ -211,13 +211,13 @@ void Window::callback_key(GLFWwindow *window, int key, int scancode, int action,
 void Window::callback_cursor(GLFWwindow *window, double x, double y) {
     Window *self = (Window *)glfwGetWindowUserPointer(window);
 
-    self->cursor[0] = (x * 2.0f) / (double)self->width - 1.0f;
-    self->cursor[1] = (y * -2.0f) / (double)self->height + 1.0f;
+    self->cursor.x = (x * 2.0f) / self->width - 1.0f;
+    self->cursor.y = (y * -2.0f) / self->height + 1.0f;
 }
 
 void Window::callback_scroll(GLFWwindow *window, double x, double y) {
     Window *self = (Window *)glfwGetWindowUserPointer(window);
 
-    self->scroll[0] = x;
-    self->scroll[1] = y;
+    self->scroll.x = x;
+    self->scroll.y = y;
 }

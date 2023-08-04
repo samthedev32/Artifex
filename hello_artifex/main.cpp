@@ -15,6 +15,8 @@ int main() {
         // ax.render.rect(vec2(0.0f, 0.0f), vec2(1.6f, 1.5f), it.surface);
         // ax.render.rect(vec2(0.0f, 0.0f), vec2(1.0f, 0.8f), it.primary);
         // ax.render.rect(vec2(0.0f, 0.0f), vec2(0.5f, 0.4f), it.secondary);
+
+        ax.render.circle(ax.cursor, 0.1f, {1.0f, 0.0f, 1.0f});
     }
 
     return 0;
