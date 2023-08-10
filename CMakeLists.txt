@@ -31,5 +31,12 @@ add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
+if (DEFINED EMSCRIPTEN)
+	set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
+
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Os -s SIDE_MODULE=1 ")
+	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS    "-Os -s WASM=1 -s SIDE_MODULE=1 -s STANDALONE_WASM --no-entry -s USE_GLFW=3")
+endif()
+
 add_subdirectory(mathutil)
 add_subdirectory(hello_artifex)

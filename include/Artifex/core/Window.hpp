@@ -17,10 +17,11 @@
 #warning Targeted OS is not recognized (may not work)
 #endif
 
-#include <GL/glad.h>
 #include <mathutil/common.hpp>
 
-#include <GLFW/glfw3.h>
+#include <GLES2/gl2.h>
+#include <EGL/egl.h>
+
 #include <map>
 #include <set>
 #include <string>
@@ -58,6 +59,8 @@ class Window {
 
     // Cursor & Scroll Positions
     vec2 cursor, scroll;
+
+// TODO: https://github.com/emscripten-core/emscripten/blob/main/test/third_party/glbook/Common/esUtil.h
 
   private:
     GLFWwindow *window = nullptr;

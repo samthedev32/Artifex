@@ -12,7 +12,7 @@ namespace Artifex {
 struct Shader {
   private:
     // Hash-Mapped Uniform Locations
-    std::unordered_map<std::string, uint> uniforms;
+    std::unordered_map<std::string, GLuint> uniforms;
 
   public:
     Shader(GLuint id = 0);
