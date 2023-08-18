@@ -3,6 +3,9 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# Dependency Libs
+add_subdirectory(mathutil)
+
 # Source Files
 set(SOURCES
     src/Engine.cpp
@@ -28,15 +31,10 @@ set(LIBRARIES
 project(Artifex VERSION 0.1.0 LANGUAGES C CXX)
 
 add_library(${PROJECT_NAME} ${SOURCES})
+if(EMSCRIPTEN)
+    target_link_options(${PROJECT_NAME} PRIVATE "-s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1")
+endif(EMSCRIPTEN)
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
-if (DEFINED EMSCRIPTEN)
-	set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
-
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Os -s SIDE_MODULE=1 ")
-	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS    "-Os -s WASM=1 -s SIDE_MODULE=1 -s STANDALONE_WASM --no-entry -s USE_GLFW=3")
-endif()
-
-add_subdirectory(mathutil)
 add_subdirectory(hello_artifex)

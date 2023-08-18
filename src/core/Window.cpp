@@ -20,8 +20,8 @@ Window::Window(std::string name, int width, int height)
 
     // Exit if Window Creation Failed
     if (window == nullptr) {
-        log_error("Window::Window", "Failed to Create Window: %i",
-                  glfwGetError(nullptr));
+        // log_error("Window::Window", "Failed to Create Window: %i",
+        //           glfwGetError(nullptr));
         glfwTerminate();
         throw "Window Creation Failed";
     }

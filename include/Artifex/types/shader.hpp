@@ -9,9 +9,10 @@
 
 namespace Artifex {
 
+// OpenGL Shader Library for Artifex
 struct Shader {
   private:
-    // Hash-Mapped Uniform Locations
+    // Uniform Locations
     std::unordered_map<std::string, GLuint> uniforms;
 
   public:

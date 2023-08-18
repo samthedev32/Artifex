@@ -14,19 +14,17 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #else
-#warning Targeted OS is not recognized (may not work)
+#warning Targeted OS is not recognized
 #endif
 
 #include <mathutil/common.hpp>
 
-#include <GLES2/gl2.h>
-#include <EGL/egl.h>
+#include <GL/glad.h>
+#include <GLFW/glfw3.h>
 
 #include <map>
 #include <set>
 #include <string>
-
-// TODO: make mouse use "vec2"
 
 namespace Artifex {
 
@@ -60,7 +58,8 @@ class Window {
     // Cursor & Scroll Positions
     vec2 cursor, scroll;
 
-// TODO: https://github.com/emscripten-core/emscripten/blob/main/test/third_party/glbook/Common/esUtil.h
+    // TODO: make emscripten compatible
+    // https://github.com/emscripten-core/emscripten/blob/main/test/third_party/glbook/Common/esUtil.h
 
   private:
     GLFWwindow *window = nullptr;

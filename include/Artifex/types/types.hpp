@@ -12,21 +12,23 @@
 namespace Artifex {
 
 // OpenGL Texture ID
-typedef GLuint Texture;
+struct Texture {
+    int width, height, channels;
+
+    GLuint id;
+};
 
 // Text Font
 struct Font {
-    Texture data; //< Font Data
-    uint8_t width, height;
-    float start;
+    Texture data;
+    uint8_t rows, cols;
 
     vec2 VERT[6];
     vec2 UV[6];
 
-    GLuint VAO, VBO; //< Rendering Data
+    GLuint VAO, VBO;
 
-    float vertices[24] = {
-        // positions      // texture coords
+    const float vertices[24] = {
         -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
         -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
         1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left

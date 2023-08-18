@@ -6,6 +6,8 @@
 #include <Artifex/core/Render.hpp>
 #include <Artifex/core/UI.hpp>
 
+#include <Artifex/types/types.hpp>
+
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -37,6 +39,12 @@ class Engine : public Window {
     // UI Renderer
     UI ui;
 
+    // Selected Resources
+    struct {
+        GLuint shader;
+        GLuint font;
+    } current;
+
   public:
     // Time when frame started
     float now;
@@ -44,11 +52,16 @@ class Engine : public Window {
     // Duration of Last Frame
     float deltaTime;
 
+    // ---- Resources
+
     // Loaded Shaders
     std::vector<Shader> shader;
 
     // Loaded Textures
-    std::vector<GLuint> texture;
+    std::vector<Texture> texture;
+
+    // Loaded Fonts
+    std::vector<Font> font;
 
   private:
     float past;

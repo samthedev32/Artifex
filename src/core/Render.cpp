@@ -18,10 +18,10 @@ void Render::init(Engine *pEngine) {
     // Load Default Rect
     float vertices[] = {
         // positions      // texture coords
-        -1.0f, 1.0f,  0.0f, 1.0f, // top right
-        -1.0f, -1.0f, 0.0f, 0.0f, // bottom right
-        1.0f,  -1.0f, 1.0f, 0.0f, // bottom left
-        1.0f,  1.0f,  1.0f, 1.0f  // top left
+        -1.0f, 1.0f,  0.0f, 0.0f, // top right
+        -1.0f, -1.0f, 0.0f, 1.0f, // bottom right
+        1.0f,  -1.0f, 1.0f, 1.0f, // bottom left
+        1.0f,  1.0f,  1.0f, 0.0f  // top left
     };
 
     unsigned int indices[] = {
@@ -73,14 +73,14 @@ void Render::deinit() {
         return;
 
     // Free Textures
-    if (engine->texture.size() > 0)
-        glDeleteTextures(engine->texture.size(), engine->texture.data());
-    engine->texture.clear();
-
+    //  (engine->texture.size() > 0)
+    // glDeleteTextures(engine->texture.size(), engine->texture.data());
+    // engine->texture.clear();
+    //
     // Free Shaders
-    for (auto s : engine->shader)
-        glDeleteShader(s.id);
-    engine->shader.clear();
+    // for (auto s : engine->shader)
+    // glDeleteShader(s.id);
+    // engine->shader.clear();
 
     // Delete Buffers
     GLuint buffers[] = {VAO, VBO};
@@ -120,7 +120,7 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
 
 void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine->texture[tex]);
+    glBindTexture(GL_TEXTURE_2D, engine->texture[tex].id);
 
     engine->shader[0].use();
 
@@ -163,7 +163,7 @@ void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
 void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
                     float cutradius, vec2 offset) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine->texture[tex]);
+    glBindTexture(GL_TEXTURE_2D, engine->texture[tex].id);
 
     engine->shader[0].use();
 
@@ -185,5 +185,48 @@ void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
 }
 
 void Render::text(vec2 center, float width, vec3 color, float rotation) {
-    // TODO
+    engine->shader[engine->current.shader].use();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, engine->font[0].data.id);
+
+    engine->shader[engine->current.shader].set("type", 2);
+    engine->shader[engine->current.shader].set("color", color);
+    engine->shader[engine->current.shader].set("ratio", engine->ratio());
+
+    // WARNING: Possible Div by 0
+    // float step = width / text.size();
+    // float left = center.x - step * text.size() / 2.0f;
+
+    // // iterate through all characters
+    // for (int i = 0; i < (int)text.size(); i++) {
+    //     char c = text[i] - tfont.start;
+
+    //     // Set Position
+    //     s.set("center", vec2(left + i * step, center.y));
+    //     s.set("size", vec2(step, step * height));
+
+    //     // WARNING: Possible Divs by 0
+    //     vec2 start = {(c % tfont.width) / (float)tfont.width,
+    //                   (c / tfont.height + 1) / (float)tfont.height};
+    //     vec2 csize = {1.0f / (float)tfont.width, 1.0f / (float)tfont.height};
+
+    //     tfont.vertices[2] = start.x;
+    //     tfont.vertices[3] = 1 - start.y + csize.y;
+    //     tfont.vertices[6] = start.x;
+    //     tfont.vertices[7] = 1 - start.y;
+    //     tfont.vertices[10] = start.x + csize.x;
+    //     tfont.vertices[11] = 1 - start.y;
+
+    //     tfont.vertices[14] = start.x + csize.x;
+    //     tfont.vertices[15] = 1 - start.y + csize.y;
+
+    //     glBindBuffer(GL_ARRAY_BUFFER, tfont.VBO);
+    //     glBufferData(GL_ARRAY_BUFFER, sizeof(tfont.vertices), tfont.vertices,
+    //                  GL_STATIC_DRAW);
+
+    //     glBindVertexArray(tfont.VAO);
+    //     // glDrawArrays(GL_TRIANGLES, 0, 6);
+    //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // }
 }
