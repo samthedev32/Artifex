@@ -11,9 +11,12 @@ enum class FILE_TYPE {
     AUTO,
     SHADER,
     IMAGE,
+    AUDIO,
+    MESH,
     FONT,
 };
 
+// Resource Manager for Artifex
 struct Load {
   public:
     // Initialize Loader
@@ -22,20 +25,25 @@ struct Load {
     // DeInitialize Loader
     void deinit();
 
-    // Load Shader(s)
+    // Load Shader
     uint16_t shader(const char *vertex, const char *fragment,
                     const char *geometry = "");
-
-    // Load Compact Shader from file
     uint16_t shader(const char *path);
 
-    // Load RAW Texture
+    // Load Texture
     uint16_t texture(unsigned char *data, int width, int height, int channels);
-
-    // Load Texture from file
     uint16_t texture(const char *path);
 
-    // TODO: font loading
+    // Load Mesh
+    uint16_t mesh();
+    uint16_t mesh(const char *path);
+
+    // Load Audio
+    uint16_t audio();
+    uint16_t audio(const char *path);
+
+    // Load Font
+    uint16_t font();
     uint16_t font(const char *path);
 
     // Load Resource

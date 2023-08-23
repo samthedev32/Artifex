@@ -30,6 +30,10 @@ class Engine : public Window {
     // Get Ratio of Window (width/height)
     inline float ratio() { return (float)width / (float)height; }
 
+    struct {
+        void texture(unsigned char *data);
+    } create;
+
     // Resource Loader
     Load load;
 
@@ -41,8 +45,8 @@ class Engine : public Window {
 
     // Selected Resources
     struct {
-        GLuint shader;
-        GLuint font;
+        uint16_t shader;
+        uint16_t font;
     } current;
 
   public:
@@ -52,16 +56,14 @@ class Engine : public Window {
     // Duration of Last Frame
     float deltaTime;
 
-    // ---- Resources
-
-    // Loaded Shaders
-    std::vector<Shader> shader;
-
-    // Loaded Textures
-    std::vector<Texture> texture;
-
-    // Loaded Fonts
-    std::vector<Font> font;
+    // Resources
+    struct {
+        std::vector<Shader> shader;
+        std::vector<Texture> texture;
+        std::vector<GLuint> mesh;
+        std::vector<Font> font;
+        std::vector<GLuint> audio; // TODO
+    } resource;
 
   private:
     float past;

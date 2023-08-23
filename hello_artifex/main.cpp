@@ -7,7 +7,6 @@ int main() {
     Engine ax("Hello Artifex", 720, 480);
 
     ax.load.load("../../hello_artifex/milk.png");
-    ax.load.load("../../hello_artifex/font.bmp", FILE_TYPE::FONT);
 
     float v = 0;
     while (ax.update({0.1f, 0.1f, 0.1f})) {

@@ -72,16 +72,6 @@ void Render::deinit() {
     if (!initialized)
         return;
 
-    // Free Textures
-    //  (engine->texture.size() > 0)
-    // glDeleteTextures(engine->texture.size(), engine->texture.data());
-    // engine->texture.clear();
-    //
-    // Free Shaders
-    // for (auto s : engine->shader)
-    // glDeleteShader(s.id);
-    // engine->shader.clear();
-
     // Delete Buffers
     GLuint buffers[] = {VAO, VBO};
     glDeleteBuffers(2, buffers);
@@ -100,19 +90,21 @@ void Render::line(vec2 a, vec2 b, vec3 color) {
 }
 
 void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
-    engine->shader[0].use();
+    engine->resource.shader[engine->current.shader].use();
 
     // Vertex
-    engine->shader[0].set("center", center);
-    engine->shader[0].set("size", vec2(size / 2.0f));
-    engine->shader[0].set("ratio", engine->ratio());
-    engine->shader[0].set("rotation", rotation);
+    engine->resource.shader[engine->current.shader].set("center", center);
+    engine->resource.shader[engine->current.shader].set("size",
+                                                        vec2(size / 2.0f));
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
+    engine->resource.shader[engine->current.shader].set("rotation", rotation);
 
     // Fragment
-    engine->shader[0].set("type", GL_RECT);
-    engine->shader[0].set("isTextured", 0);
+    engine->resource.shader[engine->current.shader].set("type", GL_RECT);
+    engine->resource.shader[engine->current.shader].set("isTextured", 0);
 
-    engine->shader[0].set("color", color);
+    engine->resource.shader[engine->current.shader].set("color", color);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -120,41 +112,45 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
 
 void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine->texture[tex].id);
+    glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
-    engine->shader[0].use();
+    engine->resource.shader[engine->current.shader].use();
 
     // Vertex
-    engine->shader[0].set("center", center);
-    engine->shader[0].set("size", vec2(size / 2.0f));
-    engine->shader[0].set("ratio", engine->ratio());
-    engine->shader[0].set("rotation", rotation);
+    engine->resource.shader[engine->current.shader].set("center", center);
+    engine->resource.shader[engine->current.shader].set("size",
+                                                        vec2(size / 2.0f));
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
+    engine->resource.shader[engine->current.shader].set("rotation", rotation);
 
     // Fragment
-    engine->shader[0].set("type", GL_RECT);
-    engine->shader[0].set("isTextured", 1);
+    engine->resource.shader[engine->current.shader].set("type", GL_RECT);
+    engine->resource.shader[engine->current.shader].set("isTextured", 1);
 
-    engine->shader[0].set("tex", 0);
+    engine->resource.shader[engine->current.shader].set("tex", 0);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
-    engine->shader[0].use();
+    engine->resource.shader[engine->current.shader].use();
 
     // Vertex
-    engine->shader[0].set("center", center);
-    engine->shader[0].set("size", vec2(radius, radius));
-    engine->shader[0].set("ratio", engine->ratio());
-    engine->shader[0].set("rotation", 0);
+    engine->resource.shader[engine->current.shader].set("center", center);
+    engine->resource.shader[engine->current.shader].set("size",
+                                                        vec2(radius, radius));
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
+    engine->resource.shader[engine->current.shader].set("rotation", 0);
 
     // Fragment
-    engine->shader[0].set("type", GL_CIRCLE);
-    engine->shader[0].set("isTextured", 0);
+    engine->resource.shader[engine->current.shader].set("type", GL_CIRCLE);
+    engine->resource.shader[engine->current.shader].set("isTextured", 0);
 
-    engine->shader[0].set("color", color);
-    engine->shader[0].set("cutradius", cutradius);
+    engine->resource.shader[engine->current.shader].set("color", color);
+    engine->resource.shader[engine->current.shader].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
@@ -163,36 +159,39 @@ void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
 void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
                     float cutradius, vec2 offset) {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine->texture[tex].id);
+    glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
-    engine->shader[0].use();
+    engine->resource.shader[engine->current.shader].use();
 
     // Vertex
-    engine->shader[0].set("center", center);
-    engine->shader[0].set("size", vec2(radius, radius));
-    engine->shader[0].set("ratio", engine->ratio());
-    engine->shader[0].set("rotation", rotation);
+    engine->resource.shader[engine->current.shader].set("center", center);
+    engine->resource.shader[engine->current.shader].set("size",
+                                                        vec2(radius, radius));
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
+    engine->resource.shader[engine->current.shader].set("rotation", rotation);
 
     // Fragment
-    engine->shader[0].set("type", GL_CIRCLE);
-    engine->shader[0].set("isTextured", 1);
+    engine->resource.shader[engine->current.shader].set("type", GL_CIRCLE);
+    engine->resource.shader[engine->current.shader].set("isTextured", 1);
 
-    engine->shader[0].set("tex", 0);
-    engine->shader[0].set("cutradius", cutradius);
+    engine->resource.shader[engine->current.shader].set("tex", 0);
+    engine->resource.shader[engine->current.shader].set("cutradius", cutradius);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Render::text(vec2 center, float width, vec3 color, float rotation) {
-    engine->shader[engine->current.shader].use();
+    engine->resource.shader[engine->current.shader].use();
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine->font[0].data.id);
+    glBindTexture(GL_TEXTURE_2D, engine->resource.font[0].data.id);
 
-    engine->shader[engine->current.shader].set("type", 2);
-    engine->shader[engine->current.shader].set("color", color);
-    engine->shader[engine->current.shader].set("ratio", engine->ratio());
+    engine->resource.shader[engine->current.shader].set("type", 2);
+    engine->resource.shader[engine->current.shader].set("color", color);
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
 
     // WARNING: Possible Div by 0
     // float step = width / text.size();
