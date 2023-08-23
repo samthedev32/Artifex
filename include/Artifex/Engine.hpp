@@ -9,6 +9,7 @@
 
 #include <Artifex/types/types.hpp>
 
+#include <SDL2/SDL_mixer.h>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -66,7 +67,9 @@ class Engine : public Window {
         std::vector<Texture> texture;
         std::vector<GLuint> mesh;
         std::vector<Font> font;
-        std::vector<int> audio;
+
+        std::vector<Mix_Music *> music;
+        std::vector<Mix_Chunk *> audio;
     } resource;
 
   private:

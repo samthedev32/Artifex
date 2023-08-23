@@ -18,6 +18,12 @@ struct Mix {
     // DeInitialize Mixer
     void deinit();
 
+    // Play Music
+    void music(uint16_t id, int loops = 0);
+
+    // Play Audio
+    void audio(uint16_t id, int channel = -1, int loops = 0);
+
   private:
     bool initialized = false;
     Engine *engine = nullptr;

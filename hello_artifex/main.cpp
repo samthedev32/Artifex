@@ -7,6 +7,9 @@ int main() {
     Engine ax("Hello Artifex", 720, 480);
 
     ax.load.load("../../hello_artifex/milk.png");
+    ax.load.music("../../hello_artifex/music.mp3");
+
+    ax.mix.music(0, -1);
 
     float v = 0;
     while (ax.update({0.1f, 0.1f, 0.1f})) {

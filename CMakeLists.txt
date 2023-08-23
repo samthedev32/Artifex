@@ -25,6 +25,7 @@ set(SOURCES
 # Libraries
 set(LIBRARIES
     SDL2
+    SDL2_mixer
     mathutil
 )
 

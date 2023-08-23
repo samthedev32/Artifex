@@ -39,7 +39,7 @@ struct Load {
     uint16_t mesh(const char *path);
 
     // Load Audio
-    uint16_t audio();
+    uint16_t music(const char *path);
     uint16_t audio(const char *path);
 
     // Load Font

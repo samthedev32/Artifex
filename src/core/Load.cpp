@@ -7,6 +7,8 @@
 #include <GL/stb_image.h>
 #endif
 
+#include <SDL2/SDL_mixer.h>
+
 using namespace Artifex;
 
 void Load::init(Engine *pEngine) {
@@ -21,6 +23,26 @@ void Load::init(Engine *pEngine) {
 void Load::deinit() {
     if (!initialized)
         return;
+
+    // Free Audios
+    for (auto audio : engine->resource.audio)
+        Mix_FreeChunk(audio);
+    engine->resource.audio.clear();
+
+    // Free Musics
+    for (auto music : engine->resource.music)
+        Mix_FreeMusic(music);
+    engine->resource.music.clear();
+
+    // Free Fonts
+    for (auto font : engine->resource.font)
+        glDeleteTextures(1, &font.data.id);
+    engine->resource.font.clear();
+
+    // Free Meshes
+    for (auto mesh : engine->resource.mesh)
+        mesh = 0;
+    engine->resource.mesh.clear();
 
     // Free Textures
     for (auto t : engine->resource.texture)
@@ -253,11 +275,30 @@ uint16_t Load::texture(const char *path) {
     return texture(data, width, height, channels);
 }
 
-// TODO: raw audio loading
+uint16_t Load::music(const char *path) {
+    Mix_Music *music = Mix_LoadMUS(path);
+
+    if (!music) {
+        log_error("Load::music", "Failed to open file");
+        return 0;
+    }
+
+    // Add to list + return ID
+    engine->resource.music.push_back(music);
+    return engine->resource.music.size() - 1;
+}
 
 uint16_t Load::audio(const char *path) {
+    // Fix it, there's a bug inside
+    Mix_Chunk *chunk = Mix_LoadWAV(path);
+
+    if (!chunk) {
+        log_error("Load::audio", "Failed to open file");
+        return 0;
+    }
+
     // Add to list + return ID
-    engine->resource.audio.push_back(0);
+    engine->resource.audio.push_back(chunk);
     return engine->resource.audio.size() - 1;
 }
 
