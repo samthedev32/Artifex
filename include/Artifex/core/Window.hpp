@@ -42,7 +42,8 @@ class Window {
     void exit(bool sure = true);
 
     // Enable/Disable Fullscreen Mode
-    void fullscreen(bool en = true);
+    void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
+                    int minWidth = 720, int minHeight = 480);
 
     // Enable/Disable VSync
     void vsync(int interval = 1);
@@ -65,6 +66,7 @@ class Window {
     SDL_Window *window = nullptr;
     SDL_GLContext glcontext;
     bool shouldClose = false;
+    bool isFullscreen = false;
 
     const Uint8 *keyboard;
     bool mouse[3];

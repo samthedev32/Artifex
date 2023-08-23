@@ -22,8 +22,7 @@ Window::Window(std::string name, int width, int height)
     // Create Window
     window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED, width, height,
-                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
-                                  SDL_WINDOW_FULLSCREEN_DESKTOP * isFullscreen);
+                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
         log_error("Window::Window", "Failed to create window: %s",
@@ -31,12 +30,7 @@ Window::Window(std::string name, int width, int height)
         return;
     }
 
-    // Set Window's Minimum Size
-    SDL_SetWindowMinimumSize(window, 720, 480);
-
-    // Show/Hide Cursor (depending on fullscreen)
-    SDL_ShowCursor((SDL_bool)!isFullscreen);
-    SDL_SetRelativeMouseMode((SDL_bool)isFullscreen);
+    fullscreen(isFullscreen);
 
     // Init OpenGL 3.3 Core (or higher)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -97,6 +91,11 @@ bool Window::update() {
             shouldClose = true;
             break;
 
+        case SDL_KEYDOWN:
+            if (event.key.keysym.scancode == SDL_SCANCODE_F11)
+                fullscreen(!isFullscreen);
+            break;
+
         case SDL_MOUSEBUTTONDOWN:
             if (0 < event.button.button && event.button.button < 4)
                 mouse[event.button.button - 1] = true; // left, middle, right
@@ -129,27 +128,18 @@ bool Window::update() {
 
 void Window::exit(bool sure) { shouldClose = sure; }
 
-void Window::fullscreen(bool en) {
-    // if (en) {
-    //     // Save Window Size
-    //     small_size[0] = width;
-    //     small_size[1] = height;
+void Window::fullscreen(bool en, uint8_t hiddenCursor, int minWidth,
+                        int minHeight) {
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
-    //     // Get Monitor
-    //     GLFWmonitor *monitor = glfwGetWindowMonitor(window);
-    //     if (!monitor)
-    //         monitor = glfwGetPrimaryMonitor();
+    bool cursor = hiddenCursor > true ? en : hiddenCursor;
 
-    //     const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
+    SDL_ShowCursor((SDL_bool)!cursor);
+    SDL_SetRelativeMouseMode((SDL_bool)cursor);
 
-    //     // Make Fullscreen
-    //     glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width,
-    //                          videoMode->height, GLFW_DONT_CARE);
-    // } else {
-    //     // Undo Fullscreen
-    //     glfwSetWindowMonitor(window, nullptr, 0, 0, small_size[0],
-    //                          small_size[1], GLFW_DONT_CARE);
-    // }
+    SDL_SetWindowMinimumSize(window, minWidth, minHeight);
+
+    isFullscreen = en;
 }
 
 void Window::vsync(int interval) { SDL_GL_SetSwapInterval(interval); }
