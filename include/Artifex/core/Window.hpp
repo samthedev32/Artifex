@@ -2,12 +2,13 @@
 #pragma once
 
 // Detect OS
-#include <unordered_map>
 #if defined(__linux)
 #define __pc
 #elif defined(__WIN32)
 #define __windows
 #define __pc
+
+#define SDL_MAIN_HANDLED
 #elif defined(__EMSCRIPTEN__)
 #define __webassembly
 #define __browser
@@ -20,10 +21,8 @@
 #include <mathutil/common.hpp>
 
 #include <GL/glad.h>
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 
-#include <map>
-#include <set>
 #include <string>
 
 namespace Artifex {
@@ -57,24 +56,18 @@ class Window {
 
     // Cursor & Scroll Positions
     vec2 cursor, scroll;
+    float sensitivity = 1.0f;
 
-    // TODO: make emscripten compatible
-    // https://github.com/emscripten-core/emscripten/blob/main/test/third_party/glbook/Common/esUtil.h
-
-  private:
-    GLFWwindow *window = nullptr;
-    int small_size[2];
-
-    std::set<int> keyboard;
-
-    bool mouseState[3];
+    // Timing
+    float past, now, deltaTime;
 
   private:
-    static void callback_resize(GLFWwindow *window, int w, int h);
-    static void callback_key(GLFWwindow *window, int key, int scancode,
-                             int action, int mods);
-    static void callback_cursor(GLFWwindow *window, double x, double y);
-    static void callback_scroll(GLFWwindow *window, double x, double y);
+    SDL_Window *window = nullptr;
+    SDL_GLContext glcontext;
+    bool shouldClose = false;
+
+    const Uint8 *keyboard;
+    bool mouse[3];
 };
 
 } // namespace Artifex

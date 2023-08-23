@@ -12,9 +12,10 @@ set(SOURCES
 
     # Core
     src/core/Window.cpp
-    src/core/Render.cpp
     src/core/Load.cpp
+    src/core/Render.cpp
     src/core/UI.cpp
+    src/core/Mix.cpp
 
     src/types/shader.cpp
 
@@ -23,7 +24,7 @@ set(SOURCES
 
 # Libraries
 set(LIBRARIES
-    glfw
+    SDL2
     mathutil
 )
 

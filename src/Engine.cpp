@@ -12,16 +12,22 @@ Engine::Engine(std::string name, int width, int height)
     : Window(name, width, height) {
 
     load.init(this);
+
     render.init(this);
     ui.init(this);
+
+    mix.init(this);
 
     past = now = time();
 }
 
 Engine::~Engine() {
-    render.deinit();
-    load.deinit();
+    mix.deinit();
+
     ui.deinit();
+    render.deinit();
+
+    load.deinit();
 }
 
 bool Engine::update(vec3 clearColor) {

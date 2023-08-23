@@ -3,6 +3,7 @@
 #include <Artifex/core/Window.hpp>
 
 #include <Artifex/core/Load.hpp>
+#include <Artifex/core/Mix.hpp>
 #include <Artifex/core/Render.hpp>
 #include <Artifex/core/UI.hpp>
 
@@ -43,6 +44,9 @@ class Engine : public Window {
     // UI Renderer
     UI ui;
 
+    // Audio Mixer
+    Mix mix;
+
     // Selected Resources
     struct {
         uint16_t shader;
@@ -62,7 +66,7 @@ class Engine : public Window {
         std::vector<Texture> texture;
         std::vector<GLuint> mesh;
         std::vector<Font> font;
-        std::vector<GLuint> audio; // TODO
+        std::vector<int> audio;
     } resource;
 
   private:
