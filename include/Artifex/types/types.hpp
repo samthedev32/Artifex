@@ -11,6 +11,8 @@
 
 namespace Artifex {
 
+class Engine;
+
 // OpenGL Texture ID
 struct Texture {
     int width, height, channels;
@@ -37,6 +39,18 @@ struct Font {
         1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
         1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
     };
+};
+
+// Module
+class Module {
+  public:
+    Engine *ax;
+
+  public:
+    virtual bool onCreate() { return true; }
+    virtual void onDestroy() {}
+
+    virtual bool onUpdate(float deltaTime) { return true; }
 };
 
 } // namespace Artifex

@@ -69,7 +69,7 @@ class Window {
     bool isFullscreen = false;
 
     const Uint8 *keyboard;
-    bool mouse[3];
+    bool mouse[3]{};
 };
 
 } // namespace Artifex

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL2/SDL_mixer.h>
+
 #include <mathutil/common.hpp>
 
 #include <cstdint>

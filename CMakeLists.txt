@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Dependency Libs
-add_subdirectory(mathutil)
+add_subdirectory(Math3D)
 
 # Source Files
 set(SOURCES
@@ -26,7 +26,7 @@ set(SOURCES
 set(LIBRARIES
     SDL2
     SDL2_mixer
-    mathutil
+    Math3D
 )
 
 # Project

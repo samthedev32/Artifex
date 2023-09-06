@@ -9,12 +9,12 @@
 
 #include <Artifex/types/types.hpp>
 
-#include <SDL2/SDL_mixer.h>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
 
 // TODO: physics
+// TODO: optimized rendering
 
 namespace Artifex {
 
@@ -23,7 +23,10 @@ class Engine : public Window {
     Engine(std::string name, int width = 0, int height = 0);
     ~Engine();
 
-    // Update Engine & Window
+    // Game Loop
+    void loop(vec3 clearColor = vec3(), bool (*onUpdate)(float) = nullptr);
+
+    // Update Engine & Window (for manual game loop)
     bool update(vec3 clearColor);
 
     // Get Current Time (s)
@@ -32,14 +35,13 @@ class Engine : public Window {
     // Get Ratio of Window (width/height)
     inline float ratio() { return (float)width / (float)height; }
 
-    struct {
-        void texture(unsigned char *data);
-    } create;
+    // Add Module
+    bool add(std::string name, Module *module, bool enable = true);
 
     // Resource Loader
     Load load;
 
-    // Basic Shape Renderer
+    // Basic Renderer
     Render render;
 
     // UI Renderer
@@ -47,6 +49,9 @@ class Engine : public Window {
 
     // Audio Mixer
     Mix mix;
+
+    // Modules / Add-ons
+    std::unordered_map<std::string, Module *> module;
 
     // Selected Resources
     struct {
