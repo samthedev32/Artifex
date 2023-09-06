@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mathutil/common.hpp>
+#include <Math3D/matrix.hpp>
+#include <Math3D/vector.hpp>
 
 #include <string>
 #include <unordered_map>

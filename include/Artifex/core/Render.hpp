@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Artifex/types/shader.hpp>
-#include <mathutil/common.hpp>
 
 #include <cstdint>
 #include <vector>

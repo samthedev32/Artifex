@@ -18,7 +18,7 @@
 #warning Targeted OS is not recognized
 #endif
 
-#include <mathutil/common.hpp>
+#include <Math3D/vector.hpp>
 
 #include <GL/glad.h>
 #include <SDL2/SDL.h>
