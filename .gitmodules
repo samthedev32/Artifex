@@ -1,3 +1,4 @@
-[submodule "Math3D"]
-	path = Math3D
-	url = https://github.com/samthedev32/Math3D
+
+[submodule "EngineToolkit"]
+	path = EngineToolkit
+	url = https://github.com/samthedev32/EngineToolkit
