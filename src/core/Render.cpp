@@ -16,17 +16,17 @@ void Render::init(Engine *pEngine) {
     engine = pEngine;
 
     // Load Default Rect
-    float vertices[] = {
+    vec<2> vertices[] = {
         // positions      // texture coords
-        -1.0f, 1.0f,  0.0f, 0.0f, // top right
-        -1.0f, -1.0f, 0.0f, 1.0f, // bottom right
-        1.0f,  -1.0f, 1.0f, 1.0f, // bottom left
-        1.0f,  1.0f,  1.0f, 0.0f  // top left
+        {-1.0f, 1.0f},  {0.0f, 0.0f}, // top right
+        {-1.0f, -1.0f}, {0.0f, 1.0f}, // bottom right
+        {1.0f, -1.0f},  {1.0f, 1.0f}, // bottom left
+        {1.0f, 1.0f},   {1.0f, 0.0f}  // top left
     };
 
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+    vec<3, int> indices[] = {
+        {0, 1, 3}, // first triangle
+        {1, 2, 3}  // second triangle
     };
 
     glGenVertexArrays(1, &VAO);
@@ -176,6 +176,33 @@ void Render::circle(vec<2> center, float radius, uint16_t tex, float rotation,
 
     engine->resource.shader[engine->current.shader].set("tex", 0);
     engine->resource.shader[engine->current.shader].set("cutradius", cutradius);
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Render::rounded(vec<2> center, float radius, uint16_t tex, float amount) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
+
+    engine->resource.shader[engine->current.shader].use();
+
+    // Vertex
+    engine->resource.shader[engine->current.shader].set("center", center);
+    engine->resource.shader[engine->current.shader].set("size",
+                                                        vec<2>(radius, radius));
+    engine->resource.shader[engine->current.shader].set("ratio",
+                                                        engine->ratio());
+    engine->resource.shader[engine->current.shader].set("rotation", 0.0f);
+
+    // Fragment
+    engine->resource.shader[engine->current.shader].set("type", 2);
+    engine->resource.shader[engine->current.shader].set("isTextured", 1);
+
+    engine->resource.shader[engine->current.shader].set("tex", 0);
+    engine->resource.shader[engine->current.shader].set("cutradius", 0.0f);
+
+    engine->resource.shader[engine->current.shader].set("corner", amount);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);

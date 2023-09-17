@@ -15,13 +15,16 @@ class Game : public Module {
     bool onUpdate(float deltaTime) {
         if (ax->key("esc"))
             ax->exit();
-        ax->render.circle({}, 0.6f, 1);
-        ax->render.circle({}, 0.5f, {1.0f, 0.4f, 0.0f});
-        ax->render.circle({}, 0.3f, 1);
 
-        ax->render.circle(ax->cursor, 0.1f,
-                          ax->key("left") ? (vec3){1.0f, 0.0f, 0.0f}
-                                          : (vec3){0.0f, 1.0f, 0.0f});
+        // ax->render.circle({}, 0.6f, 1, ax->now * (180), 0, {1.0f, 0.2f});
+        // ax->render.circle({}, 0.4f, 1, ax->now * 90, 0.7f);
+        // ax->render.circle({}, 0.5f, {1.0f, 0.4f, 0.0f}, 0.8f);
+
+        // ax->render.circle(ax->cursor, 0.1f,
+        //                   ax->key("left") ? (vec3){1.0f, 0.0f, 0.0f}
+        //                                   : (vec3){0.0f, 1.0f, 0.0f});
+
+        ax->render.rounded(ax->cursor, 0.5f, 1, (sin(ax->now) + 1.0f) / 2.0f);
 
         return true;
     }

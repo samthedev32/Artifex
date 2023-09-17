@@ -39,6 +39,9 @@ struct Render {
                 float rotation = 0.0f, float cutradius = 0.0f,
                 vec<2> offset = 0.0f);
 
+    // Draw Rounded Corner
+    void rounded(vec<2> center, float radius, uint16_t tex, float amount);
+
     // Draw Text
     void text(vec<2> center, float width, vec<3> color, float rotation = 0.0f);
 
