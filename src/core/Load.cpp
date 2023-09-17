@@ -1,3 +1,4 @@
+#include "EngineToolkit/log/log.hpp"
 #include <Artifex/core/Load.hpp>
 
 #include <Artifex/Engine.hpp>
@@ -62,7 +63,7 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     // Exit if no Shader Code
     const size_t minSize = 8;
     if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
-        log_error("Load::shader", "No Shader Resources");
+        Log::error("Load::shader", "No Shader Resources");
         return 0;
     }
 
@@ -88,8 +89,8 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vert, 1024, NULL, infoLog);
-        log_error("Load::shader", "Failed to Compile Vertex Shader:\n%s",
-                  infoLog);
+        Log::error("Load::shader", "Failed to Compile Vertex Shader:\n%s",
+                   infoLog);
         return 0;
     }
 
@@ -102,8 +103,8 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     if (!success) {
         glGetShaderInfoLog(frag, 1024, NULL, infoLog);
         glDeleteShader(vert);
-        log_error("Load::shader", "Failed to Compile Fragment Shader:\n%s",
-                  infoLog);
+        Log::error("Load::shader", "Failed to Compile Fragment Shader:\n%s",
+                   infoLog);
         return 0;
     }
 
@@ -116,8 +117,8 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
         glGetShaderiv(geo, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(geo, 1024, NULL, infoLog);
-            log_error("Load::shader", "Failed to Compile Geometry Shader:\n%s",
-                      infoLog);
+            Log::error("Load::shader", "Failed to Compile Geometry Shader:\n%s",
+                       infoLog);
             isGeo = false;
         }
     }
@@ -141,15 +142,15 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(id, 1024, NULL, infoLog);
-        log_error("Load::shader", "Failed to Link Shaders:\n%s", infoLog);
+        Log::error("Load::shader", "Failed to Link Shaders:\n%s", infoLog);
         return 0;
     }
 
-    log_system("Load::shader", "Loaded Shader", infoLog);
+    Log::verbose("Load::shader", "Loaded Shader", infoLog);
 
     // Add to list + return ID
     engine->resource.shader.push_back(Shader(id));
-    return engine->resource.shader.size() - 0;
+    return engine->resource.shader.size() - 1;
 }
 
 uint16_t Load::shader(const char *path) {
@@ -172,8 +173,8 @@ uint16_t Load::shader(const char *path) {
                 else if (!strcmp(parameter, "geometry"))
                     current = 3;
                 else
-                    log_warning("Load::load::shader", "Invalid Parameter: %s",
-                                parameter);
+                    Log::warning("Load::load::shader", "Invalid Parameter: %s",
+                                 parameter);
             } else {
                 switch (current) {
                 default:
@@ -199,7 +200,7 @@ uint16_t Load::shader(const char *path) {
         return shader(vertex.c_str(), fragment.c_str(), geometry.c_str());
     }
 
-    log_error("Load::shader", "Failed to Open File");
+    Log::error("Load::shader", "Failed to Open File");
 
     return 0;
 }
@@ -209,7 +210,7 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
     // Exit if invalid
     if (data == NULL || (width == 0 || height == 0) ||
         (channels < 1 || channels > 4)) {
-        log_error("Load::texture", "Invalid Texture");
+        Log::error("Load::texture", "Invalid Texture");
         return 0;
     }
 
@@ -251,7 +252,7 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    log_system("Load::texture", "Loaded Texture");
+    Log::verbose("Load::texture", "Loaded Texture");
 
     // Add to list + return ID
     engine->resource.texture.push_back((Texture){width, height, channels, id});
@@ -279,7 +280,7 @@ uint16_t Load::music(const char *path) {
     Mix_Music *music = Mix_LoadMUS(path);
 
     if (!music) {
-        log_error("Load::music", "Failed to open file");
+        Log::error("Load::music", "Failed to open file");
         return 0;
     }
 
@@ -293,7 +294,7 @@ uint16_t Load::audio(const char *path) {
     Mix_Chunk *chunk = Mix_LoadWAV(path);
 
     if (!chunk) {
-        log_error("Load::audio", "Failed to open file");
+        Log::error("Load::audio", "Failed to open file");
         return 0;
     }
 
@@ -319,12 +320,12 @@ uint16_t Load::font(const char *path) {
     // int err = bmp_load(&bmp, path, 1);
 
     // if (err) {
-    //     log_error("Load::font", "Loading font failed with code %i", err);
+    //     Log::error("Load::font", "Loading font failed with code %i", err);
     //     return 10 + err;
     // }
 
     // if (bmp.channels != 1) {
-    //     log_error("Load::font", "Failed to load BMP with 1 channel");
+    //     Log::error("Load::font", "Failed to load BMP with 1 channel");
     //     return 20;
     // }
 
@@ -368,7 +369,7 @@ uint16_t Load::font(const char *path) {
     //                       (void *)(2 * sizeof(float)));
     // glEnableVertexAttribArray(1);
 
-    // log_system("Load::font", "Loaded Font");
+    // Log::system("Load::font", "Loaded Font");
 
     // // Add to list + return ID
     // engine->resource.font.push_back(out);
@@ -404,7 +405,7 @@ uint16_t Load::load(const char *path, FILE_TYPE type) {
         else if (!strcmp(ext, ".font"))
             type = FILE_TYPE::FONT;
         else {
-            log_error("Load::load", "Unsupported Type: %s\n", ext);
+            Log::error("Load::load", "Unsupported Type: %s\n", ext);
             return 0;
         }
     }
@@ -413,7 +414,7 @@ uint16_t Load::load(const char *path, FILE_TYPE type) {
 
     switch (type) {
     default:
-        log_warning("Load::load", "Failed to identify file type");
+        Log::warning("Load::load", "Failed to identify file type");
         id = 0;
         break;
 

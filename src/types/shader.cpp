@@ -1,4 +1,5 @@
 #include <Artifex/types/shader.hpp>
+#include <iostream>
 
 using namespace Artifex;
 
@@ -17,8 +18,9 @@ void Shader::use() {
 void Shader::set(std::string n, bool value) {
     use();
 
-    if (uniforms[n] == 0)
+    if (uniforms.count(n) == 0)
         uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+
     glUniform1i(uniforms[n] - 1, (int)value);
 }
 
@@ -26,8 +28,9 @@ void Shader::set(std::string n, bool value) {
 void Shader::set(std::string n, int value) {
     use();
 
-    if (uniforms[n] == 0)
+    if (uniforms.count(n) == 0)
         uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+
     glUniform1i(uniforms[n] - 1, value);
 }
 
@@ -35,34 +38,39 @@ void Shader::set(std::string n, int value) {
 void Shader::set(std::string n, float value) {
     use();
 
-    if (uniforms[n] == 0)
+    if (uniforms.count(n) == 0)
         uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+
     glUniform1f(uniforms[n] - 1, value);
 }
 
 // Set 2D Vector Uniform
-void Shader::set(std::string n, vec2 vec) {
+void Shader::set(std::string n, EngineToolkit::vec<2> vec) {
     use();
 
-    if (uniforms[n] == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
-    glUniform2f(uniforms[n] - 1, vec.x, vec.y);
+    if (uniforms.count(n) == 0)
+        uniforms.insert(std::pair<std::string, GLuint>(
+            n, glGetUniformLocation(this->id, n.c_str()) + 1));
+
+    glUniform2f(uniforms[n] - 1, vec->x, vec->y);
 }
 
 // Set 3D Vector Uniform
-void Shader::set(std::string n, vec3 vec) {
+void Shader::set(std::string n, EngineToolkit::vec<3> vec) {
     use();
 
-    if (uniforms[n] == 0)
+    if (uniforms.count(n) == 0)
         uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
-    glUniform3f(uniforms[n] - 1, vec.x, vec.y, vec.z);
+
+    glUniform3f(uniforms[n] - 1, vec->x, vec->y, vec->z);
 }
 
 // Set 4 by 4 Matrix Uniform
-void Shader::set(std::string n, mat4 mat) {
+void Shader::set(std::string n, EngineToolkit::mat<4> mat) {
     use();
 
-    if (uniforms[n] == 0)
+    if (uniforms.count(n) == 0)
         uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
-    glUniformMatrix4fv(uniforms[n] - 1, 1, GL_FALSE, &mat.m[0][0]);
+
+    glUniformMatrix4fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
 }

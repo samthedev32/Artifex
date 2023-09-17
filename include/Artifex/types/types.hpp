@@ -9,6 +9,8 @@
 
 #include <Artifex/types/shader.hpp>
 
+#include <EngineToolkit/core/vector.hpp>
+
 namespace Artifex {
 
 class Engine;
@@ -25,8 +27,8 @@ struct Font {
     Texture data;
     uint8_t rows, cols;
 
-    vec2 VERT[6];
-    vec2 UV[6];
+    EngineToolkit::vec<2> VERT[6];
+    EngineToolkit::vec<2> UV[6];
 
     GLuint VAO, VBO;
 

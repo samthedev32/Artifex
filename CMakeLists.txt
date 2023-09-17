@@ -3,8 +3,14 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# Set C++ compiler flags for debug builds (use CMAKE_C_FLAGS for C)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+
+# Set C++ compiler flags for release builds
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
 # Dependency Libs
-add_subdirectory(Math3D)
+add_subdirectory(EngineToolkit)
 
 # Source Files
 set(SOURCES
@@ -26,7 +32,7 @@ set(SOURCES
 set(LIBRARIES
     SDL2
     SDL2_mixer
-    Math3D
+    EngineToolkit
 )
 
 # Project

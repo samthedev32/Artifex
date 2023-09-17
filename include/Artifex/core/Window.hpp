@@ -18,7 +18,7 @@
 #warning Targeted OS is not recognized
 #endif
 
-#include <Math3D/vector.hpp>
+#include <EngineToolkit/EngineToolkit.hpp>
 
 #include <GL/glad.h>
 #include <SDL2/SDL.h>
@@ -27,10 +27,12 @@
 
 namespace Artifex {
 
+using namespace EngineToolkit;
+
 class Window {
   public:
     // Create Window
-    Window(std::string name, int width = 0, int height = 0);
+    Window(std::string name, ivec2 size);
 
     // Destroy Window
     ~Window();
@@ -43,7 +45,7 @@ class Window {
 
     // Enable/Disable Fullscreen Mode
     void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
-                    int minWidth = 720, int minHeight = 480);
+                    ivec2 minSize = {720, 480});
 
     // Enable/Disable VSync
     void vsync(int interval = 1);
@@ -52,8 +54,8 @@ class Window {
     bool key(std::string k);
 
   public:
-    // Current Width & Height of Window
-    int width, height;
+    // Width & Height
+    ivec2 size;
 
     // Cursor & Scroll Positions
     vec2 cursor, scroll;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Math3D/vector/vec2.hpp>
+#include <EngineToolkit/core/vector.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -18,18 +18,19 @@ struct UI {
     void deinit();
 
     // Push Button
-    bool button(vec2 center, vec2 size, std::string name, uint16_t a,
-                uint16_t b);
+    bool button(EngineToolkit::vec<2> center, EngineToolkit::vec<2> size,
+                std::string name, uint16_t a, uint16_t b);
 
     // Toggle Switch
-    bool toggle(vec2 center, vec2 size, std::string name, uint16_t a,
-                uint16_t b);
+    bool toggle(EngineToolkit::vec<2> center, EngineToolkit::vec<2> size,
+                std::string name, uint16_t a, uint16_t b);
 
     // Touch
-    bool touch(vec2 center, vec2 size, uint16_t a, uint16_t b);
+    bool touch(EngineToolkit::vec<2> center, EngineToolkit::vec<2> size,
+               uint16_t a, uint16_t b);
 
     // Joystick
-    // vec2 joystick(vec2 center = vec2(), std::string name = "joystick",
+    // vec<2> joystick(vec<2> center = vec<2>(), std::string name = "joystick",
     //               float radius = 0.2f, float nob_radius = 0.04f,
     //               vec3 color = vec3(1.0f, 0.4f, 0.0f),
     //               vec3 nob_color = vec3(1.0f, 1.0f, 1.0f));

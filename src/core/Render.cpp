@@ -94,8 +94,7 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
 
     // Vertex
     engine->resource.shader[engine->current.shader].set("center", center);
-    engine->resource.shader[engine->current.shader].set("size",
-                                                        vec2(size / 2.0f));
+    engine->resource.shader[engine->current.shader].set("size", size / 2.0f);
     engine->resource.shader[engine->current.shader].set("ratio",
                                                         engine->ratio());
     engine->resource.shader[engine->current.shader].set("rotation", rotation);
@@ -118,8 +117,7 @@ void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
 
     // Vertex
     engine->resource.shader[engine->current.shader].set("center", center);
-    engine->resource.shader[engine->current.shader].set("size",
-                                                        vec2(size / 2.0f));
+    engine->resource.shader[engine->current.shader].set("size", size / 2.0f);
     engine->resource.shader[engine->current.shader].set("ratio",
                                                         engine->ratio());
     engine->resource.shader[engine->current.shader].set("rotation", rotation);

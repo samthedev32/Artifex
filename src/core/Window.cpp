@@ -1,32 +1,32 @@
 #include <Artifex/core/Window.hpp>
 
+#include <SDL2/SDL.h>
 #include <unordered_map>
 
-using namespace Artifex;
+namespace Artifex {
 
-Window::Window(std::string name, int width, int height)
-    : width(width), height(height) {
+Window::Window(std::string name, ivec2 size_) : size(size_) {
 
     // Decide if Fullscreened or not
-    bool isFullscreen = width == 0 || height == 0;
-    if (width <= 0 || height <= 0)
-        width = 1, height = 1;
+    bool isFullscreen = size->x == 0 || size->y == 0;
+    if (size->x <= 0 || size->y <= 0)
+        size->x = 1, size->y = 1;
 
     // Init SDL2
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        log_error("Window::Window", "Failed to Create Window: %s",
-                  SDL_GetError());
+        EngineToolkit::Log::error(
+            "Window::Window", "Failed to Create Window: %s", SDL_GetError());
         return;
     }
 
     // Create Window
     window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED, width, height,
+                              SDL_WINDOWPOS_UNDEFINED, size->x, size->y,
                               SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
-        log_error("Window::Window", "Failed to create window: %s",
-                  SDL_GetError());
+        EngineToolkit::Log::error(
+            "Window::Window", "Failed to create window: %s", SDL_GetError());
         return;
     }
 
@@ -42,7 +42,7 @@ Window::Window(std::string name, int width, int height)
 
     // Load GLAD
     if (!gladLoadGLLoader(SDL_GL_GetProcAddress) || glcontext == NULL) {
-        log_error("Window::Window", "Failed to init OpenGL");
+        EngineToolkit::Log::error("Window::Window", "Failed to init OpenGL");
         SDL_DestroyWindow(window);
         return;
     }
@@ -57,30 +57,31 @@ Window::~Window() {
 
 bool Window::update() {
     // Update Window Size
-    SDL_GetWindowSize(window, &width, &height);
+    SDL_GetWindowSize(window, &size->x, &size->y);
 
     // Update Window
     SDL_GL_SwapWindow(window);
 
     // Update Time
     past = now;
-    now = time();
+    now = 1.0f; // time();
+    // TODO: get time
     deltaTime = now - past;
 
     // update inputs
     keyboard = SDL_GetKeyboardState(NULL);
 
-    int m[2];
+    EngineToolkit::ivec2 m;
     if (!SDL_GetRelativeMouseMode()) {
-        SDL_GetMouseState(&m[0], &m[1]);
-        cursor.x = (m[0] / (float)width) * 2 - 1;
-        cursor.y = (m[1] / (float)height) * -2 + 1;
-        // cursor.x = map(m[0], 0, width, -1, 1);
-        // cursor.y = map(m[1], 0, height, 1, -1);
+        SDL_GetMouseState(&m->x, &m->y);
+        cursor->x = ((float)m->x / size->x) * 2 - 1;
+        cursor->y = ((float)m->y / size->y) * -2 + 1;
+        // cursor.x = map(m[0], 0, size->x, -1, 1);
+        // cursor.y = map(m[1], 0, size->y, 1, -1);
     } else {
         SDL_GetRelativeMouseState(&m[0], &m[1]);
-        cursor.x = m[0] * sensitivity;
-        cursor.y = m[1] * sensitivity;
+        cursor->x = m->x * sensitivity;
+        cursor->y = m->y * sensitivity;
     }
 
     // poll events
@@ -108,14 +109,14 @@ bool Window::update() {
 
         case SDL_MOUSEWHEEL:
             if (event.wheel.y > 0) // scroll up
-                scroll.y -= 1;
+                scroll->y -= 1;
             else if (event.wheel.y < 0) // scroll down
-                scroll.y += 1;
+                scroll->y += 1;
 
             if (event.wheel.x > 0) // scroll right
-                scroll.x += 1;
+                scroll->x += 1;
             else if (event.wheel.x < 0) // scroll left
-                scroll.x -= 1;
+                scroll->x -= 1;
             break;
 
         default:
@@ -128,8 +129,7 @@ bool Window::update() {
 
 void Window::exit(bool sure) { shouldClose = sure; }
 
-void Window::fullscreen(bool en, uint8_t hiddenCursor, int minWidth,
-                        int minHeight) {
+void Window::fullscreen(bool en, uint8_t hiddenCursor, ivec2 minSize) {
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
     bool cursor = hiddenCursor > true ? en : hiddenCursor;
@@ -137,7 +137,7 @@ void Window::fullscreen(bool en, uint8_t hiddenCursor, int minWidth,
     SDL_ShowCursor((SDL_bool)!cursor);
     SDL_SetRelativeMouseMode((SDL_bool)cursor);
 
-    SDL_SetWindowMinimumSize(window, minWidth, minHeight);
+    SDL_SetWindowMinimumSize(window, minSize->x, minSize->y);
 
     isFullscreen = en;
 }
@@ -243,3 +243,5 @@ bool Window::key(std::string k) {
 
     return keyboard[SDL2_SCANCODE_MAP[k]];
 }
+
+} // namespace Artifex

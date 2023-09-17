@@ -7,6 +7,8 @@
 
 namespace Artifex {
 
+using namespace EngineToolkit;
+
 class Engine;
 
 // OpenGL Renderer

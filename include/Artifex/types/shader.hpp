@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Math3D/matrix.hpp>
-#include <Math3D/vector.hpp>
+#include <EngineToolkit/core/matrix.hpp>
+#include <EngineToolkit/core/vector.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -33,14 +33,17 @@ struct Shader {
 
     // Set Float Uniform
     void set(std::string n, float value);
+
     // Set 2D Vector Uniform
-    void set(std::string n, vec2 vec);
+    void set(std::string n, EngineToolkit::vec<2> vec);
 
     // Set 3D Vector Uniform
-    void set(std::string n, vec3 vec);
+    void set(std::string n, EngineToolkit::vec<3> vec);
 
     // Set 4 by 4 Matrix Uniform
-    void set(std::string n, mat4 mat);
+    void set(std::string n, EngineToolkit::mat<4> mat);
+
+    // TODO: more vec & mat support
 };
 
 } // namespace Artifex

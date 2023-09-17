@@ -1,5 +1,7 @@
 #pragma once
 
+#include <EngineToolkit/EngineToolkit.hpp>
+
 #include <Artifex/core/Window.hpp>
 
 #include <Artifex/core/Load.hpp>
@@ -18,22 +20,24 @@
 
 namespace Artifex {
 
+using namespace EngineToolkit;
+
 class Engine : public Window {
   public:
-    Engine(std::string name, int width = 0, int height = 0);
+    Engine(std::string name, ivec2 size = {});
     ~Engine();
 
     // Game Loop
-    void loop(vec3 clearColor = vec3(), bool (*onUpdate)(float) = nullptr);
+    void loop(vec3 clearColor = {}, bool (*onUpdate)(float) = nullptr);
 
     // Update Engine & Window (for manual game loop)
-    bool update(vec3 clearColor);
+    bool update(vec<3> clearColor);
 
     // Get Current Time (s)
     float time();
 
     // Get Ratio of Window (width/height)
-    inline float ratio() { return (float)width / (float)height; }
+    inline float ratio() { return (float)size->x / size->y; } // bug
 
     // Add Module
     bool add(std::string name, Module *module, bool enable = true);
@@ -55,8 +59,8 @@ class Engine : public Window {
 
     // Selected Resources
     struct {
-        uint16_t shader;
-        uint16_t font;
+        uint16_t shader = 0;
+        uint16_t font = 0;
     } current;
 
   public:
