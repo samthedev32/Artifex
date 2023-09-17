@@ -44,7 +44,7 @@ bool Engine::update(EngineToolkit::vec<3> clearColor) {
     // Update Screen
     bool running = Window::update();
 
-    render.clear(clearColor->r, clearColor->g, clearColor->b);
+    render.clear(clearColor);
 
     // Update GL
     glViewport(0, 0, size->x, size->y);

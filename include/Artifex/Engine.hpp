@@ -1,7 +1,5 @@
 #pragma once
 
-#include <EngineToolkit/EngineToolkit.hpp>
-
 #include <Artifex/core/Window.hpp>
 
 #include <Artifex/core/Load.hpp>
@@ -14,9 +12,6 @@
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
-
-// TODO: physics
-// TODO: optimized rendering
 
 namespace Artifex {
 
@@ -37,7 +32,7 @@ class Engine : public Window {
     float time();
 
     // Get Ratio of Window (width/height)
-    inline float ratio() { return (float)size->x / size->y; } // bug
+    inline float ratio() { return (float)size->x / size->y; }
 
     // Add Module
     bool add(std::string name, Module *module, bool enable = true);

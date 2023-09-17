@@ -9,8 +9,6 @@
 
 #include <Artifex/types/shader.hpp>
 
-#include <EngineToolkit/core/vector.hpp>
-
 namespace Artifex {
 
 class Engine;

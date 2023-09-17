@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EngineToolkit/core/vector.hpp>
+#include <Artifex/types/types.hpp>
 
 #include <string>
 #include <unordered_map>

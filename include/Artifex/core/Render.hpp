@@ -7,8 +7,6 @@
 
 namespace Artifex {
 
-using namespace EngineToolkit;
-
 class Engine;
 
 // OpenGL Renderer
@@ -21,26 +19,30 @@ struct Render {
     void deinit();
 
     // Clear Screen
-    void clear(float r, float g, float b);
+    void clear(vec<3> color);
 
     // Draw Line
-    void line(vec2 a, vec2 b, vec3 color);
+    void line(vec<2> a, vec<2> b, vec<3> color);
 
     // Draw Rect (Colored)
-    void rect(vec2 center, vec2 size, vec3 color, float rotation = 0.0f);
+    void rect(vec<2> center, vec<2> size, vec<3> color, float rotation = 0.0f);
 
     // Draw Rect (Texture)
-    void rect(vec2 center, vec2 size, uint16_t tex, float rotation = 0.0f);
+    void rect(vec<2> center, vec<2> size, uint16_t tex, float rotation = 0.0f);
 
     // Draw Circle (Colored)
-    void circle(vec2 center, float radius, vec3 color, float cutradius = 0.0f);
+    void circle(vec<2> center, float radius, vec<3> color,
+                float cutradius = 0.0f);
 
     // Draw Circle (Textured)
-    void circle(vec2 center, float radius, uint16_t tex, float rotation = 0.0f,
-                float cutradius = 0.0f, vec2 offset = 0.0f);
+    void circle(vec<2> center, float radius, uint16_t tex,
+                float rotation = 0.0f, float cutradius = 0.0f,
+                vec<2> offset = 0.0f);
 
     // Draw Text
-    void text(vec2 center, float width, vec3 color, float rotation = 0.0f);
+    void text(vec<2> center, float width, vec<3> color, float rotation = 0.0f);
+
+    // TODO: Rotations
 
   private:
     bool initialized = false;

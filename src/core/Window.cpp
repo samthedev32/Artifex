@@ -5,7 +5,7 @@
 
 namespace Artifex {
 
-Window::Window(std::string name, ivec2 size_) : size(size_) {
+Window::Window(std::string name, vec<2, int> size_) : size(size_) {
 
     // Decide if Fullscreened or not
     bool isFullscreen = size->x == 0 || size->y == 0;
@@ -62,24 +62,16 @@ bool Window::update() {
     // Update Window
     SDL_GL_SwapWindow(window);
 
-    // Update Time
-    past = now;
-    now = 1.0f; // time();
-    // TODO: get time
-    deltaTime = now - past;
-
     // update inputs
     keyboard = SDL_GetKeyboardState(NULL);
 
-    EngineToolkit::ivec2 m;
+    EngineToolkit::vec<2, int> m;
     if (!SDL_GetRelativeMouseMode()) {
         SDL_GetMouseState(&m->x, &m->y);
         cursor->x = ((float)m->x / size->x) * 2 - 1;
         cursor->y = ((float)m->y / size->y) * -2 + 1;
-        // cursor.x = map(m[0], 0, size->x, -1, 1);
-        // cursor.y = map(m[1], 0, size->y, 1, -1);
     } else {
-        SDL_GetRelativeMouseState(&m[0], &m[1]);
+        SDL_GetRelativeMouseState(&m->x, &m->y);
         cursor->x = m->x * sensitivity;
         cursor->y = m->y * sensitivity;
     }
@@ -129,7 +121,7 @@ bool Window::update() {
 
 void Window::exit(bool sure) { shouldClose = sure; }
 
-void Window::fullscreen(bool en, uint8_t hiddenCursor, ivec2 minSize) {
+void Window::fullscreen(bool en, uint8_t hiddenCursor, vec<2, int> minSize) {
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
     bool cursor = hiddenCursor > true ? en : hiddenCursor;

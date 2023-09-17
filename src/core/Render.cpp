@@ -79,17 +79,17 @@ void Render::deinit() {
     initialized = false;
 }
 
-void Render::clear(float r, float g, float b) {
+void Render::clear(vec<3> color) {
     // Clear Screen
-    glClearColor(r, g, b, 1.0f);
+    glClearColor(color->r, color->g, color->b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Render::line(vec2 a, vec2 b, vec3 color) {
+void Render::line(vec<2> a, vec<2> b, vec<3> color) {
     // TODO
 }
 
-void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
+void Render::rect(vec<2> center, vec<2> size, vec<3> color, float rotation) {
     engine->resource.shader[engine->current.shader].use();
 
     // Vertex
@@ -109,7 +109,7 @@ void Render::rect(vec2 center, vec2 size, vec3 color, float rotation) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
+void Render::rect(vec<2> center, vec<2> size, uint16_t tex, float rotation) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
@@ -132,13 +132,14 @@ void Render::rect(vec2 center, vec2 size, uint16_t tex, float rotation) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
+void Render::circle(vec<2> center, float radius, vec<3> color,
+                    float cutradius) {
     engine->resource.shader[engine->current.shader].use();
 
     // Vertex
     engine->resource.shader[engine->current.shader].set("center", center);
     engine->resource.shader[engine->current.shader].set("size",
-                                                        vec2(radius, radius));
+                                                        vec<2>(radius, radius));
     engine->resource.shader[engine->current.shader].set("ratio",
                                                         engine->ratio());
     engine->resource.shader[engine->current.shader].set("rotation", 0);
@@ -154,8 +155,8 @@ void Render::circle(vec2 center, float radius, vec3 color, float cutradius) {
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
-                    float cutradius, vec2 offset) {
+void Render::circle(vec<2> center, float radius, uint16_t tex, float rotation,
+                    float cutradius, vec<2> offset) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
@@ -164,7 +165,7 @@ void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
     // Vertex
     engine->resource.shader[engine->current.shader].set("center", center);
     engine->resource.shader[engine->current.shader].set("size",
-                                                        vec2(radius, radius));
+                                                        vec<2>(radius, radius));
     engine->resource.shader[engine->current.shader].set("ratio",
                                                         engine->ratio());
     engine->resource.shader[engine->current.shader].set("rotation", rotation);
@@ -180,7 +181,7 @@ void Render::circle(vec2 center, float radius, uint16_t tex, float rotation,
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Render::text(vec2 center, float width, vec3 color, float rotation) {
+void Render::text(vec<2> center, float width, vec<3> color, float rotation) {
     engine->resource.shader[engine->current.shader].use();
 
     glActiveTexture(GL_TEXTURE0);
@@ -200,13 +201,14 @@ void Render::text(vec2 center, float width, vec3 color, float rotation) {
     //     char c = text[i] - tfont.start;
 
     //     // Set Position
-    //     s.set("center", vec2(left + i * step, center.y));
-    //     s.set("size", vec2(step, step * height));
+    //     s.set("center", vec<2>(left + i * step, center.y));
+    //     s.set("size", vec<2>(step, step * height));
 
     //     // WARNING: Possible Divs by 0
-    //     vec2 start = {(c % tfont.width) / (float)tfont.width,
+    //     vec<2> start = {(c % tfont.width) / (float)tfont.width,
     //                   (c / tfont.height + 1) / (float)tfont.height};
-    //     vec2 csize = {1.0f / (float)tfont.width, 1.0f / (float)tfont.height};
+    //     vec<2> csize = {1.0f / (float)tfont.width, 1.0f /
+    //     (float)tfont.height};
 
     //     tfont.vertices[2] = start.x;
     //     tfont.vertices[3] = 1 - start.y + csize.y;

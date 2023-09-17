@@ -32,7 +32,7 @@ using namespace EngineToolkit;
 class Window {
   public:
     // Create Window
-    Window(std::string name, ivec2 size);
+    Window(std::string name, vec<2, int> size);
 
     // Destroy Window
     ~Window();
@@ -45,7 +45,7 @@ class Window {
 
     // Enable/Disable Fullscreen Mode
     void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
-                    ivec2 minSize = {720, 480});
+                    vec<2, int> minSize = {720, 480});
 
     // Enable/Disable VSync
     void vsync(int interval = 1);
@@ -55,14 +55,11 @@ class Window {
 
   public:
     // Width & Height
-    ivec2 size;
+    vec<2, int> size;
 
     // Cursor & Scroll Positions
-    vec2 cursor, scroll;
+    vec<2> cursor, scroll;
     float sensitivity = 1.0f;
-
-    // Timing
-    float past, now, deltaTime;
 
   private:
     SDL_Window *window = nullptr;
