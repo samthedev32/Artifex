@@ -2,6 +2,7 @@
 #include <Artifex/core/Load.hpp>
 
 #include <Artifex/Engine.hpp>
+#include <cstring>
 
 #ifndef ARTIFEX_ONLY_BMP
 #define STB_IMAGE_IMPLEMENTATION
@@ -153,12 +154,15 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
     return engine->resource.shader.size() - 1;
 }
 
-uint16_t Load::shader(const char *path) {
+uint16_t Load::shader(const char *path,
+                      std::unordered_map<std::string, std::string> scripts) {
     FILE *f = fopen(path, "r");
 
     if (f) {
         uint8_t current = 0;
-        std::string vertex, fragment, geometry;
+
+        // RAW Shader Code (trash, vertex, fragment, geometry)
+        std::string code[4];
 
         char line[256];
         while (fgets(line, sizeof(line), f)) {
@@ -175,29 +179,20 @@ uint16_t Load::shader(const char *path) {
                 else
                     Log::warning("Load::load::shader", "Invalid Parameter: %s",
                                  parameter);
+            } else if (!strcmp(index, "#script")) {
+                if (scripts.count(parameter) != 0)
+                    code[current] += scripts[parameter];
+                else
+                    Log::warning("Load::load::shader",
+                                 "Shader Script not given: %s", parameter);
             } else {
-                switch (current) {
-                default:
-                    break;
-
-                case 1:
-                    vertex += line;
-                    break;
-
-                case 2:
-                    fragment += line;
-                    break;
-
-                case 3:
-                    geometry += line;
-                    break;
-                }
+                code[current] += line;
             }
         }
 
         fclose(f);
 
-        return shader(vertex.c_str(), fragment.c_str(), geometry.c_str());
+        return shader(code[1].c_str(), code[2].c_str(), code[3].c_str());
     }
 
     Log::error("Load::shader", "Failed to Open File");

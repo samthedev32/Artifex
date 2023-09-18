@@ -28,7 +28,8 @@ struct Load {
     // Load Shader
     uint16_t shader(const char *vertex, const char *fragment,
                     const char *geometry = "");
-    uint16_t shader(const char *path);
+    uint16_t shader(const char *path,
+                    std::unordered_map<std::string, std::string> scripts = {});
 
     // Load Texture
     uint16_t texture(unsigned char *data, int width, int height, int channels);

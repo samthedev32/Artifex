@@ -16,7 +16,7 @@ class Game : public Module {
         if (ax->key("esc"))
             ax->exit();
 
-        // ax->render.circle({}, 0.6f, 1, ax->now * (180), 0, {1.0f, 0.2f});
+        // ax->render.circle({}, 0.6f, 1, ax->now * (45), 0, {1.0f, 0.2f});
         // ax->render.circle({}, 0.4f, 1, ax->now * 90, 0.7f);
         // ax->render.circle({}, 0.5f, {1.0f, 0.4f, 0.0f}, 0.8f);
 
