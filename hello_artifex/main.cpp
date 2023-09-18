@@ -16,15 +16,10 @@ class Game : public Module {
         if (ax->key("esc"))
             ax->exit();
 
-        // ax->render.circle({}, 0.6f, 1, ax->now * (45), 0, {1.0f, 0.2f});
-        // ax->render.circle({}, 0.4f, 1, ax->now * 90, 0.7f);
-        // ax->render.circle({}, 0.5f, {1.0f, 0.4f, 0.0f}, 0.8f);
-
-        // ax->render.circle(ax->cursor, 0.1f,
-        //                   ax->key("left") ? (vec3){1.0f, 0.0f, 0.0f}
-        //                                   : (vec3){0.0f, 1.0f, 0.0f});
-
-        ax->render.rounded(ax->cursor, 0.5f, 1, (sin(ax->now) + 1.0f) / 2.0f);
+        // TODO: button style: half-rounded corners, rounded corners when
+        // hovered, shrink when clicked
+        ax->render.rounded(ax->cursor, {0.4f, 0.2f}, 1,
+                           (sin(ax->now) + 1.0f) / 2.0f, 0.0f);
 
         return true;
     }
@@ -35,7 +30,7 @@ int main() {
 
     ax.add("game", new Game());
 
-    ax.loop();
+    ax.loop({0.1f, 0.0f, 0.1f});
 
     return 0;
 }

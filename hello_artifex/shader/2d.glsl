@@ -5,33 +5,38 @@
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aTexCoord;
 
-out vec2 TexCoord;
-out vec2 FragPos;
+out struct {
+	vec2 TexCoord;
+	vec2 FragPos;
 
-out vec2 Center;
-out vec2 Size;
+	vec2 center;
+	vec2 size;
+} frag;
 
 uniform vec2 center;
 uniform vec2 size;
-uniform float rotation;
+uniform float rotation; // rotation in RADS
 
-uniform float ratio;
+uniform vec2 ratio;
 
 void main() {
-	float rads = radians(-rotation);
 	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
-	vec2 pos = center;
+	vec2 pos;
 
-	Size = size;
-	Center = center;
+	pos.x += (cos(rotation) * (point.x) - sin(rotation) * (point.y));
+	pos.y += (sin(rotation) * (point.x) + cos(rotation) * (point.y));
 
-	pos.x += (cos(rads) * (point.x) - sin(rads) * (point.y));
-	pos.y += (sin(rads) * (point.x) + cos(rads) * (point.y)) * ratio;
+	frag.FragPos = pos + center;
+	pos *= ratio;
+	pos += center;
 
-	TexCoord = aTexCoord;
-	FragPos = vec2(aPos.x, aPos.y);
-	gl_Position = vec4(pos.x, pos.y, 0.0, 1.0);
+	frag.center = center;
+	frag.size = size;
+
+	frag.TexCoord = aTexCoord;
+
+	gl_Position = vec4(pos.xy, 0.0, 1.0);
 }
 
 #shader fragment
@@ -44,14 +49,15 @@ out vec4 FragColor;
 
 const float PI = 3.14159265;
 
-in vec2 TexCoord;
-in vec2 FragPos;
+in struct {
+	vec2 TexCoord;
+	vec2 FragPos;
 
-in vec2 Center;
-in vec2 Size;
+	vec2 center;
+	vec2 size;
+} frag;
 
-uniform bool isTextured;
-uniform int type;
+uniform int look;
 
 uniform sampler2D tex;
 uniform vec3 color;
@@ -65,46 +71,12 @@ float roundedBoxSDF(vec2 center, vec2 size, float radius) {
 }
 
 void main() {
-	switch (type) {
-		default:
-		case 0:	// Rect
-			if (isTextured)
-				FragColor = texture(tex, TexCoord);
-			else
-				FragColor = vec4(color.rgb, 1.0);
-		break;
+	float radius = corner * min(frag.size.x, frag.size.y);
 
-		case 1: // Circle
-			vec2 val = FragPos;
+	float distance = roundedBoxSDF(frag.FragPos - frag.center, frag.size, radius);
 
-			float R = 1.0f + 0.5 * corner;
-			float R2 = cutradius;
-			float dist = sqrt(dot(val, val));
+	float smoothedAlpha =  1.0 - smoothstep(0.0, 0.002, distance);
 
-			if (dist >= R || dist <= R2)
-				discard;
-
-			float sm = smoothstep(R, R - 0.01, dist);
-			float sm2 = smoothstep(R2, R2 + 0.01, dist);
-			float alpha = sm * sm2;
-
-			if (isTextured)
-				FragColor = texture(tex, TexCoord);
-			else
-				FragColor = vec4(color.xyz, 1.0);
-		break;
-
-		case 2: { // Rounded
-			// TODO: replace rect & circle
-			float radius = corner * 0.5f;
-			
-			float distance = roundedBoxSDF(FragPos - Center, Size, radius);
-			
-			float edgeSoftness = 1.0f;
-			float smoothedAlpha =  smoothstep(edgeSoftness * 0.01f, 0.0f ,distance);
-			
-			vec3 color = 0.5 + 0.5*cos(0.0 + FragPos.xyx * 2.0 + vec3(0, 2, 4));
-			FragColor		= mix(vec4(0.0, 0.0, 0.0, 0.0f), vec4(color, smoothedAlpha), smoothedAlpha);
- 		} break;
-	}
+	vec3 color = 0.5 + 0.5*cos(5.0 + frag.FragPos.xyx * 2.0 + vec3(0, 2, 4));
+	FragColor		= vec4(color, smoothedAlpha);
 }
