@@ -7,7 +7,8 @@ layout(location = 1) in vec2 aTexCoord;
 
 out struct {
 	vec2 TexCoord;
-	vec2 FragPos;
+	vec2 localPos;
+	vec2 globalPos;
 
 	vec2 center;
 	vec2 size;
@@ -15,21 +16,23 @@ out struct {
 
 uniform vec2 center;
 uniform vec2 size;
-uniform float rotation; // rotation in RADS
+uniform float rotation;
 
 uniform vec2 ratio;
 
 void main() {
 	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
+	frag.localPos = point + center;
 	vec2 pos;
 
 	pos.x += (cos(rotation) * (point.x) - sin(rotation) * (point.y));
 	pos.y += (sin(rotation) * (point.x) + cos(rotation) * (point.y));
 
-	frag.FragPos = pos + center;
 	pos *= ratio;
 	pos += center;
+
+	frag.globalPos = pos + center;
 
 	frag.center = center;
 	frag.size = size;
@@ -41,8 +44,6 @@ void main() {
 
 #shader fragment
 
-// TODO: rounded corners
-
 #version 300 es
 precision mediump float;
 out vec4 FragColor;
@@ -51,7 +52,8 @@ const float PI = 3.14159265;
 
 in struct {
 	vec2 TexCoord;
-	vec2 FragPos;
+	vec2 localPos;
+	vec2 globalPos;
 
 	vec2 center;
 	vec2 size;
@@ -73,10 +75,10 @@ float roundedBoxSDF(vec2 center, vec2 size, float radius) {
 void main() {
 	float radius = corner * min(frag.size.x, frag.size.y);
 
-	float distance = roundedBoxSDF(frag.FragPos - frag.center, frag.size, radius);
+	float distance = roundedBoxSDF(frag.localPos - frag.center, frag.size, radius);
 
 	float smoothedAlpha =  1.0 - smoothstep(0.0, 0.002, distance);
 
-	vec3 color = 0.5 + 0.5*cos(5.0 + frag.FragPos.xyx * 2.0 + vec3(0, 2, 4));
+	vec3 color = 0.5 + 0.5*cos(5.0 + frag.globalPos.xyx * 5.0 + vec3(0, 2, 4));
 	FragColor		= vec4(color, smoothedAlpha);
 }

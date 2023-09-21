@@ -18,8 +18,10 @@ class Game : public Module {
 
         // TODO: button style: half-rounded corners, rounded corners when
         // hovered, shrink when clicked
-        ax->render.rounded(ax->cursor, {0.4f, 0.2f}, 1,
-                           (sin(ax->now) + 1.0f) / 2.0f, 0.0f);
+
+        ax->render.rounded(ax->cursor, {0.1f, 0.4f}, 1,
+                           (sin(ax->now / 2) + 1.0f) / 2.0f,
+                           sin(ax->now) * 90.0f);
 
         return true;
     }

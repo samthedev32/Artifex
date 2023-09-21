@@ -97,7 +97,8 @@ void Render::rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
     engine->resource.shader[engine->current.shader].set("size", size);
     engine->resource.shader[engine->current.shader].set(
         "ratio", vec<2>(1.0f, engine->ratio()));
-    engine->resource.shader[engine->current.shader].set("rotation", rotation);
+    engine->resource.shader[engine->current.shader].set("rotation",
+                                                        (float)rads(rotation));
 
     // Fragment
     engine->resource.shader[engine->current.shader].set("isTextured", 1);

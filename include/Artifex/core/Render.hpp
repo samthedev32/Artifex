@@ -21,14 +21,14 @@ struct Render {
     // Clear Screen
     void clear(vec<3> color);
 
-    // Draw Rounded Rect
+    // Draw Rounded Rect (or even Sphere)
     void rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
                  float rotation = 0.0f);
 
+    void rect(vec<2> center, vec<2> size, uint16_t tex, float rotation = 0.0f);
+
     // Draw Text
     void text(vec<2> center, float width, vec<3> color, float rotation = 0.0f);
-
-    // TODO: Rotations
 
   private:
     bool initialized = false;
