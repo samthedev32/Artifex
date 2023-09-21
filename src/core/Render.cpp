@@ -6,9 +6,6 @@
 
 using namespace Artifex;
 
-#define GL_RECT 0
-#define GL_CIRCLE 1
-
 void Render::init(Engine *pEngine) {
     if (initialized)
         return;
