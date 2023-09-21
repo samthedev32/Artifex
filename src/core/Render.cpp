@@ -101,11 +101,12 @@ void Render::rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
                                                         (float)rads(rotation));
 
     // Fragment
-    engine->resource.shader[engine->current.shader].set("isTextured", 1);
+    engine->resource.shader[engine->current.shader].set("funi.look", 2);
 
-    engine->resource.shader[engine->current.shader].set("tex", 0);
+    engine->resource.shader[engine->current.shader].set(
+        "funi.tex", (int)engine->resource.shader[tex].id);
 
-    engine->resource.shader[engine->current.shader].set("corner", amount);
+    engine->resource.shader[engine->current.shader].set("funi.corner", amount);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);

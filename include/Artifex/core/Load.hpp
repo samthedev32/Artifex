@@ -25,6 +25,8 @@ struct Load {
     // DeInitialize Loader
     void deinit();
 
+    // TODO: asynchronous resource loading
+
     // Load Shader
     uint16_t shader(const char *vertex, const char *fragment,
                     const char *geometry = "");

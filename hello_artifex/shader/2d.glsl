@@ -7,12 +7,21 @@ layout(location = 1) in vec2 aTexCoord;
 
 out struct {
 	vec2 TexCoord;
+
 	vec2 localPos;
 	vec2 globalPos;
 
 	vec2 center;
 	vec2 size;
 } frag;
+
+uniform struct {
+	vec2 center;
+	vec2 size;
+	float rotation;
+
+	vec2 ratio;
+} uni;
 
 uniform vec2 center;
 uniform vec2 size;
@@ -24,13 +33,10 @@ void main() {
 	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
 	frag.localPos = point + center;
-	vec2 pos;
+	vec2 pos = vec2(0.0);
 
-	pos.x += (cos(rotation) * (point.x) - sin(rotation) * (point.y));
-	pos.y += (sin(rotation) * (point.x) + cos(rotation) * (point.y));
-
-	pos *= ratio;
-	pos += center;
+	pos.x += (cos(rotation) * (point.x) - sin(rotation) * (point.y)) * ratio.x + center.x;
+	pos.y += (sin(rotation) * (point.x) + cos(rotation) * (point.y)) * ratio.y + center.y;
 
 	frag.globalPos = pos + center;
 
@@ -48,10 +54,9 @@ void main() {
 precision mediump float;
 out vec4 FragColor;
 
-const float PI = 3.14159265;
-
 in struct {
 	vec2 TexCoord;
+
 	vec2 localPos;
 	vec2 globalPos;
 
@@ -59,13 +64,15 @@ in struct {
 	vec2 size;
 } frag;
 
-uniform int look;
+uniform struct {
+	int look;
 
-uniform sampler2D tex;
-uniform vec3 color;
+	sampler2D tex;
+	vec3 color;
 
-uniform float cutradius;
-uniform float corner;
+	float cutradius;
+	float corner;
+} funi;
 
 // from https://iquilezles.org/articles/distfunctions
 float roundedBoxSDF(vec2 center, vec2 size, float radius) {
@@ -73,12 +80,30 @@ float roundedBoxSDF(vec2 center, vec2 size, float radius) {
 }
 
 void main() {
-	float radius = corner * min(frag.size.x, frag.size.y);
+	float radius = funi.corner * min(frag.size.x, frag.size.y);
 
 	float distance = roundedBoxSDF(frag.localPos - frag.center, frag.size, radius);
 
 	float smoothedAlpha =  1.0 - smoothstep(0.0, 0.002, distance);
 
-	vec3 color = 0.5 + 0.5*cos(5.0 + frag.globalPos.xyx * 5.0 + vec3(0, 2, 4));
-	FragColor		= vec4(color, smoothedAlpha);
+	vec3 color;
+	switch (funi.look) {
+		default:
+		case 0:
+			// TODO: customizability
+			color = 0.5 + 0.5*cos(5.0 + frag.globalPos.xyx * 5.0 + vec3(0, 2, 4));
+			break;
+		
+		case 1:
+			// Custom Color
+			color = funi.color;
+			break;
+
+		case 2:
+			// Texture
+			color = texture(funi.tex, frag.TexCoord).xyz;
+			break;
+	}
+	 
+	FragColor = vec4(color, smoothedAlpha);
 }
