@@ -4,11 +4,6 @@
 #include <Artifex/Engine.hpp>
 #include <cstring>
 
-#ifndef ARTIFEX_ONLY_BMP
-#define STB_IMAGE_IMPLEMENTATION
-#include <GL/stb_image.h>
-#endif
-
 #include <SDL2/SDL_mixer.h>
 
 using namespace Artifex;
@@ -255,20 +250,8 @@ uint16_t Load::texture(unsigned char *data, int width, int height,
 }
 
 uint16_t Load::texture(const char *path) {
-    int width, height, channels;
-    unsigned char *data = NULL;
-#ifdef ARTIFEX_ONLY_BMP
-    BMP bmp;
-    if (bmp_load(bmp, path, 0))
-        data = NULL;
-    width = bmp.width;
-    height = bmp.height;
-    channels = bmp.channels;
-    data = bmp.data;
-#else
-    data = stbi_load(path, &width, &height, &channels, 0);
-#endif
-    return texture(data, width, height, channels);
+    Image img = Image::load(path);
+    return texture(img.data, img.size->x, img.size->y, img.channels);
 }
 
 uint16_t Load::music(const char *path) {

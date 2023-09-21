@@ -18,10 +18,10 @@ void Render::init(Engine *pEngine) {
     // Load Default Rect
     vec<2> vertices[] = {
         // positions      // texture coords
-        {-1.0f, 1.0f},  {0.0f, 0.0f}, // top right
-        {-1.0f, -1.0f}, {0.0f, 1.0f}, // bottom right
-        {1.0f, -1.0f},  {1.0f, 1.0f}, // bottom left
-        {1.0f, 1.0f},   {1.0f, 0.0f}  // top left
+        {-1.0f, 1.0f},  {0.0f, 1.0f}, // top right
+        {-1.0f, -1.0f}, {0.0f, 0.0f}, // bottom right
+        {1.0f, -1.0f},  {1.0f, 0.0f}, // bottom left
+        {1.0f, 1.0f},   {1.0f, 1.0f}  // top left
     };
 
     vec<3, int> indices[] = {
