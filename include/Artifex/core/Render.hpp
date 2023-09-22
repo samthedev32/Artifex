@@ -22,10 +22,20 @@ struct Render {
     void clear(vec<3> color);
 
     // Draw Rounded Rect (or even Sphere)
-    void rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
-                 float rotation = 0.0f);
+    void roundable(vec<2> center, vec<2> size, int look, vec<3> color,
+                   uint16_t tex, float corner = 0.0f, float rotation = 0.0f);
 
-    void rect(vec<2> center, vec<2> size, uint16_t tex, float rotation = 0.0f);
+    // Draw Single-Color Roundable-Rect
+    void color(vec<2> center, vec<2> size, vec<3> color, float corner = 0.0f,
+               float rotation = 0.0f);
+
+    // Draw Dynamic-Color Roundable-Rect
+    void dcolor(vec<2> center, vec<2> size, float corner = 0.0f,
+                float rotation = 0.0f);
+
+    // Draw Textured Roundable-Rect
+    void texture(vec<2> center, vec<2> size, uint16_t texture,
+                 float corner = 0.0f, float rotation = 0.0f);
 
     // Draw Text
     void text(vec<2> center, float width, vec<3> color, float rotation = 0.0f);

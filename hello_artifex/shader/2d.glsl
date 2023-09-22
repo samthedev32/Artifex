@@ -33,10 +33,10 @@ void main() {
 	vec2 point = vec2(size.x * aPos.x, size.y * aPos.y);
 
 	frag.localPos = point + center;
-	vec2 pos = vec2(0.0);
+	vec2 pos = center;
 
-	pos.x += (cos(rotation) * (point.x) - sin(rotation) * (point.y)) * ratio.x + center.x;
-	pos.y += (sin(rotation) * (point.x) + cos(rotation) * (point.y)) * ratio.y + center.y;
+	pos.x += (sin(rotation) * (point.x) - cos(rotation) * (point.y)) * ratio.x;
+	pos.y += (cos(rotation) * (point.x) + sin(rotation) * (point.y)) * ratio.y;
 
 	frag.globalPos = pos + center;
 
@@ -72,6 +72,8 @@ uniform struct {
 
 	float cutradius;
 	float corner;
+
+	float time;
 } funi;
 
 // from https://iquilezles.org/articles/distfunctions
@@ -80,7 +82,7 @@ float roundedBoxSDF(vec2 center, vec2 size, float radius) {
 }
 
 void main() {
-	float radius = funi.corner * min(frag.size.x, frag.size.y);
+	float radius = clamp(funi.corner, 0.0, 1.0) * min(frag.size.x, frag.size.y);
 
 	float distance = roundedBoxSDF(frag.localPos - frag.center, frag.size, radius);
 
@@ -91,7 +93,7 @@ void main() {
 		default:
 		case 0:
 			// TODO: customizability
-			color = 0.5 + 0.5*cos(5.0 + frag.globalPos.xyx * 5.0 + vec3(0, 2, 4));
+			color = 0.5 + 0.5*cos(funi.time + frag.localPos.xyx * 5.0 + vec3(0, 2, 4));
 			break;
 		
 		case 1:

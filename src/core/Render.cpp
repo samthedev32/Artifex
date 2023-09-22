@@ -82,8 +82,8 @@ void Render::clear(vec<3> color) {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Render::rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
-                     float rotation) {
+void Render::roundable(vec<2> center, vec<2> size, int look, vec<3> color,
+                       uint16_t tex, float amount, float rotation) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
@@ -98,10 +98,23 @@ void Render::rounded(vec<2> center, vec<2> size, uint16_t tex, float amount,
                                                         (float)rads(rotation));
 
     // Fragment
-    engine->resource.shader[engine->current.shader].set("funi.look", 2);
+    engine->resource.shader[engine->current.shader].set("funi.look", look);
 
-    engine->resource.shader[engine->current.shader].set(
-        "funi.tex", (int)engine->resource.shader[tex].id);
+    switch (look) {
+    default:
+    case 0:
+        break;
+
+    case 1:
+        engine->resource.shader[engine->current.shader].set("funi.color",
+                                                            color);
+        break;
+
+    case 2:
+        engine->resource.shader[engine->current.shader].set(
+            "funi.tex", (int)engine->resource.shader[tex].id);
+        break;
+    }
 
     engine->resource.shader[engine->current.shader].set("funi.corner", amount);
 
