@@ -15,69 +15,70 @@
 
 namespace Artifex {
 
-using namespace EngineToolkit;
-
 class Engine : public Window {
-  public:
-    Engine(std::string name, ivec2 size = {});
-    ~Engine();
+public:
+  Engine(std::string name, uint32_t windowWidth,
+         uint32_t windowHeight);
+  ~Engine();
 
-    // Game Loop
-    void loop(vec3 clearColor = {}, bool (*onUpdate)(float) = nullptr);
+  // Game Loop
+  void loop(EngineToolkit::vec<3> clearColor = {},
+            bool (*onUpdate)(float) = nullptr);
 
-    // Update Engine & Window (for manual game loop)
-    bool update(vec<3> clearColor);
+  // Update Engine & Window (for manual game loop)
+  bool update(vec<3> clearColor);
 
-    // Get Current Time (s)
-    float time();
+  // Get Current Time (s)
+  float time();
 
-    // Get Ratio of Window (width/height)
-    inline float ratio() { return (float)size->x / size->y; }
+  // Get Ratio of Window (width/height)
+  inline float ratio() { return (float)size->x / size->y; }
 
-    // Add Module
-    bool add(std::string name, Module *module, bool enable = true);
+  // Add Module
+  bool add(std::string name, Module *module,
+           bool enable = true);
 
-    // Resource Loader
-    Load load;
+  // Resource Loader
+  Load load;
 
-    // Basic Renderer
-    Render render;
+  // Basic Renderer
+  Render render;
 
-    // UI Renderer
-    UI ui;
+  // UI Renderer
+  UI ui;
 
-    // Audio Mixer
-    Mix mix;
+  // Audio Mixer
+  Mix mix;
 
-    // Modules / Add-ons
-    std::unordered_map<std::string, Module *> module;
+  // Modules / Add-ons
+  std::unordered_map<std::string, Module *> module;
 
-    // Selected Resources
-    struct {
-        uint16_t shader = 0;
-        uint16_t font = 0;
-    } current;
+  // Selected Resources
+  struct {
+    uint16_t shader = 0;
+    uint16_t font = 0;
+  } current;
 
-  public:
-    // Time when frame started
-    float now;
+public:
+  // Time when frame started
+  float now;
 
-    // Duration of Last Frame
-    float deltaTime;
+  // Duration of Last Frame
+  float deltaTime;
 
-    // Resources
-    struct {
-        std::vector<Shader> shader;
-        std::vector<Texture> texture;
-        std::vector<GLuint> mesh;
-        std::vector<Font> font;
+  // Resources
+  struct {
+    std::vector<Shader> shader;
+    std::vector<Texture> texture;
+    std::vector<GLuint> mesh;
+    std::vector<Font> font;
 
-        std::vector<Mix_Music *> music;
-        std::vector<Mix_Chunk *> audio;
-    } resource;
+    std::vector<Mix_Music *> music;
+    std::vector<Mix_Chunk *> audio;
+  } resource;
 
-  private:
-    float past;
+private:
+  float past;
 };
 
 } // namespace Artifex

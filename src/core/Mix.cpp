@@ -5,7 +5,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <cstring>
 
-using namespace Artifex;
+namespace Artifex {
 
 void Mix::init(Engine *pEngine) {
     if (initialized)
@@ -47,3 +47,5 @@ void Mix::audio(uint16_t id, int channel, int loops) {
     if (Mix_PlayChannel(channel, engine->resource.audio[id], loops))
         Log::warning("Mix::audio", "Failed to play audio with id %i", id);
 }
+
+} // namespace Artifex

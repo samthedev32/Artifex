@@ -2,7 +2,7 @@
 
 #include <Artifex/Engine.hpp>
 
-using namespace Artifex;
+namespace Artifex {
 
 void UI::init(Engine *pEngine) {
     if (initialized)
@@ -23,58 +23,58 @@ void UI::deinit() {
     initialized = false;
 }
 
-bool UI::button(vec2 center, vec2 size, std::string name, uint16_t a,
-                uint16_t b) {
-    // if (math::collide(cursor, center, size * ratio())) {
-    //     if (input[name] && key("mouse") == false) {
-    //         input[name] = false;
-    //         return true;
-    //     }
-    //     input[name] = key("mouse");
-    // } else
-    //     input[name] = false;
+// bool UI::button(vec2 center, vec2 size, std::string name, uint16_t a,
+//                 uint16_t b) {
+//     // if (math::collide(cursor, center, size * ratio())) {
+//     //     if (input[name] && key("mouse") == false) {
+//     //         input[name] = false;
+//     //         return true;
+//     //     }
+//     //     input[name] = key("mouse");
+//     // } else
+//     //     input[name] = false;
 
-    // rect(center, size, input[name] ? b : a);
-    return false;
-}
+//     // rect(center, size, input[name] ? b : a);
+//     return false;
+// }
 
-bool UI::toggle(vec2 center, vec2 size, std::string name, uint16_t a,
-                uint16_t b) {
-    // if (math::collide(cursor, center, size * ratio())) {
-    //     if (key("mouse") == true) {
-    //         if (input[name] > 0)
-    //             input[name] = 2;
+// bool UI::toggle(vec2 center, vec2 size, std::string name, uint16_t a,
+//                 uint16_t b) {
+//     // if (math::collide(cursor, center, size * ratio())) {
+//     //     if (key("mouse") == true) {
+//     //         if (input[name] > 0)
+//     //             input[name] = 2;
 
-    //         if (input[name] <= 0)
-    //             input[name] = -2;
-    //     } else {
-    //         if (input[name] == 2)
-    //             input[name] = -1;
+//     //         if (input[name] <= 0)
+//     //             input[name] = -2;
+//     //     } else {
+//     //         if (input[name] == 2)
+//     //             input[name] = -1;
 
-    //         if (input[name] == -2)
-    //             input[name] = 1;
-    //     }
-    // } else {
-    //     if (input[name] > 0)
-    //         input[name] = 1;
-    //     if (input[name] <= 0)
-    //         input[name] = -1;
-    // }
+//     //         if (input[name] == -2)
+//     //             input[name] = 1;
+//     //     }
+//     // } else {
+//     //     if (input[name] > 0)
+//     //         input[name] = 1;
+//     //     if (input[name] <= 0)
+//     //         input[name] = -1;
+//     // }
 
-    // rect(center, size, input[name] > 0 ? b : a);
+//     // rect(center, size, input[name] > 0 ? b : a);
 
-    return false;
-}
+//     return false;
+// }
 
-bool UI::touch(vec2 center, vec2 size, uint16_t a, uint16_t b) {
-    // if (key("mouse") && math::collide(cursor, center, size * ratio())) {
-    //     rect(center, size, b);
-    //     return true;
-    // }
+// bool UI::touch(vec2 center, vec2 size, uint16_t a, uint16_t b) {
+//     // if (key("mouse") && math::collide(cursor, center, size * ratio())) {
+//     //     rect(center, size, b);
+//     //     return true;
+//     // }
 
-    // rect(center, size, a);
-    return false;
-}
+//     // rect(center, size, a);
+//     return false;
+// }
 
 // vec2 UI::joystick(vec2 center, std::string name, float radius, float
 // nob_radius,
@@ -106,3 +106,5 @@ bool UI::touch(vec2 center, vec2 size, uint16_t a, uint16_t b) {
 
 //     return math::clamp(a, vec2(-1.0f, -1), vec2(1.0f, 1.0f));
 // }
+
+} // namespace Artifex

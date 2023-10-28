@@ -1,12 +1,14 @@
-#include "EngineToolkit/log/log.hpp"
 #include <Artifex/core/Load.hpp>
+
+#include <EngineToolkit/debug/log.hpp>
+#include <EngineToolkit/media/image.hpp>
 
 #include <Artifex/Engine.hpp>
 #include <cstring>
 
 #include <SDL2/SDL_mixer.h>
 
-using namespace Artifex;
+namespace Artifex {
 
 void Load::init(Engine *pEngine) {
     if (initialized)
@@ -419,3 +421,5 @@ uint16_t Load::load(const char *path, FILE_TYPE type) {
 
     return id;
 }
+
+} // namespace Artifex

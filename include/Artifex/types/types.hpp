@@ -15,42 +15,43 @@ class Engine;
 
 // OpenGL Texture ID
 struct Texture {
-    int width, height, channels;
+  int width, height, channels;
 
-    GLuint id;
+  GLuint id;
 };
 
 // Text Font
 struct Font {
-    Texture data;
-    uint8_t rows, cols;
+  Texture data;
+  uint8_t rows, cols;
 
-    EngineToolkit::vec<2> VERT[6];
-    EngineToolkit::vec<2> UV[6];
+  vec2 VERT[6];
+  vec2 UV[6];
 
-    GLuint VAO, VBO;
+  GLuint VAO, VBO;
 
-    const float vertices[24] = {
-        -1.0f, 1.0f,  0.0f, 1.0f, // 0 top right
-        -1.0f, -1.0f, 0.0f, 0.0f, // 1 bottom right
-        1.0f,  -1.0f, 1.0f, 0.0f, // 3 top left
+  const struct {
+    vec2 pos, uv;
+  } vertices[6] = {{{-1.0f, 1.0f}, {0.0f, 1.0f}},
+                   {{-1.0f, -1.0f}, {0.0f, 0.0f}},
+                   {{1.0f, -1.0f}, {1.0f, 0.0f}},
 
-        -1.0f, 1.0f,  0.0f, 1.0f, // 1 bottom right
-        1.0f,  -1.0f, 1.0f, 0.0f, // 2 bottom left
-        1.0f,  1.0f,  1.0f, 1.0f, // 3 top left
-    };
+                   {{-1.0f, 1.0f}, {0.0f, 1.0f}},
+                   {{1.0f, -1.0f}, {1.0f, 0.0f}},
+                   {{1.0f, 1.0f}, {1.0f, 1.0f}}};
 };
 
 // Module
 class Module {
-  public:
-    Engine *ax;
+public:
+  Engine *ax;
 
-  public:
-    virtual bool onCreate() { return true; }
-    virtual void onDestroy() {}
+public:
+  virtual bool onCreate() { return true; }
 
-    virtual bool onUpdate(float deltaTime) { return true; }
+  virtual void onDestroy() {}
+
+  virtual bool onUpdate(float deltaTime) { return true; }
 };
 
 } // namespace Artifex

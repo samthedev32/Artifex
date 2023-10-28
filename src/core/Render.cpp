@@ -4,7 +4,7 @@
 
 #include <cstring>
 
-using namespace Artifex;
+namespace Artifex {
 
 void Render::init(Engine *pEngine) {
     if (initialized)
@@ -170,3 +170,5 @@ void Render::text(vec<2> center, float width, vec<3> color, float rotation) {
     //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     // }
 }
+
+} // namespace Artifex

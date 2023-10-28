@@ -5,136 +5,151 @@
 
 namespace Artifex {
 
-Window::Window(std::string name, vec<2, int> size_) : size(size_) {
+Window::Window(std::string name, uint32_t width,
+               uint32_t height)
+    : width(width == 0 ? 1 : width),
+      height(height == 0 ? 1 : height) {
 
-    // Decide if Fullscreened or not
-    bool isFullscreen = size->x == 0 || size->y == 0;
-    if (size->x <= 0 || size->y <= 0)
-        size->x = 1, size->y = 1;
+  // Decide if Fullscreened or not
+  bool isFullscreen = width == 0 || height == 0;
 
-    // Init SDL2
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        EngineToolkit::Log::error(
-            "Window::Window", "Failed to Create Window: %s", SDL_GetError());
-        return;
-    }
+  // Init SDL2
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    EngineToolkit::Log::error("Window::Window",
+                              "Failed to Create Window: %s",
+                              SDL_GetError());
+    return;
+  }
 
-    // Create Window
-    window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED, size->x, size->y,
-                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+  // Create Window
+  window = SDL_CreateWindow(
+      name.c_str(), SDL_WINDOWPOS_UNDEFINED,
+      SDL_WINDOWPOS_UNDEFINED, width, height,
+      SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-    if (window == NULL) {
-        EngineToolkit::Log::error(
-            "Window::Window", "Failed to create window: %s", SDL_GetError());
-        return;
-    }
+  if (window == NULL) {
+    EngineToolkit::Log::error("Window::Window",
+                              "Failed to create window: %s",
+                              SDL_GetError());
+    return;
+  }
 
-    fullscreen(isFullscreen);
+  fullscreen(isFullscreen);
 
-    // Init OpenGL 3.3 Core (or higher)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
+  // Request OpenGL 3.3 or higher
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                      SDL_GL_CONTEXT_PROFILE_CORE);
 
-    glcontext = SDL_GL_CreateContext(window);
+  glcontext = SDL_GL_CreateContext(window);
 
-    // Load GLAD
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress) || glcontext == NULL) {
-        EngineToolkit::Log::error("Window::Window", "Failed to init OpenGL");
-        SDL_DestroyWindow(window);
-        return;
-    }
+  // Load GLAD
+  if (!gladLoadGLLoader(SDL_GL_GetProcAddress)
+      || glcontext == NULL) {
+    EngineToolkit::Log::error("Window::Window",
+                              "Failed to init OpenGL");
+    SDL_DestroyWindow(window);
+    return;
+  }
 
-    vsync(0);
+  vsync(0);
 }
 
 Window::~Window() {
-    if (window)
-        SDL_DestroyWindow(window);
+  if (window)
+    SDL_DestroyWindow(window);
 }
 
 bool Window::update() {
-    // Update Window Size
-    SDL_GetWindowSize(window, &size->x, &size->y);
+  // Update Window Size
+  int w, h;
+  SDL_GetWindowSize(window, &w, &h);
+  width = w > 0 ? w : width;
+  height = h > 0 ? h : height;
 
-    // Update Window
-    SDL_GL_SwapWindow(window);
+  // Update Window
+  SDL_GL_SwapWindow(window);
 
-    // update inputs
-    keyboard = SDL_GetKeyboardState(NULL);
+  // update inputs
+  keyboard = SDL_GetKeyboardState(NULL);
 
-    EngineToolkit::vec<2, int> m;
-    if (!SDL_GetRelativeMouseMode()) {
-        SDL_GetMouseState(&m->x, &m->y);
-        cursor->x = ((float)m->x / size->x) * 2 - 1;
-        cursor->y = ((float)m->y / size->y) * -2 + 1;
-    } else {
-        SDL_GetRelativeMouseState(&m->x, &m->y);
-        cursor->x = m->x * sensitivity;
-        cursor->y = m->y * sensitivity;
+  int mx, my;
+  if (!SDL_GetRelativeMouseMode()) {
+    SDL_GetMouseState(&mx, &my);
+    cursor.x = ((float)mx / width) * 2 - 1;
+    cursor.y = ((float)my / height) * -2 + 1;
+  } else {
+    SDL_GetRelativeMouseState(&mx, &my);
+    cursor.x = mx * sensitivity;
+    cursor.y = my * sensitivity;
+  }
+
+  // poll events
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_QUIT:
+      shouldClose = true;
+      break;
+
+    case SDL_KEYDOWN:
+      if (event.key.keysym.scancode == SDL_SCANCODE_F11)
+        fullscreen(!isFullscreen);
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+      if (0 < event.button.button && event.button.button < 4)
+        mouse[event.button.button - 1]
+            = true; // left, middle, right
+      break;
+
+    case SDL_MOUSEBUTTONUP:
+      if (0 < event.button.button && event.button.button < 4)
+        mouse[event.button.button - 1]
+            = false; // left, middle, right
+      break;
+
+    case SDL_MOUSEWHEEL:
+      if (event.wheel.y > 0) // scroll up
+        scroll.y -= 1;
+      else if (event.wheel.y < 0) // scroll down
+        scroll.y += 1;
+
+      if (event.wheel.x > 0) // scroll right
+        scroll.x += 1;
+      else if (event.wheel.x < 0) // scroll left
+        scroll.x -= 1;
+      break;
+
+    default:
+      break;
     }
+  }
 
-    // poll events
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_QUIT:
-            shouldClose = true;
-            break;
-
-        case SDL_KEYDOWN:
-            if (event.key.keysym.scancode == SDL_SCANCODE_F11)
-                fullscreen(!isFullscreen);
-            break;
-
-        case SDL_MOUSEBUTTONDOWN:
-            if (0 < event.button.button && event.button.button < 4)
-                mouse[event.button.button - 1] = true; // left, middle, right
-            break;
-
-        case SDL_MOUSEBUTTONUP:
-            if (0 < event.button.button && event.button.button < 4)
-                mouse[event.button.button - 1] = false; // left, middle, right
-            break;
-
-        case SDL_MOUSEWHEEL:
-            if (event.wheel.y > 0) // scroll up
-                scroll->y -= 1;
-            else if (event.wheel.y < 0) // scroll down
-                scroll->y += 1;
-
-            if (event.wheel.x > 0) // scroll right
-                scroll->x += 1;
-            else if (event.wheel.x < 0) // scroll left
-                scroll->x -= 1;
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    return !shouldClose;
+  return !shouldClose;
 }
 
 void Window::exit(bool sure) { shouldClose = sure; }
 
-void Window::fullscreen(bool en, uint8_t hiddenCursor, vec<2, int> minSize) {
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP * en);
+void Window::fullscreen(bool en, uint8_t hiddenCursor,
+                        int minWidth, int minHeight) {
+  SDL_SetWindowFullscreen(window,
+                          SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
-    bool cursor = hiddenCursor > true ? en : hiddenCursor;
+  bool cursor = hiddenCursor > true ? en : hiddenCursor;
 
-    SDL_ShowCursor((SDL_bool)!cursor);
-    SDL_SetRelativeMouseMode((SDL_bool)cursor);
+  SDL_ShowCursor((SDL_bool)!cursor);
+  SDL_SetRelativeMouseMode((SDL_bool)cursor);
 
-    SDL_SetWindowMinimumSize(window, minSize->x, minSize->y);
+  SDL_SetWindowMinimumSize(window, minWidth, minHeight);
 
-    isFullscreen = en;
+  isFullscreen = en;
 }
 
-void Window::vsync(int interval) { SDL_GL_SetSwapInterval(interval); }
+void Window::vsync(int interval) {
+  SDL_GL_SetSwapInterval(interval);
+}
 
 std::unordered_map<std::string, int> SDL2_SCANCODE_MAP = {
     // Letters
@@ -224,16 +239,18 @@ std::unordered_map<std::string, int> SDL2_SCANCODE_MAP = {
 };
 
 bool Window::key(std::string k) {
-    // Mouse Buttons
-    if (k == "ml" || k == "lmouse" || k == "left") // mouse button left
-        return mouse[0];
-    else if (k == "mm" || k == "mmouse" ||
-             k == "middle") // mouse button middle/scroll
-        return mouse[1];
-    else if (k == "mr" || k == "rmouse" || k == "right") // mouse button right
-        return mouse[2];
+  // Mouse Buttons
+  if (k == "ml" || k == "lmouse"
+      || k == "left") // mouse button left
+    return mouse[0];
+  else if (k == "mm" || k == "mmouse"
+           || k == "middle") // mouse button middle/scroll
+    return mouse[1];
+  else if (k == "mr" || k == "rmouse"
+           || k == "right") // mouse button right
+    return mouse[2];
 
-    return keyboard[SDL2_SCANCODE_MAP[k]];
+  return keyboard[SDL2_SCANCODE_MAP[k]];
 }
 
 } // namespace Artifex

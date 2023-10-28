@@ -18,57 +18,54 @@
 #warning Targeted OS is not recognized
 #endif
 
-#include <EngineToolkit/EngineToolkit.hpp>
-
 #include <GL/glad.h>
 #include <SDL2/SDL.h>
 
 #include <string>
 
+#include <Artifex/math/vec/vec2.hpp>
+
 namespace Artifex {
 
-using namespace EngineToolkit;
-
 class Window {
-  public:
-    // Create Window
-    Window(std::string name, vec<2, int> size);
+public:
+  // Create Window
+  Window(std::string name, uint32_t width, uint32_t height);
 
-    // Destroy Window
-    ~Window();
+  // Destroy Window
+  ~Window();
 
-    // Update Window
-    bool update();
+  // Update Window
+  bool update();
 
-    // Close Window
-    void exit(bool sure = true);
+  // Close Window
+  void exit(bool sure = true);
 
-    // Enable/Disable Fullscreen Mode
-    void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
-                    vec<2, int> minSize = {720, 480});
+  // Enable/Disable Fullscreen Mode
+  void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
+                  int minWidth = 720, int minHeight = 480);
 
-    // Enable/Disable VSync
-    void vsync(int interval = 1);
+  // Enable/Disable VSync
+  void vsync(int interval = 1);
 
-    // Get Key State
-    bool key(std::string k);
+  // Get Key State
+  bool key(std::string k);
 
-  public:
-    // Width & Height
-    vec<2, int> size;
+public:
+  uint32_t width, height;
 
-    // Cursor & Scroll Positions
-    vec<2> cursor, scroll;
-    float sensitivity = 1.0f;
+  // Cursor & Scroll Positions
+  vec2 cursor, scroll;
+  float sensitivity = 1.0f;
 
-  private:
-    SDL_Window *window = nullptr;
-    SDL_GLContext glcontext;
-    bool shouldClose = false;
-    bool isFullscreen = false;
+private:
+  SDL_Window *window = nullptr;
+  SDL_GLContext glcontext;
+  bool shouldClose = false;
+  bool isFullscreen = false;
 
-    const Uint8 *keyboard;
-    bool mouse[3]{};
+  const Uint8 *keyboard;
+  bool mouse[3]{};
 };
 
 } // namespace Artifex

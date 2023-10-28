@@ -7,70 +7,89 @@ Shader::Shader(GLuint id) : id(id) {}
 
 // Use This Shader
 void Shader::use() {
-    int program_id;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &program_id);
+  int program_id;
+  glGetIntegerv(GL_CURRENT_PROGRAM, &program_id);
 
-    if (program_id != id)
-        glUseProgram(this->id);
+  if (program_id != id)
+    glUseProgram(this->id);
 }
 
 // Set Boolean Uniform
 void Shader::set(std::string n, bool value) {
-    use();
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniform1i(uniforms[n] - 1, (int)value);
+  glUniform1i(uniforms[n] - 1, (int)value);
 }
 
 // Set Integer Uniform
 void Shader::set(std::string n, int value) {
-    use();
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniform1i(uniforms[n] - 1, value);
+  glUniform1i(uniforms[n] - 1, value);
 }
 
 // Set Float Uniform
 void Shader::set(std::string n, float value) {
-    use();
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniform1f(uniforms[n] - 1, value);
+  glUniform1f(uniforms[n] - 1, value);
 }
 
 // Set 2D Vector Uniform
-void Shader::set(std::string n, EngineToolkit::vec<2> vec) {
-    use();
+void Shader::set(std::string n, vec2 vec) {
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms.insert(std::pair<std::string, GLuint>(
-            n, glGetUniformLocation(this->id, n.c_str()) + 1));
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniform2f(uniforms[n] - 1, vec->x, vec->y);
+  glUniform2fv(uniforms[n] - 1, 1, vec.data);
 }
 
 // Set 3D Vector Uniform
-void Shader::set(std::string n, EngineToolkit::vec<3> vec) {
-    use();
+void Shader::set(std::string n, vec3 vec) {
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniform3f(uniforms[n] - 1, vec->x, vec->y, vec->z);
+  glUniform3fv(uniforms[n] - 1, 1, vec.data);
+}
+
+// Set 4D Vector Uniform
+void Shader::set(std::string n, vec4 vec) {
+  use();
+
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+
+  glUniform4fv(uniforms[n] - 1, 1, vec.data);
+}
+
+// Set 3 by 3 Matrix Uniform
+void Shader::set(std::string n, mat3 mat) {
+  use();
+
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+
+  glUniformMatrix3fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
 }
 
 // Set 4 by 4 Matrix Uniform
-void Shader::set(std::string n, EngineToolkit::mat<4> mat) {
-    use();
+void Shader::set(std::string n, mat4 mat) {
+  use();
 
-    if (uniforms.count(n) == 0)
-        uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+  if (uniforms.count(n) == 0)
+    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
 
-    glUniformMatrix4fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
+  glUniformMatrix4fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
 }

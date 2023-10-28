@@ -2,7 +2,7 @@
 
 #include <Artifex/Engine.hpp>
 
-using namespace Artifex;
+namespace Artifex {
 
 void Physics::init(Engine *pEngine) {
     if (initialized)
@@ -23,3 +23,5 @@ void Physics::deinit() {
 
     initialized = false;
 }
+
+} // namespace Artifex
