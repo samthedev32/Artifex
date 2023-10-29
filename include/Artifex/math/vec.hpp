@@ -3,7 +3,11 @@
 #include <cstdint>
 #include <vector>
 
-// Vector Types
+// NOTE:
+// most compilers CAN vectorize this library (tested)
+// it means the `for` loops will not be treated as loops
+
+// Vector Size Type
 typedef uint8_t vec_t;
 
 // Vector Components

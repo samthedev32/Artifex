@@ -1,6 +1,6 @@
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 BreakBeforeBinaryOperators: All
-ColumnLimit: 128
+ColumnLimit: 64
 IndentWidth: 2
 UseTab: Never

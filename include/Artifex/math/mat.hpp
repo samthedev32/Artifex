@@ -7,14 +7,16 @@
 #define MIN(a, b) (a < b ? a : b)
 #define MAX(a, b) (a < b ? b : a)
 
-// Matrix Types
-typedef vec_t mat_t;
+// NOTE:
+// most compilers CAN vectorize this library (tested)
+// it means the `for` loops will not be treated as loops
+
+// Matrix Size Type
+typedef uint8_t mat_t;
 
 // Variable Dimension Matrix
-template <mat_t R = 4, mat_t C = R, typename T = float>
-struct mat {
-  static_assert(R != 0 && C != 0,
-                "Null-Size Matrices are not supported");
+template <mat_t R = 4, mat_t C = R, typename T = float> struct mat {
+  static_assert(R != 0 && C != 0, "Null-Size Matrices are not supported");
 
   T data[R][C];
 
@@ -22,8 +24,7 @@ struct mat {
 
   mat(T v = 0);
   mat(std::vector<std::vector<T>> m);
-  template <mat_t inR, mat_t inC, typename inT>
-  mat(mat<inR, inC, inT> m);
+  template <mat_t inR, mat_t inC, typename inT> mat(mat<inR, inC, inT> m);
 
   ~mat();
 
@@ -32,26 +33,19 @@ struct mat {
   mat<R, C, T> operator+(mat<R, C, T> m) const;
   mat<R, C, T> operator-(mat<R, C, T> m) const;
   // matrix division is not defined
-  template <mat_t inR, mat_t inC, typename inT>
-  mat<MAX(R, inR), MAX(C, inC)>
-  operator*(mat<inR, inC, inT> m) const;
+  template <mat_t inR, mat_t inC, typename inT> mat<MAX(R, inR), MAX(C, inC)> operator*(mat<inR, inC, inT> m) const;
 
-  template <mat_t inD, typename inT>
-  vec<inD, inT> operator*(vec<inD, inT> v) const;
+  template <mat_t inD, typename inT> vec<inD, inT> operator*(vec<inD, inT> v) const;
 
   // Assignment Operators
 
-  template <mat_t inR, mat_t inC, typename inT>
-  void operator=(mat<inR, inC, inT> m);
-  template <mat_t inR, mat_t inC, typename inT>
-  void operator*=(mat<inR, inC, inT> m);
+  template <mat_t inR, mat_t inC, typename inT> void operator=(mat<inR, inC, inT> m);
+  template <mat_t inR, mat_t inC, typename inT> void operator*=(mat<inR, inC, inT> m);
 
   // Relational Operators
 
-  template <mat_t inR, mat_t inC, typename inT>
-  bool operator==(mat<inR, inC, inT> m) const;
-  template <mat_t inR, mat_t inC, typename inT>
-  bool operator!=(mat<inR, inC, inT> m) const;
+  template <mat_t inR, mat_t inC, typename inT> bool operator==(mat<inR, inC, inT> m) const;
+  template <mat_t inR, mat_t inC, typename inT> bool operator!=(mat<inR, inC, inT> m) const;
 
   // Other Operators
 
@@ -77,14 +71,11 @@ struct mat {
 
   // Functions (Dimension-Specific)
 
-  static mat<4> perspective(mat_t fovrads, mat_t aspect,
-                            mat_t near, mat_t far);
+  static mat<4> perspective(mat_t fovrads, mat_t aspect, mat_t near, mat_t far);
 
-  static mat<4> ortho(mat_t left, mat_t right, mat_t bottom,
-                      mat_t top, mat_t fnear, mat_t ffar);
+  static mat<4> ortho(mat_t left, mat_t right, mat_t bottom, mat_t top, mat_t fnear, mat_t ffar);
 
-  static mat<4> lookat(vec<3> pos, vec<3> target,
-                       vec<3> up = {0.0f, 1.0f, 0.0f});
+  static mat<4> lookat(vec<3> pos, vec<3> target, vec<3> up = {0.0f, 1.0f, 0.0f});
 };
 
 #ifdef MATRIX_TYPES
@@ -113,17 +104,13 @@ template <mat_t R, mat_t C, typename T> mat<R, C, T>::mat(T v) {
       this->data[r][c] = v;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<R, C, T>::mat(std::vector<std::vector<T>> m) {
+template <mat_t R, mat_t C, typename T> mat<R, C, T>::mat(std::vector<std::vector<T>> m) {
   for (mat_t r = 0; r < R; r++)
     for (mat_t c = 0; c < C; c++)
-      this->data[r][c]
-          = r < m.size() && c < m[r].size() ? m[r][c] : 0;
+      this->data[r][c] = r < m.size() && c < m[r].size() ? m[r][c] : 0;
 }
 
-template <mat_t R, mat_t C, typename T>
-template <mat_t inR, mat_t inC, typename inT>
-mat<R, C, T>::mat(mat<inR, inC, inT> m) {
+template <mat_t R, mat_t C, typename T> template <mat_t inR, mat_t inC, typename inT> mat<R, C, T>::mat(mat<inR, inC, inT> m) {
   *this = m;
 }
 
@@ -131,8 +118,7 @@ template <mat_t R, mat_t C, typename T> mat<R, C, T>::~mat() {}
 
 // Arithmetic Operators
 
-template <mat_t R, mat_t C, typename T>
-mat<R, C, T> mat<R, C, T>::operator+(mat<R, C, T> m) const {
+template <mat_t R, mat_t C, typename T> mat<R, C, T> mat<R, C, T>::operator+(mat<R, C, T> m) const {
   mat<R, C, T> out;
 
   for (mat_t r = 0; r < R; r++)
@@ -142,8 +128,7 @@ mat<R, C, T> mat<R, C, T>::operator+(mat<R, C, T> m) const {
   return out;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<R, C, T> mat<R, C, T>::operator-(mat<R, C, T> m) const {
+template <mat_t R, mat_t C, typename T> mat<R, C, T> mat<R, C, T>::operator-(mat<R, C, T> m) const {
   mat<R, C, T> out;
 
   for (mat_t r = 0; r < R; r++)
@@ -155,8 +140,7 @@ mat<R, C, T> mat<R, C, T>::operator-(mat<R, C, T> m) const {
 
 template <mat_t R, mat_t C, typename T>
 template <mat_t inR, mat_t inC, typename inT>
-mat<MAX(R, inR), MAX(C, inC)>
-mat<R, C, T>::operator*(mat<inR, inC, inT> m) const {
+mat<MAX(R, inR), MAX(C, inC)> mat<R, C, T>::operator*(mat<inR, inC, inT> m) const {
   mat<MAX(R, inR), MAX(C, inC)> out;
 
   if (C != inR)
@@ -220,22 +204,17 @@ bool mat<R, C, T>::operator!=(mat<inR, inC, inT> m) const {
 
 // Other Operators
 
-template <mat_t R, mat_t C, typename T>
-T mat<R, C, T>::operator()(mat_t row, mat_t col) const {
+template <mat_t R, mat_t C, typename T> T mat<R, C, T>::operator()(mat_t row, mat_t col) const {
   return this->data[row % R][col % C];
 }
 
-template <mat_t R, mat_t C, typename T>
-T &mat<R, C, T>::operator()(mat_t row, mat_t col) {
+template <mat_t R, mat_t C, typename T> T &mat<R, C, T>::operator()(mat_t row, mat_t col) {
   return this->data[row % R][col % C];
 }
 
 // Functions (Instance Methods)
 
-template <mat_t R, mat_t C, typename T>
-bool mat<R, C, T>::isSquare() const {
-  return R == C;
-}
+template <mat_t R, mat_t C, typename T> bool mat<R, C, T>::isSquare() const { return R == C; }
 
 void inverse();
 
@@ -243,8 +222,7 @@ void inverse();
 
 // Functions (Static)
 
-template <mat_t R, mat_t C, typename T>
-mat<R, R> mat<R, C, T>::identity() {
+template <mat_t R, mat_t C, typename T> mat<R, R> mat<R, C, T>::identity() {
   mat<R> out;
 
   for (mat_t rc = 0; rc < MIN(R, C); rc++)
@@ -253,8 +231,7 @@ mat<R, R> mat<R, C, T>::identity() {
   return out;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::rotationX(mat_t rad) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::rotationX(mat_t rad) {
   mat<4> matrix;
   matrix(0, 0) = 1.0f;
   matrix(1, 1) = cosf(rad);
@@ -265,8 +242,7 @@ mat<4> mat<R, C, T>::rotationX(mat_t rad) {
   return matrix;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::rotationY(mat_t rad) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::rotationY(mat_t rad) {
   mat<4> matrix;
   matrix(0, 0) = cosf(rad);
   matrix(0, 2) = sinf(rad);
@@ -277,8 +253,7 @@ mat<4> mat<R, C, T>::rotationY(mat_t rad) {
   return matrix;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::rotationZ(mat_t rad) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::rotationZ(mat_t rad) {
   mat<4> matrix;
   matrix(0, 0) = cosf(rad);
   matrix(0, 1) = sinf(rad);
@@ -289,8 +264,7 @@ mat<4> mat<R, C, T>::rotationZ(mat_t rad) {
   return matrix;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::rotation(vec<3> rad) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::rotation(vec<3> rad) {
   mat<4> matrix, x, y, z;
 
   x = rotationX(rad->x);
@@ -304,8 +278,7 @@ mat<4> mat<R, C, T>::rotation(vec<3> rad) {
   return matrix;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> translation(vec<3> v) {
+template <mat_t R, mat_t C, typename T> mat<4> translation(vec<3> v) {
   mat<4> out = mat<4>::identity();
 
   out.data[3][0] = v->x;
@@ -328,9 +301,7 @@ template <mat_t R, mat_t C, typename T> mat<4> scale(vec<3> v) {
 
 // Functions (Dimension-Specific)
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::perspective(mat_t fovrads, mat_t aspect,
-                                 mat_t near, mat_t far) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::perspective(mat_t fovrads, mat_t aspect, mat_t near, mat_t far) {
   mat_t tanHalfFov = tan(fovrads / 2.0f);
 
   mat<4> out;
@@ -343,9 +314,7 @@ mat<4> mat<R, C, T>::perspective(mat_t fovrads, mat_t aspect,
 }
 
 template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::ortho(mat_t left, mat_t right,
-                           mat_t bottom, mat_t top, mat_t near,
-                           mat_t far) {
+mat<4> mat<R, C, T>::ortho(mat_t left, mat_t right, mat_t bottom, mat_t top, mat_t near, mat_t far) {
   mat<4> out = identity();
   out.data[0][0] = 2.0f / (right - left);
   out.data[1][1] = 2.0f / (top - bottom);
@@ -356,9 +325,7 @@ mat<4> mat<R, C, T>::ortho(mat_t left, mat_t right,
   return out;
 }
 
-template <mat_t R, mat_t C, typename T>
-mat<4> mat<R, C, T>::lookat(vec<3> pos, vec<3> target,
-                            vec<3> up) {
+template <mat_t R, mat_t C, typename T> mat<4> mat<R, C, T>::lookat(vec<3> pos, vec<3> target, vec<3> up) {
   vec<3> f = (target - pos).normalize();
   vec<3> s = vec<3>::cross(f, up).normalize();
   vec<3> u = vec<3>::cross(s, f);

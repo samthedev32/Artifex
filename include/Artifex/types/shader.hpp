@@ -51,17 +51,21 @@ public:
   // 4D Values
 
   void set(std::string n, int x, int y, int z, int w);
-  void set(std::string n, GLuint x, GLuint y, GLuint z, GLuint w);
+  void set(std::string n, GLuint x, GLuint y, GLuint z,
+           GLuint w);
   void set(std::string n, float x, float y, float z, float w);
-  void set(std::string n, double x, double y, double z, double w);
+  void set(std::string n, double x, double y, double z,
+           double w);
 
   // Vectors
 
-  template <vec_t D, typename T> void set(std::string n, vec<D, T> vec);
+  template <vec_t D, typename T>
+  void set(std::string n, vec<D, T> vec);
 
   // Matrices
 
-  template <mat_t R, mat_t C, typename T> void set(std::string n, mat<R, C, T> mat);
+  template <mat_t R, mat_t C, typename T>
+  void set(std::string n, mat<R, C, T> mat);
 };
 
 } // namespace Artifex

@@ -12,7 +12,10 @@ class Game : public Module {
     return true;
   }
 
-  bool button(vec<2> center, vec<2> size) { ax->render.roundable(center, size, 2, vec<3>(), 1, 0.3f, 90.0f); }
+  bool button(vec<2> center, vec<2> size) {
+    ax->render.roundable(center, size, 2, vec<3>(), 1, 0.3f,
+                         90.0f);
+  }
 
   bool onUpdate(float deltaTime) {
     if (ax->key("esc"))
@@ -21,7 +24,8 @@ class Game : public Module {
     // TODO: button style: half-rounded corners, rounded corners
     // when hovered, shrink when clicked
 
-    ax->resource.shader[ax->current.shader].set("funi.time", ax->now);
+    ax->resource.shader[ax->current.shader].set("funi.time",
+                                                ax->now);
 
     button({}, {0.4f, 0.2f});
 
@@ -30,7 +34,7 @@ class Game : public Module {
 };
 
 int main() {
-  Engine ax("Hello Artifex", {720, 480});
+  Engine ax("Hello, World!", {720, 480});
 
   ax.add("game", new Game());
 
