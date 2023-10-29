@@ -7,8 +7,7 @@
 
 namespace Artifex {
 
-Engine::Engine(std::string name, vec<2, uint32_t> size)
-    : Window(name, size) {
+Engine::Engine(std::string name, vec<2, uint32_t> size) : Window(name, size) {
   load.init(this);
 
   render.init(this);
@@ -34,22 +33,21 @@ Engine::~Engine() {
   load.deinit();
 }
 
-void Engine::loop(EngineToolkit::vec<3> clearColor,
-                  bool (*onUpdate)(float)) {
+void Engine::loop(vec<3> clearColor, bool (*onUpdate)(float)) {
   while (update(clearColor))
     if (onUpdate)
       if (!onUpdate(deltaTime))
         exit(true);
 }
 
-bool Engine::update(EngineToolkit::vec<3> clearColor) {
+bool Engine::update(vec<3> clearColor) {
   // Update Screen
   bool running = Window::update();
 
   render.clear(clearColor);
 
   // Update GL
-  glViewport(0, 0, size->x, size->y);
+  glViewport(0, 0, size->width, size->height);
 
   // Timing
   past = now;
@@ -66,21 +64,17 @@ bool Engine::update(EngineToolkit::vec<3> clearColor) {
 float Engine::time() {
   struct timespec res;
   clock_gettime(CLOCK_MONOTONIC, &res);
-  return (1000.0f * res.tv_sec + (float)res.tv_nsec / 1e6)
-         / 1000.0f;
+  return (1000.0f * res.tv_sec + (float)res.tv_nsec / 1e6) / 1000.0f;
 }
 
 bool Engine::add(std::string name, Module *mod, bool enable) {
   if (module.count(name)) {
-    EngineToolkit::Log::warning(
-        "Engine::add", "Module with name '%s' already exists",
-        name.c_str());
+    Log::warning("Engine::add", "Module with name '%s' already exists", name.c_str());
     return false;
   }
 
   if (!mod) {
-    EngineToolkit::Log::warning("Engine::add",
-                                "Module is not initialized");
+    Log::warning("Engine::add", "Module is not initialized");
     return false;
   }
 
@@ -88,15 +82,14 @@ bool Engine::add(std::string name, Module *mod, bool enable) {
   module[name]->ax = this;
 
   if (!module[name]->onCreate()) {
-    EngineToolkit::Log::warning("Engine::add"
-                                "Failed to create module '%s'",
-                                name.c_str());
+    Log::warning("Engine::add"
+                 "Failed to create module '%s'",
+                 name.c_str());
 
     return false;
   }
 
-  EngineToolkit::Log::verbose(
-      "Engine::add", "Added Module '%s'", name.c_str());
+  Log::verbose("Engine::add", "Added Module '%s'", name.c_str());
   return true;
 }
 

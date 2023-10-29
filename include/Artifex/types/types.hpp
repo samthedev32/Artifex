@@ -25,20 +25,16 @@ struct Font {
   Texture data;
   uint8_t rows, cols;
 
-  vec2 VERT[6];
-  vec2 UV[6];
+  vec<2> VERT[6];
+  vec<2> UV[6];
 
   GLuint VAO, VBO;
 
   const struct {
-    vec2 pos, uv;
-  } vertices[6] = {{{-1.0f, 1.0f}, {0.0f, 1.0f}},
-                   {{-1.0f, -1.0f}, {0.0f, 0.0f}},
-                   {{1.0f, -1.0f}, {1.0f, 0.0f}},
+    vec<2> pos, uv;
+  } vertices[6] = {{{-1.0f, 1.0f}, {0.0f, 1.0f}}, {{-1.0f, -1.0f}, {0.0f, 0.0f}}, {{1.0f, -1.0f}, {1.0f, 0.0f}},
 
-                   {{-1.0f, 1.0f}, {0.0f, 1.0f}},
-                   {{1.0f, -1.0f}, {1.0f, 0.0f}},
-                   {{1.0f, 1.0f}, {1.0f, 1.0f}}};
+                   {{-1.0f, 1.0f}, {0.0f, 1.0f}}, {{1.0f, -1.0f}, {1.0f, 0.0f}},  {{1.0f, 1.0f}, {1.0f, 1.0f}}};
 };
 
 // Module

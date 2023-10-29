@@ -5,32 +5,30 @@
 
 namespace Artifex {
 
-Window::Window(std::string name, uint32_t width,
-               uint32_t height)
-    : width(width == 0 ? 1 : width),
-      height(height == 0 ? 1 : height) {
+Window::Window(std::string name, vec<2, uint32_t> size)
+    : size(size) {
 
   // Decide if Fullscreened or not
-  bool isFullscreen = width == 0 || height == 0;
+  bool isFullscreen = size->width == 0 || size->height == 0;
+  size->width = size->width != 0 ? size->width : 1;
+  size->height = size->height != 0 ? size->height : 1;
 
   // Init SDL2
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    EngineToolkit::Log::error("Window::Window",
-                              "Failed to Create Window: %s",
-                              SDL_GetError());
+    Log::error("Window::Window", "Failed to Create Window: %s",
+               SDL_GetError());
     return;
   }
 
   // Create Window
   window = SDL_CreateWindow(
       name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-      SDL_WINDOWPOS_UNDEFINED, width, height,
+      SDL_WINDOWPOS_UNDEFINED, size->width, size->height,
       SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
   if (window == NULL) {
-    EngineToolkit::Log::error("Window::Window",
-                              "Failed to create window: %s",
-                              SDL_GetError());
+    Log::error("Window::Window", "Failed to create window: %s",
+               SDL_GetError());
     return;
   }
 
@@ -47,8 +45,7 @@ Window::Window(std::string name, uint32_t width,
   // Load GLAD
   if (!gladLoadGLLoader(SDL_GL_GetProcAddress)
       || glcontext == NULL) {
-    EngineToolkit::Log::error("Window::Window",
-                              "Failed to init OpenGL");
+    Log::error("Window::Window", "Failed to init OpenGL");
     SDL_DestroyWindow(window);
     return;
   }
@@ -65,8 +62,8 @@ bool Window::update() {
   // Update Window Size
   int w, h;
   SDL_GetWindowSize(window, &w, &h);
-  width = w > 0 ? w : width;
-  height = h > 0 ? h : height;
+  size->width = w > 0 ? w : size->width;
+  size->height = h > 0 ? h : size->height;
 
   // Update Window
   SDL_GL_SwapWindow(window);
@@ -74,15 +71,15 @@ bool Window::update() {
   // update inputs
   keyboard = SDL_GetKeyboardState(NULL);
 
-  int mx, my;
+  vec<2, int> m;
   if (!SDL_GetRelativeMouseMode()) {
-    SDL_GetMouseState(&mx, &my);
-    cursor.x = ((float)mx / width) * 2 - 1;
-    cursor.y = ((float)my / height) * -2 + 1;
+    SDL_GetMouseState(&m->x, &m->y);
+    cursor->x = ((float)m->x / size->width) * 2 - 1;
+    cursor->y = ((float)m->y / size->height) * -2 + 1;
   } else {
-    SDL_GetRelativeMouseState(&mx, &my);
-    cursor.x = mx * sensitivity;
-    cursor.y = my * sensitivity;
+    SDL_GetRelativeMouseState(&m->x, &m->y);
+    cursor->x = m->x * sensitivity;
+    cursor->y = m->y * sensitivity;
   }
 
   // poll events
@@ -112,14 +109,14 @@ bool Window::update() {
 
     case SDL_MOUSEWHEEL:
       if (event.wheel.y > 0) // scroll up
-        scroll.y -= 1;
+        scroll->y -= 1;
       else if (event.wheel.y < 0) // scroll down
-        scroll.y += 1;
+        scroll->y += 1;
 
       if (event.wheel.x > 0) // scroll right
-        scroll.x += 1;
+        scroll->x += 1;
       else if (event.wheel.x < 0) // scroll left
-        scroll.x -= 1;
+        scroll->x -= 1;
       break;
 
     default:

@@ -14,82 +14,70 @@ void Shader::use() {
     glUseProgram(this->id);
 }
 
-// Set Boolean Uniform
-void Shader::set(std::string n, bool value) {
+GLuint Shader::get(std::string n) {
   use();
 
   if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
-
-  glUniform1i(uniforms[n] - 1, (int)value);
+    return uniforms[n] = glGetUniformLocation(this->id, n.c_str());
+  return uniforms[n];
 }
 
-// Set Integer Uniform
-void Shader::set(std::string n, int value) {
-  use();
+// 1D Values
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+void Shader::set(std::string n, int value) { glUniform1i(get(n), value); }
+void Shader::set(std::string n, GLuint value) { glUniform1ui(get(n), value); }
+void Shader::set(std::string n, float value) { glUniform1f(get(n), value); }
+void Shader::set(std::string n, double value) { glUniform1d(get(n), value); }
 
-  glUniform1i(uniforms[n] - 1, value);
-}
+// 2D Values
 
-// Set Float Uniform
-void Shader::set(std::string n, float value) {
-  use();
+void Shader::set(std::string n, int x, int y) { glUniform2i(get(n), x, y); }
+void Shader::set(std::string n, GLuint x, GLuint y) { glUniform2ui(get(n), x, y); }
+void Shader::set(std::string n, float x, float y) { glUniform2f(get(n), x, y); }
+void Shader::set(std::string n, double x, double y) { glUniform2d(get(n), x, y); }
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+// 3D Values
 
-  glUniform1f(uniforms[n] - 1, value);
-}
+void Shader::set(std::string n, int x, int y, int z) { glUniform3i(get(n), x, y, z); }
+void Shader::set(std::string n, GLuint x, GLuint y, GLuint z) { glUniform3ui(get(n), x, y, z); }
+void Shader::set(std::string n, float x, float y, float z) { glUniform3f(get(n), x, y, z); }
+void Shader::set(std::string n, double x, double y, double z) { glUniform3d(get(n), x, y, z); }
 
-// Set 2D Vector Uniform
-void Shader::set(std::string n, vec2 vec) {
-  use();
+// 4D Values
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+void Shader::set(std::string n, int x, int y, int z, int w) { glUniform4i(get(n), x, y, z, w); }
+void Shader::set(std::string n, GLuint x, GLuint y, GLuint z, GLuint w) { glUniform4ui(get(n), x, y, z, w); }
+void Shader::set(std::string n, float x, float y, float z, float w) { glUniform4f(get(n), x, y, z, w); }
+void Shader::set(std::string n, double x, double y, double z, double w) { glUniform4d(get(n), x, y, z, w); }
 
-  glUniform2fv(uniforms[n] - 1, 1, vec.data);
-}
+// 1D Vectors
 
-// Set 3D Vector Uniform
-void Shader::set(std::string n, vec3 vec) {
-  use();
+template <> void Shader::set(std::string n, vec<1, int> vec) { glUniform1iv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<1, GLuint> vec) { glUniform1uiv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<1, float> vec) { glUniform1fv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<1, double> vec) { glUniform1dv(get(n), 1, vec.data); }
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+// 2D Vectors
 
-  glUniform3fv(uniforms[n] - 1, 1, vec.data);
-}
+template <> void Shader::set(std::string n, vec<2, int> vec) { glUniform2iv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<2, GLuint> vec) { glUniform2uiv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<2, float> vec) { glUniform2fv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<2, double> vec) { glUniform2dv(get(n), 1, vec.data); }
 
-// Set 4D Vector Uniform
-void Shader::set(std::string n, vec4 vec) {
-  use();
+// 3D Vectors
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+template <> void Shader::set(std::string n, vec<3, int> vec) { glUniform3iv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<3, GLuint> vec) { glUniform3uiv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<3, float> vec) { glUniform3fv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<3, double> vec) { glUniform3dv(get(n), 1, vec.data); }
 
-  glUniform4fv(uniforms[n] - 1, 1, vec.data);
-}
+// 4D Vectors
 
-// Set 3 by 3 Matrix Uniform
-void Shader::set(std::string n, mat3 mat) {
-  use();
+template <> void Shader::set(std::string n, vec<4, int> vec) { glUniform4iv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<4, GLuint> vec) { glUniform4uiv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<4, float> vec) { glUniform4fv(get(n), 1, vec.data); }
+template <> void Shader::set(std::string n, vec<4, double> vec) { glUniform4dv(get(n), 1, vec.data); }
 
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
+// Matrices
 
-  glUniformMatrix3fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
-}
-
-// Set 4 by 4 Matrix Uniform
-void Shader::set(std::string n, mat4 mat) {
-  use();
-
-  if (uniforms.count(n) == 0)
-    uniforms[n] = glGetUniformLocation(this->id, n.c_str()) + 1;
-
-  glUniformMatrix4fv(uniforms[n] - 1, 1, GL_FALSE, *mat.data);
-}
+// TODO

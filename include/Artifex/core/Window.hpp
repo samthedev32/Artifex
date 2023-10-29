@@ -23,14 +23,15 @@
 
 #include <string>
 
-#include <Artifex/math/vec/vec2.hpp>
+#include <Artifex/core/Log.hpp>
+#include <Artifex/math/vec.hpp>
 
 namespace Artifex {
 
 class Window {
 public:
   // Create Window
-  Window(std::string name, uint32_t width, uint32_t height);
+  Window(std::string name, vec<2, uint32_t> size);
 
   // Destroy Window
   ~Window();
@@ -52,10 +53,10 @@ public:
   bool key(std::string k);
 
 public:
-  uint32_t width, height;
+  vec<2, uint32_t> size;
 
   // Cursor & Scroll Positions
-  vec2 cursor, scroll;
+  vec<2> cursor, scroll;
   float sensitivity = 1.0f;
 
 private:

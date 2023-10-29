@@ -17,13 +17,11 @@ namespace Artifex {
 
 class Engine : public Window {
 public:
-  Engine(std::string name, uint32_t windowWidth,
-         uint32_t windowHeight);
+  Engine(std::string title, vec<2, uint32_t> size);
   ~Engine();
 
   // Game Loop
-  void loop(EngineToolkit::vec<3> clearColor = {},
-            bool (*onUpdate)(float) = nullptr);
+  void loop(vec<3> clearColor = {}, bool (*onUpdate)(float) = nullptr);
 
   // Update Engine & Window (for manual game loop)
   bool update(vec<3> clearColor);
@@ -32,11 +30,10 @@ public:
   float time();
 
   // Get Ratio of Window (width/height)
-  inline float ratio() { return (float)size->x / size->y; }
+  inline float ratio() { return (float)size->width / size->height; }
 
   // Add Module
-  bool add(std::string name, Module *module,
-           bool enable = true);
+  bool add(std::string name, Module *module, bool enable = true);
 
   // Resource Loader
   Load load;

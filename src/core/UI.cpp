@@ -5,25 +5,26 @@
 namespace Artifex {
 
 void UI::init(Engine *pEngine) {
-    if (initialized)
-        return;
+  if (initialized)
+    return;
 
-    // TODO
-    engine = pEngine;
+  // TODO
+  engine = pEngine;
 
-    initialized = true;
+  initialized = true;
 }
 
 void UI::deinit() {
-    if (!initialized)
-        return;
+  if (!initialized)
+    return;
 
-    // TODO
+  // TODO
 
-    initialized = false;
+  initialized = false;
 }
 
-// bool UI::button(vec2 center, vec2 size, std::string name, uint16_t a,
+// bool UI::button(vec2 center, vec2 size, std::string name,
+// uint16_t a,
 //                 uint16_t b) {
 //     // if (math::collide(cursor, center, size * ratio())) {
 //     //     if (input[name] && key("mouse") == false) {
@@ -38,7 +39,8 @@ void UI::deinit() {
 //     return false;
 // }
 
-// bool UI::toggle(vec2 center, vec2 size, std::string name, uint16_t a,
+// bool UI::toggle(vec2 center, vec2 size, std::string name,
+// uint16_t a,
 //                 uint16_t b) {
 //     // if (math::collide(cursor, center, size * ratio())) {
 //     //     if (key("mouse") == true) {
@@ -66,8 +68,10 @@ void UI::deinit() {
 //     return false;
 // }
 
-// bool UI::touch(vec2 center, vec2 size, uint16_t a, uint16_t b) {
-//     // if (key("mouse") && math::collide(cursor, center, size * ratio())) {
+// bool UI::touch(vec2 center, vec2 size, uint16_t a, uint16_t
+// b) {
+//     // if (key("mouse") && math::collide(cursor, center, size
+//     * ratio())) {
 //     //     rect(center, size, b);
 //     //     return true;
 //     // }
@@ -76,15 +80,16 @@ void UI::deinit() {
 //     return false;
 // }
 
-// vec2 UI::joystick(vec2 center, std::string name, float radius, float
-// nob_radius,
+// vec2 UI::joystick(vec2 center, std::string name, float
+// radius, float nob_radius,
 //                   vec3 color, vec3 nob_color) {
 //     circle(center, radius, 0.9f, color);
 
 //     vec2 pos = center;
 
 //     if (key("mouse")) {
-//         if (cursor.distance(center) <= radius && input[name] == false)
+//         if (cursor.distance(center) <= radius && input[name]
+//         == false)
 //             input[name] = true;
 
 //         if (input[name])
@@ -95,9 +100,11 @@ void UI::deinit() {
 //     // Works - Don't touch it!
 //     // WARNING: Possible Div by 0
 //     vec2 direction = (pos - center).normalize() * radius;
-//     float distance = math::clamp(pos.distance(center) / radius, -1.0f, 1.0f);
+//     float distance = math::clamp(pos.distance(center) /
+//     radius, -1.0f, 1.0f);
 
-//     circle(center + direction * distance * ratio(), nob_radius, 0.0f,
+//     circle(center + direction * distance * ratio(),
+//     nob_radius, 0.0f,
 //            nob_color);
 
 //     vec2 a = pos - center;
