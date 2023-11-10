@@ -5,11 +5,11 @@
 
 namespace Artifex {
 
-Window::Window(std::string name, vec<2, uint32_t> size)
+Window::Window(const std::string& name, vec<2, uint32_t> size)
     : size(size) {
 
   // Decide if Fullscreened or not
-  bool isFullscreen = size->width == 0 || size->height == 0;
+  isFullscreen = size->width == 0 || size->height == 0;
   size->width = size->width != 0 ? size->width : 1;
   size->height = size->height != 0 ? size->height : 1;
 
@@ -23,10 +23,10 @@ Window::Window(std::string name, vec<2, uint32_t> size)
   // Create Window
   window = SDL_CreateWindow(
       name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-      SDL_WINDOWPOS_UNDEFINED, size->width, size->height,
+      SDL_WINDOWPOS_UNDEFINED, (int)size->width, (int)size->height,
       SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-  if (window == NULL) {
+  if (window == nullptr) {
     Log::error("Window::Window", "Failed to create window: %s",
                SDL_GetError());
     return;
@@ -44,7 +44,7 @@ Window::Window(std::string name, vec<2, uint32_t> size)
 
   // Load GLAD
   if (!gladLoadGLLoader(SDL_GL_GetProcAddress)
-      || glcontext == NULL) {
+      || glcontext == nullptr) {
     Log::error("Window::Window", "Failed to init OpenGL");
     SDL_DestroyWindow(window);
     return;
@@ -69,17 +69,17 @@ bool Window::update() {
   SDL_GL_SwapWindow(window);
 
   // update inputs
-  keyboard = SDL_GetKeyboardState(NULL);
+  keyboard = SDL_GetKeyboardState(nullptr);
 
   vec<2, int> m;
   if (!SDL_GetRelativeMouseMode()) {
     SDL_GetMouseState(&m->x, &m->y);
-    cursor->x = ((float)m->x / size->width) * 2 - 1;
-    cursor->y = ((float)m->y / size->height) * -2 + 1;
+    cursor->x = ((float)m->x / (float)size->width) * 2 - 1;
+    cursor->y = ((float)m->y / (float)size->height) * -2 + 1;
   } else {
     SDL_GetRelativeMouseState(&m->x, &m->y);
-    cursor->x = m->x * sensitivity;
-    cursor->y = m->y * sensitivity;
+    cursor->x = (float)m->x * sensitivity;
+    cursor->y = (float)m->y * sensitivity;
   }
 
   // poll events
@@ -90,7 +90,7 @@ bool Window::update() {
       shouldClose = true;
       break;
 
-    case SDL_KEYDOWN:
+    case SDL_KEYUP:
       if (event.key.keysym.scancode == SDL_SCANCODE_F11)
         fullscreen(!isFullscreen);
       break;
@@ -134,10 +134,10 @@ void Window::fullscreen(bool en, uint8_t hiddenCursor,
   SDL_SetWindowFullscreen(window,
                           SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
-  bool cursor = hiddenCursor > true ? en : hiddenCursor;
+  bool showCursor = hiddenCursor > true ? en : hiddenCursor;
 
-  SDL_ShowCursor((SDL_bool)!cursor);
-  SDL_SetRelativeMouseMode((SDL_bool)cursor);
+  SDL_ShowCursor((SDL_bool)!showCursor);
+  SDL_SetRelativeMouseMode((SDL_bool)showCursor);
 
   SDL_SetWindowMinimumSize(window, minWidth, minHeight);
 
@@ -235,7 +235,7 @@ std::unordered_map<std::string, int> SDL2_SCANCODE_MAP = {
     {"f12", SDL_SCANCODE_F12},
 };
 
-bool Window::key(std::string k) {
+bool Window::key(const std::string& k) {
   // Mouse Buttons
   if (k == "ml" || k == "lmouse"
       || k == "left") // mouse button left

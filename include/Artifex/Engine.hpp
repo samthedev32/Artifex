@@ -10,6 +10,7 @@
 #include <Artifex/types/types.hpp>
 
 #include <cstdint>
+#include <typeinfo>
 #include <unordered_map>
 #include <vector>
 
@@ -17,23 +18,26 @@ namespace Artifex {
 
 class Engine : public Window {
 public:
-  Engine(std::string title, vec<2, uint32_t> size);
+  Engine(const std::string &title, const vec<2, uint32_t> &size);
   ~Engine();
 
   // Game Loop
-  void loop(vec<3> clearColor = {}, bool (*onUpdate)(float) = nullptr);
+  void loop(const vec<3> &clearColor = {}, void (*onUpdate)(float) = nullptr);
 
   // Update Engine & Window (for manual game loop)
-  bool update(vec<3> clearColor);
+  bool update(const vec<3> &clearColor);
 
   // Get Current Time (s)
-  float time();
+  static float time();
 
   // Get Ratio of Window (width/height)
-  inline float ratio() { return (float)size->width / size->height; }
+  inline float ratio() { return (float)size->width / (float)size->height; }
+
+  // Register Callback Function
+  void callback(void (*func)(int), void *userdata, int flags);
 
   // Add Module
-  bool add(std::string name, Module *module, bool enable = true);
+  template <typename T> bool add(const std::string &name);
 
   // Resource Loader
   Load load;
@@ -47,9 +51,6 @@ public:
   // Audio Mixer
   Mix mix;
 
-  // Modules / Add-ons
-  std::unordered_map<std::string, Module *> module;
-
   // Selected Resources
   struct {
     uint16_t shader = 0;
@@ -58,10 +59,10 @@ public:
 
 public:
   // Time when frame started
-  float now;
+  float now = 0.0f;
 
   // Duration of Last Frame
-  float deltaTime;
+  float deltaTime = 0.0f;
 
   // Resources
   struct {
@@ -76,6 +77,32 @@ public:
 
 private:
   float past;
+
+  std::unordered_map<std::string, Module *> module;
 };
+
+#include <type_traits>
+
+template <typename T> bool Engine::add(const std::string &name) {
+  static_assert(std::is_base_of<Module, T>::value, "Invalid Module");
+
+  if (module.count(name)) {
+    Log::warning("Engine::add", "Module with name '%s' already exists", name.c_str());
+    return false;
+  }
+
+  module[name] = new T(*this);
+
+  if (!module[name]->onCreate()) {
+    Log::warning("Engine::add"
+                 "Failed to create module '%s'",
+                 name.c_str());
+
+    return false;
+  }
+
+  Log::verbose("Engine::add", "Added Module '%s'", name.c_str());
+  return true;
+}
 
 } // namespace Artifex

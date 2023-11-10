@@ -31,7 +31,7 @@ namespace Artifex {
 class Window {
 public:
   // Create Window
-  Window(std::string name, vec<2, uint32_t> size);
+  Window(const std::string& name, vec<2, uint32_t> size);
 
   // Destroy Window
   ~Window();
@@ -47,10 +47,10 @@ public:
                   int minWidth = 720, int minHeight = 480);
 
   // Enable/Disable VSync
-  void vsync(int interval = 1);
+  static void vsync(int interval = 1);
 
   // Get Key State
-  bool key(std::string k);
+  bool key(const std::string& k);
 
 public:
   vec<2, uint32_t> size;
@@ -65,7 +65,7 @@ private:
   bool shouldClose = false;
   bool isFullscreen = false;
 
-  const Uint8 *keyboard;
+  const Uint8 *keyboard = nullptr;
   bool mouse[3]{};
 };
 

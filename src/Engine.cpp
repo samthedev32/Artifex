@@ -1,13 +1,11 @@
 #include <Artifex/Engine.hpp>
 
-#include <stdio.h>
-#include <string.h>
+#include <ctime>
 #include <string>
-#include <time.h>
 
 namespace Artifex {
 
-Engine::Engine(std::string name, vec<2, uint32_t> size) : Window(name, size) {
+Engine::Engine(const std::string &name, const vec<2, uint32_t> &size) : Window(name, size) {
   load.init(this);
 
   render.init(this);
@@ -33,21 +31,20 @@ Engine::~Engine() {
   load.deinit();
 }
 
-void Engine::loop(vec<3> clearColor, bool (*onUpdate)(float)) {
+void Engine::loop(const vec<3> &clearColor, void (*onUpdate)(float)) {
   while (update(clearColor))
     if (onUpdate)
-      if (!onUpdate(deltaTime))
-        exit(true);
+      onUpdate(deltaTime);
 }
 
-bool Engine::update(vec<3> clearColor) {
+bool Engine::update(const vec<3> &clearColor) {
   // Update Screen
   bool running = Window::update();
 
   render.clear(clearColor);
 
   // Update GL
-  glViewport(0, 0, size->width, size->height);
+  glViewport(0, 0, (int)size->width, (int)size->height);
 
   // Timing
   past = now;
@@ -62,35 +59,13 @@ bool Engine::update(vec<3> clearColor) {
 }
 
 float Engine::time() {
-  struct timespec res;
+  struct timespec res {};
   clock_gettime(CLOCK_MONOTONIC, &res);
-  return (1000.0f * res.tv_sec + (float)res.tv_nsec / 1e6) / 1000.0f;
+  return (float)(1000.0f * (float)res.tv_sec + (float)res.tv_nsec / 1e6) / 1000.0f;
 }
 
-bool Engine::add(std::string name, Module *mod, bool enable) {
-  if (module.count(name)) {
-    Log::warning("Engine::add", "Module with name '%s' already exists", name.c_str());
-    return false;
-  }
-
-  if (!mod) {
-    Log::warning("Engine::add", "Module is not initialized");
-    return false;
-  }
-
-  module[name] = mod;
-  module[name]->ax = this;
-
-  if (!module[name]->onCreate()) {
-    Log::warning("Engine::add"
-                 "Failed to create module '%s'",
-                 name.c_str());
-
-    return false;
-  }
-
-  Log::verbose("Engine::add", "Added Module '%s'", name.c_str());
-  return true;
+void Engine::callback(void (*func)(int), void *userdata, int flags) {
+  // TODO
 }
 
 } // namespace Artifex

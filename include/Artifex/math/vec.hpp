@@ -29,7 +29,7 @@ template <vec_t D = 3, typename T = float> struct vec {
 
   vec(std::vector<T> v);
   template <typename... Args> vec(Args... args);
-  template <vec_t inD, typename inT> vec(vec<inD, inT> v);
+  template <vec_t inD, typename inT>  vec(vec<inD, inT> v);
 
   ~vec();
 
@@ -47,14 +47,14 @@ template <vec_t D = 3, typename T = float> struct vec {
 
   // Assignment Operators
 
-  template <vec_t inD, typename inT> void operator=(const vec<inD, inT> &v);
+  template <vec_t inD, typename inT> vec<D, T>& operator=(const vec<inD, inT> &v);
   template <vec_t inD, typename inT> void operator+=(const vec<inD, inT> &v);
   template <vec_t inD, typename inT> void operator-=(const vec<inD, inT> &v);
   template <vec_t inD, typename inT> void operator*=(const vec<inD, inT> &v);
   template <vec_t inD, typename inT> void operator/=(const vec<inD, inT> &v);
   template <vec_t inD, typename inT> void operator%=(const vec<inD, inT> &v);
 
-  void operator=(const T &v);
+  vec<D, T>& operator=(const T &v);
   void operator*=(const T &v);
   void operator/=(const T &v);
   void operator%=(const T &v);
@@ -81,9 +81,9 @@ template <vec_t D = 3, typename T = float> struct vec {
 
   // Functions (Instance Methods)
 
-  T length() const;
-  vec normalize() const;
-  vec clamp(vec min, vec max) const;
+  [[nodiscard]] T length() const;
+  [[nodiscard]] vec normalize() const;
+  [[nodiscard]] vec clamp(vec min, vec max) const;
 
   // Functions (Static)
 
@@ -93,7 +93,7 @@ template <vec_t D = 3, typename T = float> struct vec {
 
   // Functions (Dimension-Specific)
 
-  static vec<3> cross(vec<3> a, vec<3> b);
+  static vec<3> cross(const vec<3>& a, const vec<3>& b);
 };
 
 #ifdef VECTOR_TYPES
@@ -268,9 +268,11 @@ template <vec_t D, typename T> vec<D, T> vec<D, T>::operator%(const T &v) const 
 
 // Assignment Operators
 
-template <vec_t D, typename T> template <vec_t inD, typename inT> void vec<D, T>::operator=(const vec<inD, inT> &v) {
+template <vec_t D, typename T> template <vec_t inD, typename inT> vec<D, T>& vec<D, T>::operator=(const vec<inD, inT> &v) {
   for (vec_t i = 0; i < D; i++)
     this->data[i] = i < inD ? v.data[i] : 0;
+
+  return *this;
 }
 
 template <vec_t D, typename T> template <vec_t inD, typename inT> void vec<D, T>::operator+=(const vec<inD, inT> &v) {
@@ -293,9 +295,11 @@ template <vec_t D, typename T> template <vec_t inD, typename inT> void vec<D, T>
   *this = *this % v;
 }
 
-template <vec_t D, typename T> void vec<D, T>::operator=(const T &v) {
+template <vec_t D, typename T> vec<D, T>& vec<D, T>::operator=(const T &v) {
   for (vec_t i = 0; i < D; i++)
     this->data[i] = v;
+
+  return *this;
 }
 
 template <vec_t D, typename T> void vec<D, T>::operator*=(const T &v) { *this = *this * v; }
@@ -321,18 +325,22 @@ template <vec_t D, typename T> template <vec_t inD, typename inT> bool vec<D, T>
 }
 
 template <vec_t D, typename T> template <vec_t inD, typename inT> bool vec<D, T>::operator>(const vec<inD, inT> &v) const {
+  // TODO
   return false;
 }
 
 template <vec_t D, typename T> template <vec_t inD, typename inT> bool vec<D, T>::operator<(const vec<inD, inT> &v) const {
+  // TODO
   return false;
 }
 
 template <vec_t D, typename T> template <vec_t inD, typename inT> bool vec<D, T>::operator>=(const vec<inD, inT> &v) const {
+  // TODO
   return false;
 }
 
 template <vec_t D, typename T> template <vec_t inD, typename inT> bool vec<D, T>::operator<=(const vec<inD, inT> &v) const {
+  // TODO
   return false;
 }
 
@@ -399,7 +407,7 @@ template <vec_t D, typename T> vec<D, T> vec<D, T>::lerp(vec<D, T> a, vec<D, T> 
 
 // Functions (Dimension-Specific)
 
-template <vec_t D, typename T> vec<3> vec<D, T>::cross(vec<3> a, vec<3> b) {
+template <vec_t D, typename T> vec<3> vec<D, T>::cross(const vec<3>& a, const vec<3>& b) {
   return std::vector<T>({a.data[1] * b.data[2] - a.data[2] * b.data[1], a.data[2] * b.data[0] - a.data[0] * b.data[2],
                          a.data[0] * b.data[1] - a.data[1] * b.data[0]});
 }

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <map>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <vector>
 
-#include <Artifex/types/shader.hpp>
+#include "shader.hpp"
+#include "module.hpp"
 
 namespace Artifex {
 
@@ -33,21 +34,7 @@ struct Font {
   const struct {
     vec<2> pos, uv;
   } vertices[6] = {{{-1.0f, 1.0f}, {0.0f, 1.0f}}, {{-1.0f, -1.0f}, {0.0f, 0.0f}}, {{1.0f, -1.0f}, {1.0f, 0.0f}},
-
                    {{-1.0f, 1.0f}, {0.0f, 1.0f}}, {{1.0f, -1.0f}, {1.0f, 0.0f}},  {{1.0f, 1.0f}, {1.0f, 1.0f}}};
-};
-
-// Module
-class Module {
-public:
-  Engine *ax;
-
-public:
-  virtual bool onCreate() { return true; }
-
-  virtual void onDestroy() {}
-
-  virtual bool onUpdate(float deltaTime) { return true; }
 };
 
 } // namespace Artifex

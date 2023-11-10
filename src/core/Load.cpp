@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include <SDL2/SDL_mixer.h>
+#include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -38,7 +39,7 @@ void Load::deinit() {
   engine->resource.music.clear();
 
   // Free Fonts
-  for (auto font : engine->resource.font)
+  for (const auto &font : engine->resource.font)
     glDeleteTextures(1, &font.data.id);
   engine->resource.font.clear();
 
@@ -53,15 +54,14 @@ void Load::deinit() {
   engine->resource.texture.clear();
 
   // Free Shaders
-  for (auto s : engine->resource.shader)
+  for (const auto &s : engine->resource.shader)
     glDeleteShader(s.id);
   engine->resource.shader.clear();
 
   initialized = false;
 }
 
-uint16_t Load::shader(const char *vertex, const char *fragment,
-                      const char *geometry) {
+uint16_t Load::shader(const char *vertex, const char *fragment, const char *geometry) {
   // Exit if no Shader Code
   const size_t minSize = 8;
   if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
@@ -72,57 +72,52 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
   // Get Raw Codes
   const char *vert_s = vertex;
   const char *frag_s = fragment;
-  const char *geo_s = NULL;
+  const char *geo_s = nullptr;
 
   if (strlen(geometry) >= minSize)
     geo_s = geometry;
 
   GLuint vert, frag, geo, id;
-  bool isGeo = geo_s != NULL;
+  bool isGeo = geo_s != nullptr;
 
   int success;
   char infoLog[1024];
 
   // ---- Compile Vertex Shader
   vert = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vert, 1, &vert_s, NULL);
+  glShaderSource(vert, 1, &vert_s, nullptr);
   glCompileShader(vert);
 
   glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(vert, 1024, NULL, infoLog);
-    Log::error("Load::shader",
-               "Failed to Compile Vertex Shader:\n%s", infoLog);
+    glGetShaderInfoLog(vert, 1024, nullptr, infoLog);
+    Log::error("Load::shader", "Failed to Compile Vertex Shader:\n%s", infoLog);
     return 0;
   }
 
   // ---- Compile Fragment Shader
   frag = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(frag, 1, &frag_s, NULL);
+  glShaderSource(frag, 1, &frag_s, nullptr);
   glCompileShader(frag);
 
   glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(frag, 1024, NULL, infoLog);
+    glGetShaderInfoLog(frag, 1024, nullptr, infoLog);
     glDeleteShader(vert);
-    Log::error("Load::shader",
-               "Failed to Compile Fragment Shader:\n%s",
-               infoLog);
+    Log::error("Load::shader", "Failed to Compile Fragment Shader:\n%s", infoLog);
     return 0;
   }
 
   // ---- Compile Geometry Shader (if present)
   if (isGeo) {
     geo = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(geo, 1, &geo_s, NULL);
+    glShaderSource(geo, 1, &geo_s, nullptr);
     glCompileShader(geo);
 
     glGetShaderiv(geo, GL_COMPILE_STATUS, &success);
     if (!success) {
-      glGetShaderInfoLog(geo, 1024, NULL, infoLog);
-      Log::error("Load::shader",
-                 "Failed to Compile Geometry Shader:\n%s",
-                 infoLog);
+      glGetShaderInfoLog(geo, 1024, nullptr, infoLog);
+      Log::error("Load::shader", "Failed to Compile Geometry Shader:\n%s", infoLog);
       isGeo = false;
     }
   }
@@ -145,22 +140,19 @@ uint16_t Load::shader(const char *vertex, const char *fragment,
   // Check if linking was successful
   glGetProgramiv(id, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(id, 1024, NULL, infoLog);
-    Log::error("Load::shader", "Failed to Link Shaders:\n%s",
-               infoLog);
+    glGetProgramInfoLog(id, 1024, nullptr, infoLog);
+    Log::error("Load::shader", "Failed to Link Shaders:\n%s", infoLog);
     return 0;
   }
 
   Log::verbose("Load::shader", "Loaded Shader", infoLog);
 
   // Add to list + return ID
-  engine->resource.shader.push_back(Shader(id));
+  engine->resource.shader.emplace_back(id);
   return engine->resource.shader.size() - 1;
 }
 
-uint16_t Load::shader(
-    const char *path,
-    std::unordered_map<std::string, std::string> scripts) {
+uint16_t Load::shader(const char *path, std::unordered_map<std::string, std::string> scripts) {
   FILE *f = fopen(path, "r");
 
   if (f) {
@@ -182,15 +174,12 @@ uint16_t Load::shader(
         else if (!strcmp(parameter, "geometry"))
           current = 3;
         else
-          Log::warning("Load::load::shader",
-                       "Invalid Parameter: %s", parameter);
+          Log::warning("Load::load::shader", "Invalid Parameter: %s", parameter);
       } else if (!strcmp(index, "#script")) {
         if (scripts.count(parameter) != 0)
           code[current] += scripts[parameter];
         else
-          Log::warning("Load::load::shader",
-                       "Shader Script not given: %s",
-                       parameter);
+          Log::warning("Load::load::shader", "Shader Script not given: %s", parameter);
       } else {
         code[current] += line;
       }
@@ -198,8 +187,7 @@ uint16_t Load::shader(
 
     fclose(f);
 
-    return shader(code[1].c_str(), code[2].c_str(),
-                  code[3].c_str());
+    return shader(code[1].c_str(), code[2].c_str(), code[3].c_str());
   }
 
   Log::error("Load::shader", "Failed to Open File");
@@ -207,11 +195,9 @@ uint16_t Load::shader(
   return 0;
 }
 
-uint16_t Load::texture(unsigned char *data, int width,
-                       int height, int channels) {
+uint16_t Load::texture(unsigned char *data, int width, int height, int channels) {
   // Exit if invalid
-  if (data == NULL || (width == 0 || height == 0)
-      || (channels < 1 || channels > 4)) {
+  if (data == nullptr || (width == 0 || height == 0) || (channels < 1 || channels > 4)) {
     Log::error("Load::texture", "Invalid Texture");
     return 0;
   }
@@ -223,7 +209,7 @@ uint16_t Load::texture(unsigned char *data, int width,
   glBindTexture(GL_TEXTURE_2D, id);
 
   // Select Color Mode
-  GLuint mode = GL_RGB;
+  GLint mode = GL_RGB;
   switch (channels) {
   case 1:
     mode = GL_RED;
@@ -244,23 +230,19 @@ uint16_t Load::texture(unsigned char *data, int width,
   }
 
   // Create Texture
-  glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode,
-               GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
 
   // Generate MipMap & Set Parameters
   glGenerateMipmap(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                  GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   Log::verbose("Load::texture", "Loaded Texture");
 
   // Add to list + return ID
-  engine->resource.texture.push_back(
-      (Texture){width, height, channels, id});
+  engine->resource.texture.push_back((Texture){width, height, channels, id});
   return engine->resource.texture.size() - 1;
 }
 
@@ -379,13 +361,8 @@ uint16_t Load::font(const char *path) {
   return 0;
 }
 
-bool isOneOf(const char *ext,
-             std::vector<const char *> supported) {
-  for (auto c : supported)
-    if (!strcmp(ext, c))
-      return true;
-
-  return false;
+bool isOneOf(const char *ext, const std::vector<const char *> &supported) {
+  return std::any_of(supported.begin(), supported.end(), [ext](const char *c) { return !strcmp(ext, c); });
 }
 
 uint16_t Load::load(const char *path, FILE_TYPE type) {
@@ -394,14 +371,8 @@ uint16_t Load::load(const char *path, FILE_TYPE type) {
     const char *ext = strrchr(path, '.');
     if (isOneOf(ext, {".glsl", ".shader"}))
       type = FILE_TYPE::SHADER;
-#ifdef ARTIFEX_ONLY_BMP
-    else if (!strcmp(ext, ".bmp"))
+    else if (isOneOf(ext, {".png", ".jpg", ".jpeg", ".bmp", ".gif"}))
       type = FILE_TYPE::IMAGE;
-#else
-    else if (isOneOf(ext,
-                     {".png", ".jpg", ".jpeg", ".bmp", ".gif"}))
-      type = FILE_TYPE::IMAGE;
-#endif
     else if (isOneOf(ext, {".mp3", ".ogg", ".wav"}))
       type = FILE_TYPE::AUDIO;
     else if (!strcmp(ext, ".obj"))
@@ -414,7 +385,7 @@ uint16_t Load::load(const char *path, FILE_TYPE type) {
     }
   }
 
-  uint16_t id = 0;
+  uint16_t id;
 
   switch (type) {
   default:

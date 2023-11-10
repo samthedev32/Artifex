@@ -17,6 +17,7 @@ set(SOURCES
     src/core/Mix.cpp
 
     src/types/shader.cpp
+    src/types/module.cpp
 
     src/GL/glad.c
 )

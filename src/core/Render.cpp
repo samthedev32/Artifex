@@ -43,7 +43,7 @@ void Render::init(Engine *pEngine) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attribute
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
   // texture coord attribute
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
@@ -58,7 +58,7 @@ void Render::init(Engine *pEngine) {
   // TODO: default shader
   // engine->load.shader(default_shader_code[0],
   // default_shader_code[1]);
-  engine->load.load("../../../examples/hello_world/shader/2d.glsl");
+  engine->load.shader("../../../examples/hello_world/shader/2d.glsl");
 
   // Load Texture
   unsigned char data[3] = {255, 0, 0};
@@ -84,20 +84,23 @@ void Render::clear(vec<3> color) {
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Render::roundable(vec<2> center, vec<2> size, int look, vec<3> color, uint16_t tex, float amount, float rotation) {
+void Render::roundable(const vec<2> &center, const vec<2> &size, int look, const vec<3> &color, uint16_t tex, float amount,
+                       float rotation) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, engine->resource.texture[tex].id);
 
   engine->resource.shader[engine->current.shader].use();
 
   // Vertex
-  engine->resource.shader[engine->current.shader].set("center", center);
-  engine->resource.shader[engine->current.shader].set("size", size);
-  engine->resource.shader[engine->current.shader].set("ratio", vec<2>(1.0f, engine->ratio()));
-  engine->resource.shader[engine->current.shader].set("rotation", (float)rads(rotation));
+  engine->resource.shader[engine->current.shader].set("v.center", center);
+  engine->resource.shader[engine->current.shader].set("v.size", size);
+  engine->resource.shader[engine->current.shader].set("v.ratio", vec<2>(1.0f, engine->ratio()));
+  engine->resource.shader[engine->current.shader].set("v.rotation", (float)rads(rotation));
 
   // Fragment
-  engine->resource.shader[engine->current.shader].set("funi.look", look);
+  engine->resource.shader[engine->current.shader].set("f.look", look);
+  engine->resource.shader[engine->current.shader].set("f.corner", amount);
+  engine->resource.shader[engine->current.shader].set("f.time", engine->now);
 
   switch (look) {
   default:
@@ -105,27 +108,25 @@ void Render::roundable(vec<2> center, vec<2> size, int look, vec<3> color, uint1
     break;
 
   case 1:
-    engine->resource.shader[engine->current.shader].set("funi.color", color);
+    engine->resource.shader[engine->current.shader].set("f.color", color);
     break;
 
   case 2:
-    engine->resource.shader[engine->current.shader].set("funi.tex", (int)engine->resource.shader[tex].id);
+    engine->resource.shader[engine->current.shader].set("f.tex", (int)engine->resource.shader[tex].id);
     break;
   }
 
-  engine->resource.shader[engine->current.shader].set("funi.corner", amount);
-
   glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLE_FAN, 6, GL_UNSIGNED_INT, nullptr);
 }
 
-void Render::text(vec<2> center, float width, vec<3> color, float rotation) {
+void Render::text(const vec<2> &center, float width, const vec<3> &color, float rotation) {
   engine->resource.shader[engine->current.shader].use();
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, engine->resource.font[0].data.id);
 
-  engine->resource.shader[engine->current.shader].set("type", 2);
+  engine->resource.shader[engine->current.shader].set("v.type", 2);
   engine->resource.shader[engine->current.shader].set("color", color);
   engine->resource.shader[engine->current.shader].set("ratio", engine->ratio());
 
