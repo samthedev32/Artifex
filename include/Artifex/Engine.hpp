@@ -37,7 +37,7 @@ public:
   void callback(void (*func)(int), void *userdata, int flags);
 
   // Add Module
-  template <typename T> bool add(const std::string &name);
+  template <typename T> bool add(const std::string &name, uint32_t flags = 0);
 
   // Resource Loader
   Load load;
@@ -83,7 +83,7 @@ private:
 
 #include <type_traits>
 
-template <typename T> bool Engine::add(const std::string &name) {
+template <typename T> bool Engine::add(const std::string &name, uint32_t flags) {
   static_assert(std::is_base_of<Module, T>::value, "Invalid Module");
 
   if (module.count(name)) {
@@ -91,7 +91,7 @@ template <typename T> bool Engine::add(const std::string &name) {
     return false;
   }
 
-  module[name] = new T(*this);
+  module[name] = new T(*this, flags);
 
   if (!module[name]->onCreate()) {
     Log::warning("Engine::add"

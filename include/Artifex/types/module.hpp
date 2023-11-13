@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace Artifex {
 
 class Engine;
@@ -21,7 +23,7 @@ public:
   Engine &engine;
 
 public:
-  Module(Engine &engine, int flags);
+  Module(Engine &engine, uint32_t flags);
   ~Module();
 
   virtual bool onCreate() { return true; }

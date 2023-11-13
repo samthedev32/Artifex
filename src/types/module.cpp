@@ -10,7 +10,7 @@
 
 namespace Artifex {
 
-Module::Module(Artifex::Engine &engine, int flags) : engine(engine) {
+Module::Module(Engine &engine, uint32_t flags) : engine(engine) {
   // TODO: Register Module
 }
 
@@ -18,4 +18,4 @@ Module::~Module() {
   // TODO: unRegister Module
 }
 
-}
+} // namespace Artifex

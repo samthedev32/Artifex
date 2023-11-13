@@ -87,7 +87,7 @@ void main() {
         default :
         case 0:
         // TODO: customizability
-        color = 0.5 + 0.5 * cos(f.time + io.globalPos.xyx + vec3(0, 2, 4));
+        color = 0.5 + 0.5 * cos(f.time + io.globalPos.xyx + vec3(0.0, 2.0, 4.0));
         break;
 
         case 1:

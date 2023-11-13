@@ -4,13 +4,13 @@ using namespace Artifex;
 
 class Game : public Artifex::Module {
 public:
-  explicit Game(Engine &engine) : Artifex::Module(engine, ONCREATE | ONDESTROY | ONUPDATE) {}
+  explicit Game(Engine &engine, uint32_t flags) : Artifex::Module(engine, ONCREATE | ONDESTROY | ONUPDATE) {}
 
   bool onCreate() override {
     engine.load.load("../../../examples/hello_world/milk.png");
     engine.load.music("../../../examples/hello_world/music.mp3");
 
-    // ax->mix.music(0, -1);
+    //    engine.mix.music(0, -1);
 
     //    engine.callback(asd, ONCREATE);
 
@@ -21,7 +21,7 @@ public:
   // when hovered, shrink when clicked
 
   bool button(const vec<2> &center, const vec<2> &size) {
-    engine.render.roundable(center, size, 0, vec<3>(), 1, 0.3f, 90.0f);
+    engine.render.roundable(center, size, 0, vec<3>(1.0, 0.0, 1.0), 1, 0.3f, 90.0f);
 
     return false;
   }
