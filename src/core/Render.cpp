@@ -1,4 +1,4 @@
-#include <Artifex/core/renderer.hpp>
+#include <Artifex/core/Render.hpp>
 
 #include <Artifex/Engine.hpp>
 
