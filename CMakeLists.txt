@@ -5,28 +5,29 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Source Files
 set(SOURCES
-    src/Engine.cpp
+        src/Engine.cpp
 
-    # Core
-    src/core/Log.cpp
+        # Core
+        src/core/Log.cpp
 
-    src/core/Window.cpp
-    src/core/Load.cpp
-    src/core/Render.cpp
-    src/core/UI.cpp
-    src/core/Mix.cpp
+        src/core/window.cpp
+        src/core/Load.cpp
+        src/core/renderer.cpp
+        src/core/UI.cpp
+        src/core/Mix.cpp
 
-    src/types/shader.cpp
-    src/types/module.cpp
+        src/types/shader.cpp
+        src/types/module.cpp
 
-    src/GL/glad.c
+        src/GL/glad.c
+        src/ui/modifier.cpp
+        src/ui/layout.cpp
 )
 
 # Libraries
 set(LIBRARIES
-    SDL2
-    SDL2_mixer
-    # EngineToolkit
+        SDL2
+        SDL2_mixer
 )
 
 # Project

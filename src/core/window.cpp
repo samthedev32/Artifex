@@ -1,12 +1,11 @@
-#include <Artifex/core/Window.hpp>
+#include <Artifex/core/window.hpp>
 
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
 namespace Artifex {
 
-Window::Window(const std::string& name, vec<2, uint32_t> size)
-    : size(size) {
+Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
 
   // Decide if Fullscreened or not
   isFullscreen = size->width == 0 || size->height == 0;
@@ -15,20 +14,16 @@ Window::Window(const std::string& name, vec<2, uint32_t> size)
 
   // Init SDL2
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    Log::error("Window::Window", "Failed to Create Window: %s",
-               SDL_GetError());
+    Log::error("Window::Window", "Failed to Create Window: %s", SDL_GetError());
     return;
   }
 
   // Create Window
-  window = SDL_CreateWindow(
-      name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-      SDL_WINDOWPOS_UNDEFINED, (int)size->width, (int)size->height,
-      SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+  window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)size->width, (int)size->height,
+                            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
   if (window == nullptr) {
-    Log::error("Window::Window", "Failed to create window: %s",
-               SDL_GetError());
+    Log::error("Window::Window", "Failed to create window: %s", SDL_GetError());
     return;
   }
 
@@ -37,14 +32,12 @@ Window::Window(const std::string& name, vec<2, uint32_t> size)
   // Request OpenGL 3.3 or higher
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                      SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
   glcontext = SDL_GL_CreateContext(window);
 
   // Load GLAD
-  if (!gladLoadGLLoader(SDL_GL_GetProcAddress)
-      || glcontext == nullptr) {
+  if (!gladLoadGLLoader(SDL_GL_GetProcAddress) || glcontext == nullptr) {
     Log::error("Window::Window", "Failed to init OpenGL");
     SDL_DestroyWindow(window);
     return;
@@ -97,14 +90,12 @@ bool Window::update() {
 
     case SDL_MOUSEBUTTONDOWN:
       if (0 < event.button.button && event.button.button < 4)
-        mouse[event.button.button - 1]
-            = true; // left, middle, right
+        mouse[event.button.button - 1] = true; // left, middle, right
       break;
 
     case SDL_MOUSEBUTTONUP:
       if (0 < event.button.button && event.button.button < 4)
-        mouse[event.button.button - 1]
-            = false; // left, middle, right
+        mouse[event.button.button - 1] = false; // left, middle, right
       break;
 
     case SDL_MOUSEWHEEL:
@@ -129,10 +120,8 @@ bool Window::update() {
 
 void Window::exit(bool sure) { shouldClose = sure; }
 
-void Window::fullscreen(bool en, uint8_t hiddenCursor,
-                        int minWidth, int minHeight) {
-  SDL_SetWindowFullscreen(window,
-                          SDL_WINDOW_FULLSCREEN_DESKTOP * en);
+void Window::fullscreen(bool en, uint8_t hiddenCursor, int minWidth, int minHeight) {
+  SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP * en);
 
   bool showCursor = hiddenCursor > true ? en : hiddenCursor;
 
@@ -144,9 +133,7 @@ void Window::fullscreen(bool en, uint8_t hiddenCursor,
   isFullscreen = en;
 }
 
-void Window::vsync(int interval) {
-  SDL_GL_SetSwapInterval(interval);
-}
+void Window::vsync(int interval) { SDL_GL_SetSwapInterval(interval); }
 
 std::unordered_map<std::string, int> SDL2_SCANCODE_MAP = {
     // Letters
@@ -235,16 +222,13 @@ std::unordered_map<std::string, int> SDL2_SCANCODE_MAP = {
     {"f12", SDL_SCANCODE_F12},
 };
 
-bool Window::key(const std::string& k) {
+bool Window::key(const std::string &k) {
   // Mouse Buttons
-  if (k == "ml" || k == "lmouse"
-      || k == "left") // mouse button left
+  if (k == "ml" || k == "lmouse" || k == "left") // mouse button left
     return mouse[0];
-  else if (k == "mm" || k == "mmouse"
-           || k == "middle") // mouse button middle/scroll
+  else if (k == "mm" || k == "mmouse" || k == "middle") // mouse button middle/scroll
     return mouse[1];
-  else if (k == "mr" || k == "rmouse"
-           || k == "right") // mouse button right
+  else if (k == "mr" || k == "rmouse" || k == "right") // mouse button right
     return mouse[2];
 
   return keyboard[SDL2_SCANCODE_MAP[k]];

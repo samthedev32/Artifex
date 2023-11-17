@@ -18,14 +18,11 @@ void stime(char *str) {
   timeinfo = localtime(&rawtime);
 
   // Create String
-  sprintf(str, "%04d.%02d.%02d %02d:%02d:%02d",
-          timeinfo->tm_year + 1900, timeinfo->tm_mon + 1,
-          timeinfo->tm_mday, timeinfo->tm_hour,
-          timeinfo->tm_min, timeinfo->tm_sec);
+  sprintf(str, "%04d.%02d.%02d %02d:%02d:%02d", timeinfo->tm_year + 1900, timeinfo->tm_mon + 1, timeinfo->tm_mday,
+          timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 }
 
-void vcustom(char type, const char *tag, const char *message,
-             va_list args) {
+void vcustom(char type, const char *tag, const char *message, va_list args) {
   char msg[1024];
   char date[32];
   stime(date);
@@ -35,8 +32,7 @@ void vcustom(char type, const char *tag, const char *message,
   uint8_t tagLen = maxTagLen - (cutTag ? 3 : 0);
 
   // Create String
-  sprintf(msg, "[%19s] %-*.*s%s [%c]  %s\n", date, tagLen,
-          tagLen, tag, cutTag ? "..." : "", type, message);
+  sprintf(msg, "[%19s] %-*.*s%s [%c]  %s\n", date, tagLen, tagLen, tag, cutTag ? "..." : "", type, message);
 
   // Print Message
   vprintf(msg, args);
@@ -78,6 +74,15 @@ void error(const char *tag, const char *message, ...) {
   va_start(args, message);
 
   vcustom('E', tag, message, args);
+
+  va_end(args);
+}
+
+void assert(const char *tag, const char *message, ...) {
+  va_list args;
+  va_start(args, message);
+
+  vcustom('A', tag, message, args);
 
   va_end(args);
 }
