@@ -12,7 +12,7 @@ set(SOURCES
 
         src/core/window.cpp
         src/core/Load.cpp
-        src/core/renderer.cpp
+        src/core/Render.cpp
         src/core/UI.cpp
         src/core/Mix.cpp
 

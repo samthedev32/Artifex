@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Modifier.hpp"
+#include "modifier.hpp"
 
 namespace Artifex::UI {
 
