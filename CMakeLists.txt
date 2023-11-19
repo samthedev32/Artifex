@@ -26,7 +26,7 @@ set(SOURCES
 
 # Libraries
 set(LIBRARIES
-        SDL2
+        glfw
         SDL2_mixer
 )
 

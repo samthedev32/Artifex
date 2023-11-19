@@ -1,27 +1,22 @@
 // Windowing Library for Artifex
 #pragma once
 
-// Detect OS
-#if defined(__linux)
-#define __pc
-#elif defined(__WIN32)
-#define __windows
-#define __pc
-
+// OS Handling
+#if defined(__WIN32)
 #define SDL_MAIN_HANDLED
 #elif defined(__EMSCRIPTEN__)
 #define __webassembly
 #define __browser
 #include <emscripten.h>
 #include <emscripten/html5.h>
-#else
-#warning Targeted OS is not recognized
 #endif
 
 #include <GL/glad.h>
-#include <SDL2/SDL.h>
+#include <GLFW/glfw3.h>
 
+#include <set>
 #include <string>
+#include <unordered_map>
 
 #include <Artifex/core/Log.hpp>
 #include <Artifex/math/vec.hpp>
@@ -31,7 +26,7 @@ namespace Artifex {
 class Window {
 public:
   // Create Window
-  Window(const std::string& name, vec<2, uint32_t> size);
+  Window(const std::string &name, vec<2, uint32_t> size);
 
   // Destroy Window
   ~Window();
@@ -43,30 +38,34 @@ public:
   void exit(bool sure = true);
 
   // Enable/Disable Fullscreen Mode
-  void fullscreen(bool en = true, uint8_t hiddenCursor = 2,
-                  int minWidth = 720, int minHeight = 480);
+  void fullscreen(bool en = true, uint8_t hiddenCursor = 2, int minWidth = 720, int minHeight = 480);
 
   // Enable/Disable VSync
   static void vsync(int interval = 1);
 
   // Get Key State
-  bool key(const std::string& k);
+  bool key(const std::string &k);
 
 public:
   vec<2, uint32_t> size;
 
   // Cursor & Scroll Positions
-  vec<2> cursor, scroll;
+  vec<2, double> cursor, scroll;
   float sensitivity = 1.0f;
 
 private:
-  SDL_Window *window = nullptr;
-  SDL_GLContext glcontext;
-  bool shouldClose = false;
-  bool isFullscreen = false;
+  static void callback_resize(GLFWwindow *window, int w, int h);
+  static void callback_key(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void callback_cursor(GLFWwindow *window, double x, double y);
+  static void callback_scroll(GLFWwindow *window, double x, double y);
 
-  const Uint8 *keyboard = nullptr;
-  bool mouse[3]{};
+  GLFWwindow *window = nullptr;
+  bool isFullscreen = false;
+  vec<2, uint32_t> smallSize;
+
+  std::set<int> keyboard;
+
+  bool mouseState[3];
 };
 
 } // namespace Artifex
