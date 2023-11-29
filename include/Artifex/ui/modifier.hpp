@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <Artifex/math/vec.hpp>
+
 #include <string>
 #include <unordered_map>
 

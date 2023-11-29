@@ -21,8 +21,14 @@ public:
   // when hovered, shrink when clicked
 
   bool button(const vec<2> &center, const vec<2> &size) {
-    engine.render.roundable(center, size, 0, vec<3>(1.0, 0.0, 1.0), 1, 0.5f, 90.0f);
+    int max = (engine.cursor->x + 1) / 2.0 * 1000;
+    float c = (engine.cursor->y + 1) / 2.0 * 30.0;
 
+    for (int i = 0; i < max; i++)
+      engine.render.roundable({-1 + i * 2.0 / max, 0.0}, {2.0 / max / 2.0, ((sin(engine.now + i * c / max) + 1) / 2) * 0.5}, 0,
+                              vec<3>(1.0, 0.0, 1.0), 1, 0.5f, 90.0f);
+
+    printf("fps: %f\n", 1.0f / engine.deltaTime);
     return false;
   }
 
