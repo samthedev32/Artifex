@@ -3,7 +3,6 @@
 
 // OS Handling
 #if defined(__WIN32)
-#define SDL_MAIN_HANDLED
 #elif defined(__EMSCRIPTEN__)
 #define __webassembly
 #define __browser
@@ -65,7 +64,7 @@ private:
 
   std::set<int> keyboard;
 
-  bool mouseState[3];
+  bool mouseState[3]{};
 };
 
 } // namespace Artifex

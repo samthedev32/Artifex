@@ -5,23 +5,23 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Source Files
 set(SOURCES
-        src/Engine.cpp
+        #        src/Engine.cpp
 
         # Core
         src/core/Log.cpp
 
         src/core/window.cpp
-        src/core/Load.cpp
-        src/core/Render.cpp
-        src/core/UI.cpp
-        src/core/Mix.cpp
+        #        src/core/Load.cpp
+        src/core/Renderer.cpp
+        #        src/core/UI.cpp
+        #        src/core/Mix.cpp
 
         src/types/shader.cpp
         src/types/module.cpp
 
         src/GL/glad.c
-        src/ui/modifier.cpp
-        src/ui/layout.cpp
+        #        src/ui/modifier.cpp
+        #        src/ui/layout.cpp
 )
 
 # Libraries

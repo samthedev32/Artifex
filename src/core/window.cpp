@@ -104,6 +104,7 @@ bool Window::key(const std::string &k) { return keyboard.count(glfwGetKeyScancod
 void Window::callback_resize(GLFWwindow *window, int w, int h) {
   auto *self = (Window *)glfwGetWindowUserPointer(window);
   self->size = {w, h};
+  glViewport(0, 0, w, h);
 }
 
 void Window::callback_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
