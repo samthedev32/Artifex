@@ -1,6 +1,5 @@
 #include <Artifex/core/window.hpp>
 
-#include <SDL2/SDL.h>
 #include <unordered_map>
 
 namespace Artifex {
@@ -8,7 +7,6 @@ namespace Artifex {
 extern std::unordered_map<std::string, int> GLFW_STRING_SCANCODE;
 
 Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
-
   // Decide Window Size
   isFullscreen = size->width == 0 || size->height == 0;
   size->width = size->width != 0 ? size->width : 1;
@@ -29,6 +27,12 @@ Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
     return;
   }
 
+  // Get Actual Window Sizes
+  int w, h;
+  glfwGetWindowSize(window, &w, &h);
+  size = {w, h};
+  ratio = (float)w / (float)h;
+
   // Make OpenGL Context
   glfwMakeContextCurrent(window);
 
@@ -36,9 +40,10 @@ Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
   // Load OpenGL (exit if failed)
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     Log::error("Window", "Failed to init OpenGL: %u", glGetError());
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -75,35 +80,37 @@ bool Window::update() {
   return !glfwWindowShouldClose(window);
 }
 
-void Window::exit(bool sure) { glfwSetWindowShouldClose(window, sure); }
+void Window::exit(const bool sure) const { glfwSetWindowShouldClose(window, sure); }
 
-void Window::fullscreen(bool en, uint8_t hiddenCursor, int minWidth, int minHeight) {
+void Window::fullscreen(const bool en, uint8_t hiddenCursor, int minWidth, int minHeight) {
   if (en) {
     // Save Window Size
     smallSize = size;
 
     // Get Monitor
     GLFWmonitor *monitor = glfwGetWindowMonitor(window);
-    const GLFWvidmode *videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
 
     // Make Fullscreen
     glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, videoMode->width, videoMode->height, GLFW_DONT_CARE);
 
   } else {
     // Undo Fullscreen
-    glfwSetWindowMonitor(window, nullptr, 0, 0, (int)smallSize->width, (int)smallSize->height, GLFW_DONT_CARE);
+    glfwSetWindowMonitor(window, nullptr, 0, 0, static_cast<int>(smallSize->width), static_cast<int>(smallSize->height),
+                         GLFW_DONT_CARE);
   }
 }
 
-void Window::vsync(int interval) { glfwSwapInterval(interval); }
+void Window::vsync(const int interval) { glfwSwapInterval(interval); }
 
-bool Window::key(const std::string &k) { return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0; }
+bool Window::key(const std::string &k) const { return keyboard.count(glfwGetKeyScancode(GLFW_STRING_SCANCODE[k])) > 0; }
 
 // Callbacks
 
 void Window::callback_resize(GLFWwindow *window, int w, int h) {
   auto *self = (Window *)glfwGetWindowUserPointer(window);
   self->size = {w, h};
+  self->ratio = (float)w / (float)h;
   glViewport(0, 0, w, h);
 }
 

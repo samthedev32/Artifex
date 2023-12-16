@@ -7,10 +7,6 @@
 #define MIN(a, b) (a < b ? a : b)
 #define MAX(a, b) (a < b ? b : a)
 
-// NOTE:
-// most compilers CAN vectorize this library (tested)
-// it means the `for` loops will not be treated as loops
-
 // Matrix Size Type
 typedef uint8_t mat_t;
 
@@ -77,24 +73,6 @@ template <mat_t R = 4, mat_t C = R, typename T = float> struct mat {
 
   static mat<4> lookat(vec<3> pos, vec<3> target, vec<3> up = {0.0f, 1.0f, 0.0f});
 };
-
-#ifdef MATRIX_TYPES
-// Simple Matrices (usually same as fmat)
-typedef mat<3> mat3;
-typedef mat<4> mat4;
-
-// Floating-Point Matrices
-typedef mat<3, float> fmat3;
-typedef mat<4, float> fmat4;
-
-// Double-Precision Matrices
-typedef mat<3, double> dmat3;
-typedef mat<4, double> dmat4;
-
-// Integer Matrices
-typedef mat<3, int> imat3;
-typedef mat<4, int> imat4;
-#endif
 
 // Constructors & Destructor
 
@@ -215,10 +193,6 @@ template <mat_t R, mat_t C, typename T> T &mat<R, C, T>::operator()(mat_t row, m
 // Functions (Instance Methods)
 
 template <mat_t R, mat_t C, typename T> bool mat<R, C, T>::isSquare() const { return R == C; }
-
-void inverse();
-
-// T sum();
 
 // Functions (Static)
 

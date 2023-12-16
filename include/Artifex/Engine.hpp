@@ -4,8 +4,8 @@
 
 #include <Artifex/core/Load.hpp>
 #include <Artifex/core/Mix.hpp>
-#include <Artifex/core/Renderer.hpp>
 #include <Artifex/core/UI.hpp>
+#include <Artifex/core/renderer.hpp>
 
 #include <Artifex/types/types.hpp>
 

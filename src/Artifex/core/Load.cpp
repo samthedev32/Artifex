@@ -1,8 +1,8 @@
-#include <Artifex/core/Load.hpp>
+#include "Artifex/core/Load.hpp"
 
-#include <Artifex/core/Log.hpp>
+#include "Artifex/core/Log.hpp"
 
-#include <Artifex/Engine.hpp>
+#include "Artifex/Engine.hpp"
 #include <cstring>
 
 #include <SDL2/SDL_mixer.h>

@@ -1,30 +1,36 @@
-# GameEngineName - 2D Game Engine
+# Artifex - 2D Game Engine
 
 ## About
-C++ Library for making 2D Games
+C++ Game Engine for making 2D Games
 
 Uses...
 - [GLFW](www.glfw.org) + [OpenGL](www.opengl.org) for Windowing + Rendering
-- Box2D for Physics
 
 ## Documentation
 
 ### Setup
 
+This Project is set up to work on both Linux and Windows with a few tweaks
+I am using CLion to develop it, and I am trying to make it work out-of-the-box on both platforms
+
 #### Linux (Debian Based)
 
-> Install Physics Engine
+> Install Dependencies
 ```bash
-sudo apt install libbox2d-dev
+sudo apt install libglfw3-dev
 ```
 
 #### Windows
 
-Coming Later!
+> Update GLFW
+If you wish to update the GLFW library, grab the [latest version](https://www.glfw.org/download.html) and replace the files from [include/GLFW](../include/GLFW) and [lib/GLFW](../lib/GLFW)
+It should work out of the box if you are using a CMake based build system (tested with CLion)
+
+More details coming soon!
 
 #### MacOS
 
-I don't own a Mac Device, but if you do and want to make support for it, please contact me!
+I am not planning on making macOS Support, but I would appreciate if you did!
 
 ### Usage
 

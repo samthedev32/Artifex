@@ -6,7 +6,7 @@
 // Created by samthedev on 11/9/23.
 //
 
-#include <Artifex/types/module.hpp>
+#include "Artifex/types/module.hpp"
 
 namespace Artifex {
 

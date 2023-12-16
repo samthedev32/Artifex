@@ -2,7 +2,7 @@
 // Created by samthedev on 11/13/23.
 //
 
-#include <Artifex/ui/modifier.hpp>
+#include "Artifex/ui/modifier.hpp"
 
 namespace Artifex::UI {
 

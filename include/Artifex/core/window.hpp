@@ -15,7 +15,6 @@
 
 #include <set>
 #include <string>
-#include <unordered_map>
 
 #include <Artifex/core/Log.hpp>
 #include <Artifex/math/vec.hpp>
@@ -34,7 +33,7 @@ public:
   bool update();
 
   // Close Window
-  void exit(bool sure = true);
+  void exit(bool sure = true) const;
 
   // Enable/Disable Fullscreen Mode
   void fullscreen(bool en = true, uint8_t hiddenCursor = 2, int minWidth = 720, int minHeight = 480);
@@ -43,14 +42,14 @@ public:
   static void vsync(int interval = 1);
 
   // Get Key State
-  bool key(const std::string &k);
+  bool key(const std::string &k) const;
 
 public:
   vec<2, uint32_t> size;
+  float ratio;
 
   // Cursor & Scroll Positions
   vec<2, double> cursor, scroll;
-  float sensitivity = 1.0f;
 
 private:
   static void callback_resize(GLFWwindow *window, int w, int h);

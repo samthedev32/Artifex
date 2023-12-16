@@ -3,10 +3,6 @@
 #include <cstdint>
 #include <vector>
 
-// NOTE:
-// most compilers CAN vectorize this library (tested)
-// it means the `for` loops will not be treated as loops
-
 // Vector Size Type
 typedef uint8_t vec_t;
 
@@ -95,32 +91,6 @@ template <vec_t D = 3, typename T = float> struct vec {
 
   static vec<3> cross(const vec<3>& a, const vec<3>& b);
 };
-
-#ifdef VECTOR_TYPES
-// Simple Vectors (same as fvec)
-typedef vec<1> vec1;
-typedef vec<2> vec2;
-typedef vec<3> vec3;
-typedef vec<4> vec4;
-
-// Floating-Point Vectors
-typedef vec<1, float> fvec1;
-typedef vec<2, float> fvec2;
-typedef vec<3, float> fvec3;
-typedef vec<4, float> fvec4;
-
-// Double-Precision Vectors
-typedef vec<1, double> dvec1;
-typedef vec<2, double> dvec2;
-typedef vec<3, double> dvec3;
-typedef vec<4, double> dvec4;
-
-// Integer Vectors
-typedef vec<1, int> ivec1;
-typedef vec<2, int> ivec2;
-typedef vec<3, int> ivec3;
-typedef vec<4, int> ivec4;
-#endif
 
 namespace internal {
 

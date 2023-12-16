@@ -1,7 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include <Artifex/core/Renderer.hpp>
+#include <Artifex/core/Log.hpp>
+#include <Artifex/core/renderer.hpp>
 #include <cstring>
 
 using namespace Artifex;
@@ -81,7 +82,7 @@ int main() {
 
       fclose(f);
 
-      renderer.shader(code[1].c_str(), code[2].c_str(), code[3].c_str());
+      renderer.load.shader(code[1].c_str(), code[2].c_str(), code[3].c_str());
     } else {
       Log::error("Main/Load", "Failed to Open Shader File");
     }
@@ -92,13 +93,14 @@ int main() {
     int ch;
     stbi_set_flip_vertically_on_load(true);
     void *image = stbi_load("../../../examples/hello_world/milk.png", &size->width, &size->height, &ch, 3);
-    renderer.texture(image, size, ch);
+    renderer.load.texture(image, size, ch);
   }
 
   while (renderer.update()) {
     Artifex::Renderer::clear({});
 
-    renderer.roundable({}, {0.5f, 0.7f}, 0, {1.0f, 0.0f, 1.0f}, 1, 0.4f);
+    renderer.draw.color({1.0f, 0.0f, 1.0f});
+    //    renderer.roundable({}, {0.5f, 0.7f}, 0, {1.0f, 0.0f, 1.0f}, 1, 0.4f);
   }
 
   return 0;

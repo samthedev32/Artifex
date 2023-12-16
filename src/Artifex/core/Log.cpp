@@ -1,6 +1,5 @@
-#include <Artifex/core/Log.hpp>
+#include "Artifex/core/Log.hpp"
 
-#include <bits/types/time_t.h>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdio>
@@ -13,9 +12,8 @@ namespace Log {
 void stime(char *str) {
   // Get Time
   time_t rawtime;
-  struct tm *timeinfo;
   time(&rawtime);
-  timeinfo = localtime(&rawtime);
+  const struct tm *timeinfo = localtime(&rawtime);
 
   // Create String
   sprintf(str, "%04d.%02d.%02d %02d:%02d:%02d", timeinfo->tm_year + 1900, timeinfo->tm_mon + 1, timeinfo->tm_mday,
