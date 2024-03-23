@@ -1,29 +1,61 @@
-//
-// Created by SamTheDev on 11/12/2023.
-//
+#include <Artifex/core/Renderer.hpp>
 
-#include <Artifex/core/renderer.hpp>
+#include "GL/glad.h"
+
+#include <ctime>
 
 namespace Artifex {
 
-void Renderer::draw::color(const vec<3> &color) {
-  // TODO optimize using draw.mesh
-  renderer.shaders[0].use();
+Shader &Renderer::select(uuid_t shader) {
+  if (shaders.count(shader) == 0)
+    return shaders[base.shader];
+
+  shaders[shader].use();
+  return shaders[shader];
+}
+
+void Renderer::draw(uuid_t mesh) {
+  if (meshes.count(mesh) == 0)
+    return;
+
+  glBindVertexArray(meshes[mesh].VAO);
+  glDrawElements(GL_TRIANGLE_FAN, meshes[mesh].size, GL_UNSIGNED_INT, nullptr);
+}
+
+void Renderer::draw(const vec<2> &center, const vec<2> &size, float rotation, Look look, float corner, const vec<3> &color,
+                    size_t tex) {
+  Shader &s = select(base.shader);
 
   // Vertex
-  renderer.shaders[0].set("v.center", vec<2>{});
-  renderer.shaders[0].set("v.size", vec<2>{0.5f});
-  renderer.shaders[0].set("v.ratio", vec<2>(1.0f, renderer.ratio));
-  renderer.shaders[0].set("v.rotation", (float)0.0f);
+  s.set("v.center", center);
+  s.set("v.size", size);
+  s.set("v.ratio", vec<2>(1.0f, ratio));
+  s.set("v.rotation", rotation);
 
   // Fragment
-  renderer.shaders[0].set("f.look", 1);
-  renderer.shaders[0].set("f.corner", 0.0f); // TODO determine by shape
+  s.set("f.look", static_cast<int>(look));
+  s.set("f.corner", corner);
 
-  renderer.shaders[0].set("f.color", color);
+  timespec res{};
+  clock_gettime(CLOCK_MONOTONIC, &res);
+  s.set("f.time", static_cast<float>(1000.0f * res.tv_sec + res.tv_nsec / 1e6) / 1000.0f);
 
-  glBindVertexArray(renderer.meshes[0].VAO);
-  glDrawElements(GL_TRIANGLE_FAN, renderer.meshes[0].size, GL_UNSIGNED_INT, nullptr);
+  switch (look) {
+  default:
+  case Look::DYNAMIC:
+    // TODO: config
+    break;
+
+  case Look::COLOR:
+    s.set("f.color", color);
+    break;
+
+  case Look::TEXTURE:
+    s.set("f.tex", static_cast<int>(tex));
+    break;
+  }
+
+  draw(base.mesh);
 }
 
 // void Renderer::roundable(const vec<2> &center, const vec<2> &size, int look, const vec<3> &color, uint16_t tex, float amount,

@@ -1,7 +1,10 @@
-#include "Artifex/types/shader.hpp"
+#include <Artifex/types/shader.hpp>
+
+#include "GL/glad.h"
+
 #include <iostream>
 
-using namespace Artifex;
+namespace Artifex {
 
 Shader::Shader(GLuint id) : id(id) {}
 
@@ -14,7 +17,7 @@ void Shader::use() const {
     glUseProgram(this->id);
 }
 
-GLint Shader::get(const std::string &n) {
+unsigned int Shader::get(const std::string &n) {
   use();
 
   if (uniforms.count(n) == 0)
@@ -81,3 +84,4 @@ template <> void Shader::set(const std::string &n, vec<4, double> vec) { glUnifo
 // Matrices
 
 // TODO
+} // namespace Artifex

@@ -1,5 +1,8 @@
 #include <Artifex/core/window.hpp>
 
+#define GLAD_IMPLEMENTATION
+#include "GL/glad.h"
+
 #include <unordered_map>
 
 namespace Artifex {
@@ -89,6 +92,9 @@ void Window::fullscreen(const bool en, uint8_t hiddenCursor, int minWidth, int m
 
     // Get Monitor
     GLFWmonitor *monitor = glfwGetWindowMonitor(window);
+    if (monitor == nullptr)
+      monitor = glfwGetPrimaryMonitor();
+
     const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
 
     // Make Fullscreen

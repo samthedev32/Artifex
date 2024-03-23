@@ -10,7 +10,7 @@
 #include <emscripten/html5.h>
 #endif
 
-#include <GL/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <set>
@@ -21,6 +21,7 @@
 
 namespace Artifex {
 
+// Artifex Window
 class Window {
 public:
   // Create Window
@@ -42,7 +43,7 @@ public:
   static void vsync(int interval = 1);
 
   // Get Key State
-  bool key(const std::string &k) const;
+  [[nodiscard]] bool key(const std::string &k) const;
 
 public:
   vec<2, uint32_t> size;

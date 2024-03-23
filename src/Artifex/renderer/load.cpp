@@ -2,13 +2,19 @@
 // Created by SamTheDev on 11/12/2023.
 //
 
-#include <Artifex/core/renderer.hpp>
+#include <Artifex/core/Renderer.hpp>
+
+#define GLAD_IMPLEMENTATION
+#include "GL/glad.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "GL/stb_image.h"
 
 #include <cstring>
 
 namespace Artifex {
 
-size_t Renderer::load::shader(const char *vertex, const char *fragment, const char *geometry) {
+uuid_t Renderer::load_shader(const char *vertex, const char *fragment, const char *geometry) {
   // Exit if no Shader Code
   constexpr size_t minSize = 8;
   if (strlen(vertex) < minSize || strlen(fragment) < minSize) {
@@ -16,9 +22,9 @@ size_t Renderer::load::shader(const char *vertex, const char *fragment, const ch
     return 0;
   }
 
-  bool isGeo = strlen(geometry) >= minSize;
+  bool isGeo = geometry && strlen(geometry) >= minSize;
 
-  GLuint geo;
+  GLuint geo{};
 
   int success;
   char infoLog[1024];
@@ -88,11 +94,50 @@ size_t Renderer::load::shader(const char *vertex, const char *fragment, const ch
   Log::verbose("Load::shader", "Loaded Shader", infoLog);
 
   // Add to list + return ID
-  renderer.shaders.emplace_back(id);
-  return renderer.shaders.size() - 1;
+  uuid_t uuid = uuid_generate();
+  shaders[uuid] = Shader(id);
+  return uuid;
 }
 
-size_t Renderer::load::texture(void *data, const vec<2, uint32_t> &size, uint8_t channels) {
+uuid_t Renderer::load_shader(const char *path) {
+  if (FILE *f = fopen(path, "r")) {
+    int current = -1;
+
+    // RAW Shader Code (vertex, fragment, geometry)
+    std::string code[3];
+
+    char line[256];
+    while (fgets(line, sizeof(line), f)) {
+      char index[10], parameter[10];
+      sscanf(line, "%9s %9s", index, parameter);
+
+      if (!strcmp(index, "#shader")) {
+        if (!strcmp(parameter, "vertex"))
+          current = 0;
+        else if (!strcmp(parameter, "fragment"))
+          current = 1;
+        else if (!strcmp(parameter, "geometry"))
+          current = 2;
+        // else
+        // Log::warning("Main/Load", "Invalid Shader type: %s", parameter);
+        // } else if (!strcmp(index, "#script")) {
+        // Log::warning("Main/Load", "Shader Scripts are not supported YET!\n");
+      } else {
+        if (-1 != current)
+          code[current] += line;
+      }
+    }
+
+    fclose(f);
+
+    return load_shader(code[0].c_str(), code[1].c_str(), code[2].c_str());
+  }
+
+  // Failed to open file
+  return base.shader;
+}
+
+size_t Renderer::load_texture(void *data, const vec<2, uint32_t> &size, uint8_t channels) {
   // Exit if invalid
   // TODO implement vec comparations
   if (data == nullptr || (size->width == 0 || size->height == 0) || (channels < 1 || channels > 4)) {
@@ -140,12 +185,21 @@ size_t Renderer::load::texture(void *data, const vec<2, uint32_t> &size, uint8_t
   Log::verbose("Load::texture", "Loaded Texture");
 
   // Add to list + return ID
-  renderer.textures.push_back(id);
-  return renderer.textures.size() - 1;
+  uuid_t uuid = uuid_generate();
+  textures[uuid] = id;
+  return uuid;
 }
 
-size_t Renderer::load::mesh(vec<2, float> *vertices, int vsize, uint32_t *indices, int isize) {
-  Renderer::meshData o;
+uuid_t Renderer::load_texture(const char *path) {
+  vec<2, int> size;
+  int ch;
+  stbi_set_flip_vertically_on_load(true);
+  void *image = stbi_load(path, &size->width, &size->height, &ch, 3);
+  return load_texture(image, size, ch);
+}
+
+size_t Renderer::load_mesh(vec<2, float> *vertices, int vsize, uint32_t *indices, int isize) {
+  Renderer::Mesh o;
   o.size = isize;
 
   glGenVertexArrays(1, &o.VAO);
@@ -172,8 +226,9 @@ size_t Renderer::load::mesh(vec<2, float> *vertices, int vsize, uint32_t *indice
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
 
-  renderer.meshes.push_back(o);
-  return renderer.meshes.size() - 1;
+  uuid_t uuid = uuid_generate();
+  meshes[uuid] = o;
+  return uuid;
 }
 
 } // namespace Artifex

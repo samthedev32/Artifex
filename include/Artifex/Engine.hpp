@@ -9,6 +9,8 @@
 
 #include <Artifex/types/types.hpp>
 
+#include <Artifex/utility/UUID.hpp>
+
 #include <cstdint>
 #include <typeinfo>
 #include <unordered_map>
@@ -16,7 +18,7 @@
 
 namespace Artifex {
 
-class Engine : public Window {
+class Engine {
 public:
   Engine(const std::string &title, const vec<2, uint32_t> &size);
   ~Engine();

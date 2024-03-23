@@ -10,31 +10,33 @@ set(SOURCES
         # Core
         src/Artifex/core/Log.cpp
 
-        ## Renderer
         src/Artifex/renderer/window.cpp
+
+        ## Renderer
         src/Artifex/renderer/renderer.cpp
         src/Artifex/renderer/load.cpp
         src/Artifex/renderer/draw.cpp
+
+        src/Artifex/renderer/shader.cpp
+
+        src/Artifex/renderer/GL/glad.c
 
         #        src/core/Load.cpp
         #        src/core/UI.cpp
         #        src/core/Mix.cpp
 
-        src/Artifex/types/shader.cpp
         src/Artifex/types/module.cpp
 
-        src/GL/glad.c
+        src/Artifex/utility/uuid.c
 
         #        src/ui/modifier.cpp
         #        src/ui/layout.cpp
 )
 
-link_directories(lib/GLFW)
-
 # Libraries
 set(LIBRARIES
-        glfw3
-        #        SDL2_mixer
+        GL
+        glfw
 )
 
 # Project
