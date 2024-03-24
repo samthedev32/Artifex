@@ -1,10 +1,14 @@
 # Artifex - 2D Game Engine
 
 ## About
+
 C++ Game Engine for making 2D Games
 
 Uses...
-- [GLFW](www.glfw.org) + [OpenGL](www.opengl.org) for Windowing + Rendering
+
+- [GLFW](www.glfw.org) for Windowing
+- [OpenGL](www.opengl.org) for Rendering
+- [OpenAL](https://www.openal-soft.org/) for Audio
 
 ## Documentation
 
@@ -15,27 +19,28 @@ I am using CLion to develop it, and I am trying to make it work out-of-the-box o
 
 #### Linux (Debian Based)
 
-> Install Dependencies
+Install Dependencies
+
 ```bash
-sudo apt install libglfw3-dev
+sudo apt install libglfw3-dev libopenal-dev
 ```
 
 #### Windows
 
-> Update GLFW
-If you wish to update the GLFW library, grab the [latest version](https://www.glfw.org/download.html) and replace the files from [include/GLFW](../include/GLFW) and [lib/GLFW](../lib/GLFW)
-It should work out of the box if you are using a CMake based build system (tested with CLion)
+Every Include & Binary is in `/external`, should work as-is
 
-More details coming soon!
+#### macOS & iOS
 
-#### MacOS
+I am not planning on making macOS & iOS Support, but I would appreciate if you did!
 
-I am not planning on making macOS Support, but I would appreciate if you did!
+#### Android
+
+I am planning on porting the engine to Android in the future, but it won't come anytime soon!
+
+#### WASM (Emscripten)
+
+WASM support is coming soon!
 
 ### Usage
 
-Coming Soon!
-
-## License
-
-This Project is licensed under the [zlib License](https://opensource.org/license/zlib-license-php/)
+...

@@ -13,13 +13,13 @@ namespace Artifex {
 
 extern const char *_shader[2];
 
-Renderer::Renderer(const std::string &name, const vec<2, uint32_t> &size) : Window(name, size) {
+Renderer::Renderer(const std::string &name, const vec<2, uint32_t> &size) : window(name, size) {
   // Load Default Shader
-  // base.shader = load_shader(_shader[0], _shader[1]);
-  base.shader = load_shader("../../../examples/hello_world/shaders/2d.glsl");
+  base.shader = load_shader(_shader[0], _shader[1]);
+  // base.shader = load_shader("../../../examples/hello_world/shader/2d.glsl");
 
   // Load Default Mesh
-  vec<2, float> vertices[] = {
+  const vec<2, float> vertices[] = {
       // positions      // texture coords
       {-1.0f, 1.0f},  {0.0f, 1.0f}, // top right
       {-1.0f, -1.0f}, {0.0f, 0.0f}, // bottom right
@@ -27,12 +27,12 @@ Renderer::Renderer(const std::string &name, const vec<2, uint32_t> &size) : Wind
       {1.0f, 1.0f},   {1.0f, 1.0f}  // top left
   };
 
-  uint32_t indices[] = {
+  const uint32_t indices[] = {
       0, 1, 3, // first triangle
       1, 2, 3  // second triangle
   };
 
-  base.mesh = load_mesh(vertices, sizeof(vertices) * sizeof(*vertices), indices, sizeof(indices) * sizeof(*indices));
+  base.mesh = load_mesh(vertices, 8 * sizeof(*vertices), indices, 6 * sizeof(*indices));
 
   // Load Default Texture
   unsigned char data[] = {255};
@@ -41,19 +41,16 @@ Renderer::Renderer(const std::string &name, const vec<2, uint32_t> &size) : Wind
 
 Renderer::~Renderer() {
   // Delete Textures
-  for (auto [_, t] : textures)
-    glDeleteTextures(1, &t);
-  textures.clear();
+  for (auto [id, _] : textures)
+    unload_texture(id);
 
   // Delete Buffers
-  for (auto [_, m] : meshes)
-    glDeleteBuffers(3, &m.VAO);
-  meshes.clear();
+  for (auto [id, _] : meshes)
+    unload_mesh(id);
 
   // Delete Shaders
-  for (const auto &[_, s] : shaders)
-    glDeleteProgram(s.id);
-  shaders.clear();
+  for (const auto &[id, _] : shaders)
+    unload_shader(id);
 }
 
 void Renderer::clear(vec<3> color) {
@@ -62,6 +59,12 @@ void Renderer::clear(vec<3> color) {
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
+bool Renderer::update() {
+  // TODO update rendering stuff
+  return window.update();
+}
+
+// TODO basic shader
 const char *_shader[2] = {
     // Vertex Shader
     "#version 300 es\n"

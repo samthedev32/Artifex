@@ -64,7 +64,7 @@ uniform struct {
     sampler2D tex;
     vec3 color;
 
-    float corner;
+    vec4 corner;// topleft, topright, bottomleft, bottomright
 
     float time;
 } f;
@@ -75,7 +75,20 @@ float roundedBoxSDF(vec2 center, vec2 size, float radius) {
 }
 
 void main() {
-    float radius = clamp(f.corner, 0.0, 1.0) * min(io.size.x, io.size.y);
+    float corner = 0.0;
+    if (io.localPos.x < 0.0) {
+        if (io.localPos.y < 0.0)
+        corner = f.corner.x;
+        if (io.localPos.y > 0.0)
+        corner = f.corner.y;
+    } else if (io.localPos.x > 0.0) {
+        if (io.localPos.y < 0.0)
+        corner = f.corner.z;
+        if (io.localPos.y > 0.0)
+        corner = f.corner.w;
+    }
+
+    float radius = clamp(corner, 0.0, 1.0) * min(io.size.x, io.size.y);
 
     float distance =
     roundedBoxSDF(io.globalPos - io.center, io.size, radius);

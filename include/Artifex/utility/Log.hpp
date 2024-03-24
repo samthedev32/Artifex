@@ -4,7 +4,7 @@
 namespace Log {
 
 // Cut-off Length of Tag
-const int maxTagLen = 16;
+constexpr int maxTagLen = 16;
 
 // Log Debug Information, only visible for DEBUG Builds
 void debug(const char *tag, const char *message, ...);

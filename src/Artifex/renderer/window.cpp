@@ -1,4 +1,5 @@
 #include <Artifex/core/window.hpp>
+#include <Artifex/utility/Log.hpp>
 
 #define GLAD_IMPLEMENTATION
 #include "GL/glad.h"
@@ -11,7 +12,6 @@ extern std::unordered_map<std::string, int> GLFW_STRING_SCANCODE;
 
 Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
   // Decide Window Size
-  isFullscreen = size->width == 0 || size->height == 0;
   size->width = size->width != 0 ? size->width : 1;
   size->height = size->height != 0 ? size->height : 1;
 
@@ -21,7 +21,7 @@ Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
   glfwInit();
 
   // Create Window
-  window = glfwCreateWindow((int)size->width, (int)size->height, name.c_str(), nullptr, nullptr);
+  window = glfwCreateWindow(static_cast<int>(size->width), static_cast<int>(size->height), name.c_str(), nullptr, nullptr);
 
   // Exit if Window Creation Failed
   if (window == nullptr) {
@@ -33,8 +33,8 @@ Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
   // Get Actual Window Sizes
   int w, h;
   glfwGetWindowSize(window, &w, &h);
-  size = {w, h};
-  ratio = (float)w / (float)h;
+  this->size = {w, h};
+  ratio = static_cast<float>(w) / static_cast<float>(h);
 
   // Make OpenGL Context
   glfwMakeContextCurrent(window);
@@ -61,8 +61,6 @@ Window::Window(const std::string &name, vec<2, uint32_t> size) : size(size) {
   glfwSetKeyCallback(window, callback_key);
   glfwSetCursorPosCallback(window, callback_cursor);
   glfwSetScrollCallback(window, callback_scroll);
-
-  vsync(0);
 }
 
 Window::~Window() {
@@ -87,23 +85,30 @@ void Window::exit(const bool sure) const { glfwSetWindowShouldClose(window, sure
 
 void Window::fullscreen(const bool en, uint8_t hiddenCursor, int minWidth, int minHeight) {
   if (en) {
-    // Save Window Size
-    smallSize = size;
+    if (!isFullscreen) {
+      // Save Window Size
+      smallSize = size;
 
-    // Get Monitor
-    GLFWmonitor *monitor = glfwGetWindowMonitor(window);
-    if (monitor == nullptr)
-      monitor = glfwGetPrimaryMonitor();
+      // Get Monitor
+      GLFWmonitor *monitor = glfwGetWindowMonitor(window);
+      if (monitor == nullptr)
+        monitor = glfwGetPrimaryMonitor();
 
-    const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
+      const GLFWvidmode *videoMode = glfwGetVideoMode(monitor);
 
-    // Make Fullscreen
-    glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, videoMode->width, videoMode->height, GLFW_DONT_CARE);
+      // Make Fullscreen
+      glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, videoMode->width, videoMode->height, GLFW_DONT_CARE);
 
+      isFullscreen = true;
+    }
   } else {
-    // Undo Fullscreen
-    glfwSetWindowMonitor(window, nullptr, 0, 0, static_cast<int>(smallSize->width), static_cast<int>(smallSize->height),
-                         GLFW_DONT_CARE);
+    if (isFullscreen) {
+      // Undo Fullscreen
+      glfwSetWindowMonitor(window, nullptr, 0, 0, static_cast<int>(smallSize->width), static_cast<int>(smallSize->height),
+                           GLFW_DONT_CARE);
+
+      isFullscreen = false;
+    }
   }
 }
 
@@ -114,23 +119,23 @@ bool Window::key(const std::string &k) const { return keyboard.count(glfwGetKeyS
 // Callbacks
 
 void Window::callback_resize(GLFWwindow *window, int w, int h) {
-  auto *self = (Window *)glfwGetWindowUserPointer(window);
+  auto *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
   self->size = {w, h};
-  self->ratio = (float)w / (float)h;
+  self->ratio = static_cast<float>(w) / static_cast<float>(h);
   glViewport(0, 0, w, h);
 }
 
 void Window::callback_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
-  auto *self = (Window *)glfwGetWindowUserPointer(window);
+  auto *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
 
   if (action == GLFW_PRESS)
     self->keyboard.insert(scancode);
-  else
+  else if (action == GLFW_RELEASE)
     self->keyboard.erase(scancode);
 }
 
 void Window::callback_cursor(GLFWwindow *window, double x, double y) {
-  auto *self = (Window *)glfwGetWindowUserPointer(window);
+  auto *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
 
   self->cursor = {(x * 2.0) / (double)self->size->width - 1.0, (y * -2.0) / (double)self->size->height + 1.0};
 }

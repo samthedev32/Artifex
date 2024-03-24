@@ -1,4 +1,4 @@
-#include "Artifex/core/Log.hpp"
+#include <Artifex/utility/Log.hpp>
 
 #include <cstdarg>
 #include <cstdint>

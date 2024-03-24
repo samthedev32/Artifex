@@ -22,29 +22,29 @@ void Renderer::draw(uuid_t mesh) {
   glDrawElements(GL_TRIANGLE_FAN, meshes[mesh].size, GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::draw(const vec<2> &center, const vec<2> &size, float rotation, Look look, float corner, const vec<3> &color,
-                    size_t tex) {
+void Renderer::draw(const vec<2> &center, const vec<2> &size, float rotation, Look look, const vec<4> &corner,
+                    const vec<3> &color, size_t tex) {
   Shader &s = select(base.shader);
 
   // Vertex
   s.set("v.center", center);
   s.set("v.size", size);
-  s.set("v.ratio", vec<2>(1.0f, ratio));
+  s.set("v.ratio", vec<2>(1.0f, window.ratio));
   s.set("v.rotation", rotation);
 
   // Fragment
   s.set("f.look", static_cast<int>(look));
   s.set("f.corner", corner);
 
-  timespec res{};
-  clock_gettime(CLOCK_MONOTONIC, &res);
-  s.set("f.time", static_cast<float>(1000.0f * res.tv_sec + res.tv_nsec / 1e6) / 1000.0f);
-
   switch (look) {
   default:
-  case Look::DYNAMIC:
+  case Look::DYNAMIC: {
     // TODO: config
-    break;
+    timespec res{};
+    clock_gettime(CLOCK_MONOTONIC, &res);
+    s.set("f.time",
+          static_cast<float>(1000.0f * static_cast<float>(res.tv_sec) + static_cast<float>(res.tv_nsec) / 1e6) / 1000.0f);
+  } break;
 
   case Look::COLOR:
     s.set("f.color", color);

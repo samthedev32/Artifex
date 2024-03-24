@@ -1,15 +1,11 @@
 #pragma once
 
-#include <Artifex/core/window.hpp>
-
-#include <Artifex/core/Load.hpp>
 #include <Artifex/core/Mix.hpp>
-#include <Artifex/core/UI.hpp>
-#include <Artifex/core/renderer.hpp>
+#include <Artifex/core/Renderer.hpp>
 
 #include <Artifex/types/types.hpp>
 
-#include <Artifex/utility/UUID.hpp>
+#include <Artifex/utility/uuid.h>
 
 #include <cstdint>
 #include <typeinfo>
@@ -41,41 +37,15 @@ public:
   // Add Module
   template <typename T> bool add(const std::string &name, uint32_t flags = 0);
 
-  // Resource Loader
-  Load load;
-
-  // Basic Renderer
-  Renderer render;
-
-  // UI Renderer
-  UI ui;
-
-  // Audio Mixer
-  Mix mix;
-
-  // Selected Resources
-  struct {
-    uint16_t shader = 0;
-    uint16_t font = 0;
-  } current;
-
 public:
-  // Time when frame started
   float now = 0.0f;
-
-  // Duration of Last Frame
   float deltaTime = 0.0f;
 
-  // Resources
-  struct {
-    std::vector<Shader> shader;
-    std::vector<Texture> texture;
-    std::vector<GLuint> mesh;
-    std::vector<Font> font;
+  struct Entity {
+    uuid_t texture, mesh, shader;
+  };
 
-    std::vector<Mix_Music *> music;
-    std::vector<Mix_Chunk *> audio;
-  } resource;
+  std::unordered_map<uuid_t, Entity> entities;
 
 private:
   float past;

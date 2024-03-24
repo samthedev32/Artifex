@@ -3,12 +3,9 @@
 //
 
 #include <Artifex/core/Renderer.hpp>
+#include <Artifex/utility/Log.hpp>
 
-#define GLAD_IMPLEMENTATION
 #include "GL/glad.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "GL/stb_image.h"
 
 #include <cstring>
 
@@ -99,44 +96,6 @@ uuid_t Renderer::load_shader(const char *vertex, const char *fragment, const cha
   return uuid;
 }
 
-uuid_t Renderer::load_shader(const char *path) {
-  if (FILE *f = fopen(path, "r")) {
-    int current = -1;
-
-    // RAW Shader Code (vertex, fragment, geometry)
-    std::string code[3];
-
-    char line[256];
-    while (fgets(line, sizeof(line), f)) {
-      char index[10], parameter[10];
-      sscanf(line, "%9s %9s", index, parameter);
-
-      if (!strcmp(index, "#shader")) {
-        if (!strcmp(parameter, "vertex"))
-          current = 0;
-        else if (!strcmp(parameter, "fragment"))
-          current = 1;
-        else if (!strcmp(parameter, "geometry"))
-          current = 2;
-        // else
-        // Log::warning("Main/Load", "Invalid Shader type: %s", parameter);
-        // } else if (!strcmp(index, "#script")) {
-        // Log::warning("Main/Load", "Shader Scripts are not supported YET!\n");
-      } else {
-        if (-1 != current)
-          code[current] += line;
-      }
-    }
-
-    fclose(f);
-
-    return load_shader(code[0].c_str(), code[1].c_str(), code[2].c_str());
-  }
-
-  // Failed to open file
-  return base.shader;
-}
-
 size_t Renderer::load_texture(void *data, const vec<2, uint32_t> &size, uint8_t channels) {
   // Exit if invalid
   // TODO implement vec comparations
@@ -190,15 +149,7 @@ size_t Renderer::load_texture(void *data, const vec<2, uint32_t> &size, uint8_t 
   return uuid;
 }
 
-uuid_t Renderer::load_texture(const char *path) {
-  vec<2, int> size;
-  int ch;
-  stbi_set_flip_vertically_on_load(true);
-  void *image = stbi_load(path, &size->width, &size->height, &ch, 3);
-  return load_texture(image, size, ch);
-}
-
-size_t Renderer::load_mesh(vec<2, float> *vertices, int vsize, uint32_t *indices, int isize) {
+size_t Renderer::load_mesh(const vec<2, float> *vertices, int vsize, const uint32_t *indices, int isize) {
   Renderer::Mesh o;
   o.size = isize;
 
@@ -229,6 +180,21 @@ size_t Renderer::load_mesh(vec<2, float> *vertices, int vsize, uint32_t *indices
   uuid_t uuid = uuid_generate();
   meshes[uuid] = o;
   return uuid;
+}
+
+void Renderer::unload_shader(uuid_t id) {
+  glDeleteProgram(shaders[id].id);
+  shaders.erase(id);
+}
+
+void Renderer::unload_texture(uuid_t id) {
+  glDeleteTextures(1, &textures[id]);
+  textures.erase(id);
+}
+
+void Renderer::unload_mesh(uuid_t id) {
+  glDeleteBuffers(3, &meshes[id].VAO);
+  meshes.erase(id);
 }
 
 } // namespace Artifex

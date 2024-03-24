@@ -1,8 +1,5 @@
-#define STB_IMAGE_IMPLEMENTATION
-
-#include <Artifex/core/Log.hpp>
 #include <Artifex/core/Renderer.hpp>
-#include <cstring>
+#include <ctime>
 
 using namespace Artifex;
 //
@@ -40,6 +37,12 @@ using namespace Artifex;
 //  void onUpdate(float deltaTime) override { button({}, {0.4f, 0.2f}); }
 //};
 
+float time() {
+  timespec res{};
+  clock_gettime(CLOCK_MONOTONIC, &res);
+  return static_cast<float>(1000.0f * static_cast<float>(res.tv_sec) + static_cast<float>(res.tv_nsec) / 1e6) / 1000.0f;
+}
+
 int main() {
   //  Engine ax("Hello, World!", {720, 480});
   //
@@ -47,17 +50,24 @@ int main() {
   //
   //  ax.loop({0.1f, 0.0f, 0.1f});
 
-  Renderer renderer("Renderer Window", {720, 480});
+  Renderer renderer("Artifex Engine", {720, 480});
 
   // renderer.load_shader("../../../examples/hello_world/shader/2d.glsl");
   // auto tex = renderer.load_texture("../../../examples/hello_world/milk.png");
-
+  float past, now = time();
   while (renderer.update()) {
-    Artifex::Renderer::clear({});
-    renderer.draw({}, {0.5}, 0, Artifex::Renderer::Look::COLOR, 0, {}, 0);
+    past = now, now = time();
+    float deltaTime = now - past;
 
-    // renderer.draw({1.0f, 0.0f, 1.0f});
-    //    renderer.roundable({}, {0.5f, 0.7f}, 0, {1.0f, 0.0f, 1.0f}, 1, 0.4f);
+    renderer.clear({});
+    renderer.draw({}, {0.5}, time(), Artifex::Renderer::Look::DYNAMIC, 0.4f);
+
+    if (renderer.window.key("f11"))
+      renderer.window.fullscreen();
+    if (renderer.window.key("f12"))
+      renderer.window.fullscreen(false);
+    if (renderer.window.key("esc"))
+      renderer.window.exit();
   }
 
   return 0;

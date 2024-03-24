@@ -1,49 +1,76 @@
-#include "Artifex/core/Mix.hpp"
+#include <Artifex/core/Mix.hpp>
 
-#include "Artifex/Engine.hpp"
-
-#include <SDL2/SDL_mixer.h>
-
-#include "Artifex/core/Log.hpp"
+#include <stdexcept>
 
 namespace Artifex {
 
-void Mix::init(Engine *pEngine) {
-  if (initialized)
-    return;
+Mix::Mix() {
+  // Initialize OpenAL
+  if (!((device = alcOpenDevice(nullptr))))
+    throw std::runtime_error(std::string(__func__) + ": failed to open device");
 
-  engine = pEngine;
-  //
-  //  if (!Mix_Init(MIX_INIT_MP3))
-  //    Log::warning("Mix::init", "An Error Occured during initialization: %s", Mix_GetError());
-  //  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048)) {
-  //    Log::error("Mix::init", "Failed to open Audio Device: %s", Mix_GetError());
-  //    return;
-  //  }
-  //
-  //  if (!Mix_AllocateChannels(16))
-  //    Log::warning("Mix::init", "Failed to open more channels: %s", Mix_GetError());
-
-  initialized = true;
+  context = alcCreateContext(device, nullptr);
+  alcMakeContextCurrent(context);
 }
 
-void Mix::deinit() {
-  if (!initialized)
-    return;
-
-  //  Mix_CloseAudio();
-
-  initialized = false;
+Mix::~Mix() {
+  alcMakeContextCurrent(NULL);
+  alcDestroyContext(context);
+  alcCloseDevice(device);
 }
 
-void Mix::music(uint16_t id, int loops) {
-  //  if (Mix_PlayMusic(engine->resource.music[id], loops))
-  //    Log::warning("Mix::music", "Failed to play music with id %i", id);
+uuid_t Mix::load(const std::vector<int16_t> &data, int freq) {
+  // Audio properties
+  ALsizei size = data.size() * sizeof(int16_t); // Size of audio data in bytes
+  // ALsizei freq = (float)44100 / (float)2;       // Sample frequency, adjust according to your audio data
+  ALenum format = AL_FORMAT_MONO16; // Monophonic 16-bit PCM format
+
+  // Generate buffer and source
+  ALuint buffer;
+  alGenBuffers(1, &buffer);
+
+  // Load audio data into buffer
+  alBufferData(buffer, format, data.data(), size, freq);
+
+  // Check for OpenAL errors
+  ALenum alError = alGetError();
+  if (alError != AL_NO_ERROR)
+    throw std::runtime_error(std::string(__func__) + ": OpenAL error");
+
+  const uuid_t id = uuid_generate();
+  buffers[id] = buffer;
+  return id;
 }
 
-void Mix::audio(uint16_t id, int channel, int loops) {
-  //  if (Mix_PlayChannel(channel, engine->resource.audio[id], loops))
-  //    Log::warning("Mix::audio", "Failed to play audio with id %i", id);
+uuid_t Mix::load(const char *path) {
+  const std::vector<int16_t> data{};
+  int freq{};
+
+  // TODO load audio
+
+  return load(data, freq);
+}
+
+void Mix::unload(uuid_t id) {
+  alDeleteBuffers(1, &buffers[id]);
+  buffers.erase(id);
+}
+
+void Mix::play(uuid_t id) {
+  // Play the audio
+  ALuint source;
+  alGenSources(1, &source);
+  alSourcei(source, AL_BUFFER, buffers[id]);
+  alSourcePlay(source);
+
+  // Wait for the audio to finish playing
+  ALint source_state;
+  do {
+    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+  } while (source_state == AL_PLAYING); // && wait);
+
+  // Clean up resources
+  alDeleteSources(1, &source);
 }
 
 } // namespace Artifex

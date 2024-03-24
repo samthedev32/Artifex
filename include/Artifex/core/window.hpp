@@ -1,11 +1,8 @@
-// Windowing Library for Artifex
 #pragma once
 
 // OS Handling
 #if defined(__WIN32)
 #elif defined(__EMSCRIPTEN__)
-#define __webassembly
-#define __browser
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #endif
@@ -16,12 +13,11 @@
 #include <set>
 #include <string>
 
-#include <Artifex/core/Log.hpp>
 #include <Artifex/math/vec.hpp>
 
 namespace Artifex {
 
-// Artifex Window
+// Windowing Class for GLFW
 class Window {
 public:
   // Create Window
@@ -45,12 +41,14 @@ public:
   // Get Key State
   [[nodiscard]] bool key(const std::string &k) const;
 
-public:
   vec<2, uint32_t> size;
   float ratio;
 
   // Cursor & Scroll Positions
   vec<2, double> cursor, scroll;
+
+protected:
+  bool isFullscreen = false;
 
 private:
   static void callback_resize(GLFWwindow *window, int w, int h);
@@ -59,7 +57,6 @@ private:
   static void callback_scroll(GLFWwindow *window, double x, double y);
 
   GLFWwindow *window = nullptr;
-  bool isFullscreen = false;
   vec<2, uint32_t> smallSize;
 
   std::set<int> keyboard;
