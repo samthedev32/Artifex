@@ -1,1 +1,2 @@
-add_subdirectory(hello_world)
+add_subdirectory(gfx_simple)
+add_subdirectory(mix_simple)

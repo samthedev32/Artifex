@@ -21,8 +21,11 @@ public:
 
   // Load RAW Resources
   uuid_t load_shader(const char *vertex, const char *fragment, const char *geometry = nullptr);
-  uuid_t load_texture(void *data, const vec<2, uint32_t> &size, uint8_t channels);
+  uuid_t load_texture(const void *data, const vec<2, uint32_t> &size, uint8_t channels);
   uuid_t load_mesh(const vec<2, float> *vertices, int vsize, const uint32_t *indices, int isize);
+
+  // Load Resource from File
+  uuid_t load_shader(const char *path);
 
   // Unload Resources
   void unload_shader(uuid_t id);
@@ -34,7 +37,7 @@ public:
   void draw(uuid_t mesh);        // issue draw call
 
   // Primitive Shape Appearance Look
-  enum class Look { DYNAMIC, COLOR, TEXTURE };
+  enum Look { DYNAMIC, COLOR, TEXTURE };
 
   // Draw Default Shape
   void draw(const vec<2> &center, const vec<2> &size, float rotation, Look look, const vec<4> &corner, const vec<3> &color = {},
@@ -63,6 +66,8 @@ private:
   std::unordered_map<uuid_t, Shader> shaders{0};
   std::unordered_map<uuid_t, Mesh> meshes{0};
   std::unordered_map<uuid_t, unsigned int> textures{0};
+
+  static void checkErrors();
 };
 
 } // namespace Artifex

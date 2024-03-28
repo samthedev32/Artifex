@@ -110,7 +110,7 @@ void main() {
 
         case 2:
         // Texture
-        color = texture(f.tex, io.TexCoord).xyz;
+        color = texture(f.tex, io.TexCoord).rgb;
         break;
     }
 

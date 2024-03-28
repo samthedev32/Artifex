@@ -29,7 +29,6 @@ set(SOURCES
         src/Artifex/types/module.cpp
 
         src/Artifex/utility/uuid.c
-        src/Artifex/utility/RAW/shader.cpp
 )
 
 # Libraries
@@ -40,7 +39,7 @@ if (WIN32)
     list(APPEND LIBRARIES opengl32 glfw3 soft_oal)
 else ()
     # Linux & other
-    list(APPEND LIBRARIES GL glfw AL)
+    list(APPEND LIBRARIES GL glfw openal)
 endif ()
 
 add_library(${PROJECT_NAME} ${SOURCES})

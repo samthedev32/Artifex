@@ -88,6 +88,8 @@ uuid_t Renderer::load_shader(const char *vertex, const char *fragment, const cha
     return 0;
   }
 
+  checkErrors();
+
   Log::verbose("Load::shader", "Loaded Shader", infoLog);
 
   // Add to list + return ID
@@ -96,7 +98,52 @@ uuid_t Renderer::load_shader(const char *vertex, const char *fragment, const cha
   return uuid;
 }
 
-size_t Renderer::load_texture(void *data, const vec<2, uint32_t> &size, uint8_t channels) {
+uuid_t Renderer::load_shader(const char *path) {
+  std::unordered_map<std::string, std::string> script;
+
+  if (FILE *f = fopen(path, "r")) {
+    int current = -1;
+
+    // RAW Shader Code (vertex, fragment, geometry)
+    std::string code[3];
+
+    char line[256];
+    while (fgets(line, sizeof(line), f)) {
+      char index[10], parameter[10];
+      sscanf(line, "%9s %9s", index, parameter);
+
+      if (!strcmp(index, "#shader")) {
+        if (!strcmp(parameter, "vertex"))
+          current = 0;
+        else if (!strcmp(parameter, "fragment"))
+          current = 1;
+        else if (!strcmp(parameter, "geometry"))
+          current = 2;
+        else
+          printf("Invalid shader type\n");
+      } else if (!strcmp(index, "#script")) {
+        if (script.count(parameter) != 0 && current != -1)
+          code[current] += script.at(parameter);
+        else
+          printf("missing script\n");
+      } else {
+        if (current != -1)
+          code[current] += line;
+      }
+    }
+
+    fclose(f);
+
+    return load_shader(code[0].c_str(), code[1].c_str(), code[2].c_str());
+  }
+
+  printf("failed to open file\n");
+
+  // Failed to open file
+  return 0;
+}
+
+size_t Renderer::load_texture(const void *data, const vec<2, uint32_t> &size, uint8_t channels) {
   // Exit if invalid
   // TODO implement vec comparations
   if (data == nullptr || (size->width == 0 || size->height == 0) || (channels < 1 || channels > 4)) {
