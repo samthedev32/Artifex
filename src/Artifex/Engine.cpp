@@ -8,14 +8,14 @@ namespace Artifex {
 
 Engine::Engine(const std::string &name, const vec<2, uint32_t> &size) {
   clock.reset();
-  add<GraphicsModule>(); // TODO make it called for every entity
+  graphics = add<GraphicsModule>(); // TODO make it called for every entity
 }
 
 Engine::~Engine() {
-  // Destroy Modules
-  for (auto [_, m] : module) {
-    m->onDestroy();
-    delete m;
+  // Destroy Entities
+  for (const auto &[id, e] : entity) {
+    for (auto m : e.modules)
+      module[m]->onDestroy(id);
   }
 }
 
@@ -27,11 +27,6 @@ void Engine::loop(const std::function<void(float)> &onUpdate) {
 }
 
 bool Engine::update() {
-  // Update Screen
-  //  bool running = window.update();
-  //  renderer.update();
-  //  renderer.clear();
-
   // Timing
   clock.update();
 
@@ -39,14 +34,20 @@ bool Engine::update() {
   for (const auto &[id, e] : entity) {
     // Update Modules
     for (auto m : e.modules) {
-      module[m]->onUpdate(clock.deltaTime);
+      module[m]->onUpdate(id, clock.deltaTime);
     }
   }
-  for (auto [_, m] : module)
-    m->onUpdate(clock.deltaTime);
+
+  bool running = true;
+
+  // Update Global Modules
+  for (auto [_, m] : module) {
+    if (!m->onGlobalUpdate(clock.deltaTime))
+      running = false;
+  }
 
   //  return running;
-  return true;
+  return running;
 }
 
 void Engine::callback(const std::function<void(int)> &func, void *userdata, int flags) {
@@ -55,7 +56,9 @@ void Engine::callback(const std::function<void(int)> &func, void *userdata, int 
 
 uuid_t Engine::add(const EntityDescriptor &entityDescriptor) {
   // TODO
-  return 0;
+  auto id = entity.add({});
+  entity[id].modules.push_back(graphics);
+  return id;
 }
 
 } // namespace Artifex

@@ -17,13 +17,16 @@ public:
   ~GraphicsModule() = default;
 
   // Entity is created
-  bool onCreate() override;
+  bool onCreate(uuid_t entity) override;
 
   // Entity is destroyed
-  void onDestroy() override;
+  void onDestroy(uuid_t entity) override;
 
-  // Entity os updated; render
-  void onUpdate(float deltaTime) override;
+  // Entity is updated; render
+  void onUpdate(uuid_t entity, float deltaTime) override;
+
+  // Update Window
+  bool onGlobalUpdate(float deltaTime) override;
 
 private:
   Window window;

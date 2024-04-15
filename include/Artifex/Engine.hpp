@@ -44,11 +44,22 @@ public:
   // Add Entity
   uuid_t add(const EntityDescriptor &entityDescriptor);
 
+  //  uuid_t queryModule(std::string name);
+  //  Module &getModule(uuid_t module);
+
+  //  uuid_t queryEntity(std::string name);
+  //  Entity &getEntity(uuid_t entity);
+
 private:
   Clock clock;
 
   ComponentMap<Module *> module;
   ComponentMap<Entity> entity;
+
+  uuid_t graphics;
+
+  //  std::unordered_map<std::string, uuid_t> moduleMap;
+  //  std::unordered_map<std::string, uuid_t> entityMap;
 };
 
 #include <type_traits>
@@ -58,7 +69,7 @@ template <typename T> uuid_t Engine::add(uint32_t flags) {
 
   uuid_t id = module.add(new T(*this, flags));
 
-  if (!id || !module[id]->onCreate()) {
+  if (!id || !module[id]->onCreate(0)) {
     Log::warning("Engine::add", "Failed to create module");
 
     return 0;

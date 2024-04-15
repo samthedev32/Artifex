@@ -38,7 +38,7 @@ template <typename T> uuid_t ComponentMap<T>::add(T t) {
   // TODO optimize
   do {
     id = uuid_generate();
-  } while (data.count(id) == 0);
+  } while (has(id));
 
   data[id] = t;
   return id;

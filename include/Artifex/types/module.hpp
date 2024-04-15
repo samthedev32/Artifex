@@ -4,18 +4,13 @@
 
 #pragma once
 
+#include <Artifex/utility/uuid.h>
+
 #include <cstdint>
 
 namespace Artifex {
 
 class Engine;
-
-enum {
-  ONCREATE = 1 << 0,
-  ONDESTROY = 1 << 1,
-  ONUPDATE = 1 << 2,
-  ONFIXEDUPDATE = 1 << 2,
-};
 
 // Module
 class Module {
@@ -26,9 +21,17 @@ public:
   explicit Module(Engine &engine, uint32_t flags) : engine(engine) {}
   ~Module() = default;
 
-  virtual bool onCreate() { return true; }
-  virtual void onDestroy() {}
-  virtual void onUpdate(float deltaTime) {}
+  // Assigned Entity Created
+  virtual bool onCreate(uuid_t entity) { return true; }
+
+  // Assigned Entity Destroyed
+  virtual void onDestroy(uuid_t entity) {}
+
+  // Assigned Entity Updated
+  virtual void onUpdate(uuid_t entity, float deltaTime) {}
+
+  // Global (Engine) Update; called per-frame
+  virtual bool onGlobalUpdate(float deltaTime) { return false; }
 };
 
 } // namespace Artifex
