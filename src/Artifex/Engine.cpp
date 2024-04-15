@@ -1,19 +1,14 @@
-#include "Artifex/Engine.hpp"
+#include <Artifex/Engine.hpp>
+
+#include <Artifex/modules/Graphics.hpp>
 
 #include <ctime>
-#include <string>
 
 namespace Artifex {
 
-Engine::Engine(const std::string &name, const vec<2, uint32_t> &size) : Window(name, size) {
-  load.init(this);
-
-  render.init(this);
-  ui.init(this);
-
-  mix.init(this);
-
-  past = now = time();
+Engine::Engine(const std::string &name, const vec<2, uint32_t> &size) {
+  clock.reset();
+  add<GraphicsModule>(); // TODO make it called for every entity
 }
 
 Engine::~Engine() {
@@ -22,50 +17,45 @@ Engine::~Engine() {
     m->onDestroy();
     delete m;
   }
-
-  mix.deinit();
-
-  ui.deinit();
-  render.deinit();
-
-  load.deinit();
 }
 
-void Engine::loop(const vec<3> &clearColor, void (*onUpdate)(float)) {
-  while (update(clearColor))
+void Engine::loop(const std::function<void(float)> &onUpdate) {
+  clock.reset();
+  while (update())
     if (onUpdate)
-      onUpdate(deltaTime);
+      onUpdate(clock.deltaTime);
 }
 
-bool Engine::update(const vec<3> &clearColor) {
+bool Engine::update() {
   // Update Screen
-  bool running = Window::update();
-
-  render.clear(clearColor);
-
-  // Update GL
-  glViewport(0, 0, (int)size->width, (int)size->height);
+  //  bool running = window.update();
+  //  renderer.update();
+  //  renderer.clear();
 
   // Timing
-  past = now;
-  now = time();
-  deltaTime = now - past;
+  clock.update();
 
-  // Update Modules
+  // Update Entities
+  for (const auto &[id, e] : entity) {
+    // Update Modules
+    for (auto m : e.modules) {
+      module[m]->onUpdate(clock.deltaTime);
+    }
+  }
   for (auto [_, m] : module)
-    m->onUpdate(deltaTime);
+    m->onUpdate(clock.deltaTime);
 
-  return running;
+  //  return running;
+  return true;
 }
 
-float Engine::time() {
-  struct timespec res {};
-  clock_gettime(CLOCK_MONOTONIC, &res);
-  return (float)(1000.0f * (float)res.tv_sec + (float)res.tv_nsec / 1e6) / 1000.0f;
-}
-
-void Engine::callback(void (*func)(int), void *userdata, int flags) {
+void Engine::callback(const std::function<void(int)> &func, void *userdata, int flags) {
   // TODO
+}
+
+uuid_t Engine::add(const EntityDescriptor &entityDescriptor) {
+  // TODO
+  return 0;
 }
 
 } // namespace Artifex

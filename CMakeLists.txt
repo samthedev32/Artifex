@@ -4,31 +4,35 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Project
-project(Artifex VERSION 0.1.0 LANGUAGES C CXX)
+project(Artifex LANGUAGES C CXX)
 
 # Source Files
 set(SOURCES
-        #        src/Engine.cpp
+        src/Artifex/Engine.cpp
 
-        # Core
+        ## Graphics
+        src/Artifex/graphics/Window.cpp
+
+        src/Artifex/graphics/renderer.cpp
+        src/Artifex/graphics/load.cpp
+        src/Artifex/graphics/draw.cpp
+
+        src/Artifex/graphics/shader.cpp
+
+        src/include/GL/glad.c
+
+        ## Audio
+        src/Artifex/audio/Mix.cpp
+        src/Artifex/audio/Capture.cpp
+
+        # Physics
+        src/Artifex/physics/physics.cpp
+
+        # Utility
         src/Artifex/utility/Log.cpp
-
-        src/Artifex/renderer/window.cpp
-
-        ## Renderer
-        src/Artifex/renderer/renderer.cpp
-        src/Artifex/renderer/load.cpp
-        src/Artifex/renderer/draw.cpp
-
-        src/Artifex/renderer/shader.cpp
-
-        src/Artifex/renderer/GL/glad.c
-
-        src/Artifex/core/Mix.cpp
-
-        src/Artifex/types/module.cpp
-
+        src/Artifex/utility/Clock.cpp
         src/Artifex/utility/uuid.c
+        src/Artifex/modules/Graphics.cpp
 )
 
 # Libraries
@@ -45,6 +49,7 @@ endif ()
 add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
+target_include_directories(${PROJECT_NAME} PRIVATE "src/include")
 
 add_subdirectory(external)
 

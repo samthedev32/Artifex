@@ -23,8 +23,8 @@ public:
   Engine &engine;
 
 public:
-  Module(Engine &engine, uint32_t flags);
-  ~Module();
+  explicit Module(Engine &engine, uint32_t flags) : engine(engine) {}
+  ~Module() = default;
 
   virtual bool onCreate() { return true; }
   virtual void onDestroy() {}

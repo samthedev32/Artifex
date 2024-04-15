@@ -1,80 +1,71 @@
 #pragma once
 
-#include <Artifex/core/Mix.hpp>
-#include <Artifex/core/Renderer.hpp>
+#include <Artifex/audio/Mix.hpp>
 
-#include <Artifex/types/types.hpp>
+#include <Artifex/types/module.hpp>
 
-#include <Artifex/utility/uuid.h>
+#include <Artifex/utility/Clock.hpp>
+#include <Artifex/utility/ComponentMap.hpp>
+#include <Artifex/utility/Log.hpp>
 
-#include <cstdint>
-#include <typeinfo>
-#include <unordered_map>
-#include <vector>
+#include <Artifex/math/vec.hpp>
+
+#include <functional>
 
 namespace Artifex {
 
+struct Entity {
+  // Entity Modules
+  std::vector<uuid_t> modules;
+};
+
 class Engine {
 public:
-  Engine(const std::string &title, const vec<2, uint32_t> &size);
+  explicit Engine(const std::string &title, const vec<2, uint32_t> &size = {});
   ~Engine();
 
   // Game Loop
-  void loop(const vec<3> &clearColor = {}, void (*onUpdate)(float) = nullptr);
+  void loop(const std::function<void(float)> &onUpdate = {});
 
   // Update Engine & Window (for manual game loop)
-  bool update(const vec<3> &clearColor);
-
-  // Get Current Time (s)
-  static float time();
-
-  // Get Ratio of Window (width/height)
-  inline float ratio() { return (float)size->width / (float)size->height; }
+  bool update();
 
   // Register Callback Function
-  void callback(void (*func)(int), void *userdata, int flags);
+  void callback(const std::function<void(int)> &func, void *userdata, int flags);
 
   // Add Module
-  template <typename T> bool add(const std::string &name, uint32_t flags = 0);
+  template <typename T> uuid_t add(uint32_t flags = 0);
 
-public:
-  float now = 0.0f;
-  float deltaTime = 0.0f;
-
-  struct Entity {
-    uuid_t texture, mesh, shader;
+  // Entity Descriptor
+  struct EntityDescriptor {
+    std::string texture;
   };
 
-  std::unordered_map<uuid_t, Entity> entities;
+  // Add Entity
+  uuid_t add(const EntityDescriptor &entityDescriptor);
 
 private:
-  float past;
+  Clock clock;
 
-  std::unordered_map<std::string, Module *> module;
+  ComponentMap<Module *> module;
+  ComponentMap<Entity> entity;
 };
 
 #include <type_traits>
 
-template <typename T> bool Engine::add(const std::string &name, uint32_t flags) {
+template <typename T> uuid_t Engine::add(uint32_t flags) {
   static_assert(std::is_base_of<Module, T>::value, "Invalid Module");
 
-  if (module.count(name)) {
-    Log::warning("Engine::add", "Module with name '%s' already exists", name.c_str());
-    return false;
+  uuid_t id = module.add(new T(*this, flags));
+
+  if (!id || !module[id]->onCreate()) {
+    Log::warning("Engine::add", "Failed to create module");
+
+    return 0;
   }
 
-  module[name] = new T(*this, flags);
-
-  if (!module[name]->onCreate()) {
-    Log::warning("Engine::add"
-                 "Failed to create module '%s'",
-                 name.c_str());
-
-    return false;
-  }
-
-  Log::verbose("Engine::add", "Added Module '%s'", name.c_str());
-  return true;
+  Log::verbose("Engine::add", "Added Module");
+  return id;
 }
 
 } // namespace Artifex

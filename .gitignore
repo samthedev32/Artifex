@@ -1,4 +1,4 @@
 build/
-build.em/
-.vscode/
+cmake-build-debug/
+
 .cache/

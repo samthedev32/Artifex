@@ -1,2 +1,7 @@
-add_subdirectory(gfx_simple)
-add_subdirectory(mix_simple)
+add_subdirectory(graphics)
+add_subdirectory(audio)
+add_subdirectory(engine)
+
+add_subdirectory(physics_simple)
+
+add_subdirectory(games)
