@@ -1,0 +1,17 @@
+{
+    "cmake.options.statusBarVisibility": "compact",
+    "cmake.options.advanced": {
+        "build": {
+            "statusBarVisibility": "visible",
+        },
+        "launch": {
+            "statusBarVisibility": "visible",
+        },
+        "debug": {
+            "statusBarVisibility": "hidden",
+        },
+        "ctest": {
+            "statusBarVisibility": "hidden"
+        }
+    }
+}
