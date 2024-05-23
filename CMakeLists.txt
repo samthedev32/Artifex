@@ -33,6 +33,9 @@ set(SOURCES
         src/Artifex/utility/Clock.cpp
         src/Artifex/utility/uuid.c
         src/Artifex/modules/Graphics.cpp
+        src/Artifex/module.cpp
+        src/Artifex/entity.cpp
+        src/Artifex/component.cpp
 )
 
 # Libraries

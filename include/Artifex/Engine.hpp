@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Artifex/audio/Mix.hpp>
-
+#include <Artifex/types/entity.hpp>
 #include <Artifex/types/module.hpp>
 
 #include <Artifex/utility/Clock.hpp>
@@ -10,73 +9,68 @@
 
 #include <Artifex/math/vec.hpp>
 
+#include <Artifex/utility/ECS.hpp>
+
+#include <any>
 #include <functional>
+#include <set>
 
 namespace Artifex {
 
-struct Entity {
-  // Entity Modules
-  std::vector<uuid_t> modules;
+// Entity Descriptor
+struct EntityDescriptor {
+  // Modules to be linked to the entity
+  std::set<uuid_t> modules;
+
+  struct {
+    // Enable Default Renderer
+    bool renderer = true;
+
+    // Enable Default Physics Engine
+    bool physics = false;
+  } enable;
 };
 
 class Engine {
 public:
-  explicit Engine(const std::string &title, const vec<2, uint32_t> &size = {});
+  explicit Engine(const char *title, const vec<2, uint32_t> &size = {});
   ~Engine();
 
   // Game Loop
-  void loop(const std::function<void(float)> &onUpdate = {});
+  void loop(const std::function<void(double)> &onUpdate = {});
 
-  // Update Engine & Window (for manual game loop)
+  // Update Engine (for manual game loop)
   bool update();
 
-  // Register Callback Function
-  void callback(const std::function<void(int)> &func, void *userdata, int flags);
+  // Module Manipulation
+  template <typename T, typename... Args, typename = void> uuid_t add(Args... args);
+  void removeModule(uuid_t id);
+  Module &getModule(uuid_t id);
 
-  // Add Module
-  template <typename T> uuid_t add(uint32_t flags = 0);
-
-  // Entity Descriptor
-  struct EntityDescriptor {
-    std::string texture;
-  };
-
-  // Add Entity
+  // Entity Manipulation
   uuid_t add(const EntityDescriptor &entityDescriptor);
+  void removeEntity(uuid_t id);
+  Entity &getEntity(uuid_t id);
 
-  //  uuid_t queryModule(std::string name);
-  //  Module &getModule(uuid_t module);
-
-  //  uuid_t queryEntity(std::string name);
-  //  Entity &getEntity(uuid_t entity);
+public:
+  // TODO layers
+  uuid_t m_graphics;
 
 private:
-  Clock clock;
+  Clock m_clock;
 
-  ComponentMap<Module *> module;
-  ComponentMap<Entity> entity;
+  // Modules
+  ComponentMap<Module *> m_module;
 
-  uuid_t graphics;
+  // Entities
+  ComponentMap<Entity> m_entity;
 
-  //  std::unordered_map<std::string, uuid_t> moduleMap;
-  //  std::unordered_map<std::string, uuid_t> entityMap;
+  ECS ecs;
+
+  // TODO index everything by name
 };
 
-#include <type_traits>
-
-template <typename T> uuid_t Engine::add(uint32_t flags) {
-  static_assert(std::is_base_of<Module, T>::value, "Invalid Module");
-
-  uuid_t id = module.add(new T(*this, flags));
-
-  if (!id || !module[id]->onCreate(0)) {
-    Log::warning("Engine::add", "Failed to create module");
-
-    return 0;
-  }
-
-  Log::verbose("Engine::add", "Added Module");
-  return id;
-}
+// Templated Implementations
+#include "templated.hpp"
 
 } // namespace Artifex

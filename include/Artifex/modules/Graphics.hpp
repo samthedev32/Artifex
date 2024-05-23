@@ -11,22 +11,25 @@ namespace Artifex {
 class GraphicsModule : public Module {
 public:
   // Init Window & Renderer
-  explicit GraphicsModule(Engine &engine, uint32_t flags);
+  GraphicsModule(Engine &engine, const char *title = "Artifex Engine", const vec<2, uint32_t> &size = {720, 480});
 
   // Release Renderer & Destroy Window
   ~GraphicsModule() = default;
 
   // Entity is created
-  bool onCreate(uuid_t entity) override;
+  bool onCreate(Entity &entity) override;
 
   // Entity is destroyed
-  void onDestroy(uuid_t entity) override;
+  void onDestroy(Entity &entity) override;
 
   // Entity is updated; render
-  void onUpdate(uuid_t entity, float deltaTime) override;
+  void onUpdate(Entity &entity, double deltaTime) override;
 
   // Update Window
-  bool onGlobalUpdate(float deltaTime) override;
+  bool onGlobalUpdate(double deltaTime) override;
+
+  // TODO: rename to allocateComponents
+  std::vector<std::pair<uuid_t, size_t>> ComponentList() override;
 
 private:
   Window window;

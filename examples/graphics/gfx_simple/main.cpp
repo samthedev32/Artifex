@@ -2,7 +2,7 @@
 #include <Artifex/graphics/Window.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../../helper/stb_image.h"
 
 #include <ctime>
 

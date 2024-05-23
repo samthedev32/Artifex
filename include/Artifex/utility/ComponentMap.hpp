@@ -28,7 +28,6 @@ public:
 
 private:
   std::unordered_map<uuid_t, T> data;
-  T dummy;
 };
 
 template <typename T> uuid_t ComponentMap<T>::add(T t) {
@@ -44,14 +43,7 @@ template <typename T> uuid_t ComponentMap<T>::add(T t) {
   return id;
 }
 
-template <typename T> T &ComponentMap<T>::get(uuid_t id) {
-  if (data.count(id) != 0)
-    return data[id];
-
-  // else: die
-  // TODO: don't die
-  return dummy;
-}
+template <typename T> T &ComponentMap<T>::get(uuid_t id) { return data[id]; }
 
 template <typename T> T &ComponentMap<T>::operator[](uuid_t id) { return get(id); }
 
