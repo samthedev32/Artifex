@@ -1,8 +1,4 @@
-#include <Artifex/graphics/Renderer.hpp>
-#include <Artifex/graphics/Window.hpp>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "../../helper/stb_image.h"
+#include <Artifex/Engine.hpp>
 
 #include <ctime>
 
@@ -15,28 +11,19 @@ float time() {
 }
 
 int main() {
-  Window window("Artifex Engine", {720, 480});
-  Renderer renderer(window.size);
+  Engine engine("GFX Simple", {720, 480});
 
   // Load Image
-  int w, h, ch;
-  stbi_set_flip_vertically_on_load(true);
-  const unsigned char *data = stbi_load("../../../../examples/resources/texture/milk.png", &w, &h, &ch, 3);
-  const uuid_t id = renderer.load_texture(data, {w, h}, ch);
+  auto tex = engine.m_asset.load(AssetManager::Texture, "../../../../examples/resources/texture/milk.png");
 
   // Main Loop
   float past, now = time();
-  while (window.update()) {
-    renderer.update();
+  while (engine.update()) {
+    engine.m_renderer.image({}, {0.5}, tex, {0, 0.5f});
+      engine.m_renderer.color({0.4, -0.4}, {0.2}, {}, {0, 1});
 
-    past = now, now = time();
-    float deltaTime = now - past;
-
-    renderer.clear({});
-    renderer.draw({}, {0.5}, time() / 2.0f, Renderer::TEXTURE, 0.4f, {}, id);
-
-    if (window.key("esc"))
-      window.exit();
+    if (engine.m_window.key("esc"))
+      engine.m_window.exit();
   }
 
   return 0;

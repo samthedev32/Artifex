@@ -1,6 +1,7 @@
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-BreakBeforeBinaryOperators: All
-ColumnLimit: 128
-IndentWidth: 2
-UseTab: Never
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: true
+DerivePointerAlignment: false
+PointerAlignment: Left
+BreakBeforeBraces: Attach

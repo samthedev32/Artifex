@@ -3,43 +3,39 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-# Project
-project(Artifex LANGUAGES C CXX)
+project(Artifex)
 
 # Source Files
 set(SOURCES
-        src/Artifex/Engine.cpp
+        src/Engine.cpp
 
-        ## Graphics
-        src/Artifex/graphics/Window.cpp
+        # Asset Manager
+        src/types/uuid.cpp
+        src/AssetManager.cpp
 
-        src/Artifex/graphics/renderer.cpp
-        src/Artifex/graphics/load.cpp
-        src/Artifex/graphics/draw.cpp
+        # ECS
+        src/ECS/World.cpp
+        src/ECS/Type.cpp
+        src/ECS/Column.cpp
 
-        src/Artifex/graphics/shader.cpp
+        # Graphics
+        src/Window.cpp
+        src/Renderer.cpp
 
-        src/include/GL/glad.c
+        # Audio
+        src/Mixer.cpp
 
-        ## Audio
-        src/Artifex/audio/Mix.cpp
-        src/Artifex/audio/Capture.cpp
-
-        # Physics
-        src/Artifex/physics/physics.cpp
-
-        # Utility
-        src/Artifex/utility/Log.cpp
-        src/Artifex/utility/Clock.cpp
-        src/Artifex/utility/uuid.c
-        src/Artifex/modules/Graphics.cpp
-        src/Artifex/module.cpp
-        src/Artifex/entity.cpp
-        src/Artifex/component.cpp
+        src/Log.cpp
 )
 
 # Libraries
-set(LIBRARIES m)
+set(LIBRARIES
+        m
+
+        glad
+
+        stb
+)
 
 if (WIN32)
     # Windows Libraries
@@ -52,8 +48,6 @@ endif ()
 add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
-target_include_directories(${PROJECT_NAME} PRIVATE "src/include")
 
 add_subdirectory(external)
-
 add_subdirectory(examples)

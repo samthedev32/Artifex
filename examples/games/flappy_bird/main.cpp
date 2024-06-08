@@ -1,21 +1,18 @@
 #include <Artifex/Engine.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "../../helper/stb_image.h"
-
 #include <string>
 
 int main() {
   Artifex::Engine engine("Flappy Bird", {720, 480});
 
-  uuid_t id = engine.add({});
-
-  Entity &e = engine.getEntity(id);
-
-  e[0] = vec<2>(0);
-  e[1] = vec<2>(0.5, 0.3);
-
-  auto pos = e.get<vec<2>>(0);
+//  uuid_t id = engine.add({});
+//
+//  Entity &e = engine.getEntity(id);
+//
+//  e[0] = vec<2>(0);
+//  e[1] = vec<2>(0.5, 0.3);
+//
+//  auto pos = e.get<vec<2>>(0);
 
   // Set Position & Size for Entity [id]
   //  e.set(0, vec<2>{});
