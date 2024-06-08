@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 3.8)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 project(Artifex)
@@ -30,24 +28,23 @@ set(SOURCES
 
 # Libraries
 set(LIBRARIES
-        m
-
         glad
-
         stb
 )
 
 if (WIN32)
     # Windows Libraries
-    list(APPEND LIBRARIES opengl32 glfw3 soft_oal)
+    list(APPEND LIBRARIES glfw3 OpenAL32)
 else ()
     # Linux & other
-    list(APPEND LIBRARIES GL glfw openal)
+    list(APPEND LIBRARIES glfw openal)
 endif ()
 
 add_library(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
-target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
 add_subdirectory(external)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC "include")
+
 add_subdirectory(examples)

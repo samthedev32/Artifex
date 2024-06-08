@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
+#include <Artifex/types/uuid.hpp>
+
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-typedef struct ALCdevice_struct ALCdevice;
-typedef struct ALCcontext_struct ALCcontext;
+struct ALCdevice;
+struct ALCcontext;
 
 namespace Artifex {
     class AssetManager;
-
-    typedef uint16_t ID;
 
     class Mixer {
     public:
@@ -60,8 +60,8 @@ namespace Artifex {
     private:
         AssetManager &m_asset;
 
-        ALCdevice *m_device{};
-        ALCcontext *m_context{};
+        struct ALCdevice *m_device{};
+        struct ALCcontext *m_context{};
 
         std::unordered_map<ID, unsigned int> m_sources{};
 

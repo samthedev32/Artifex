@@ -27,7 +27,9 @@ struct Column {
 };
 
 template <typename T>
-ID Column::add() {}
+ID Column::add() {
+    return 0;
+}
 
 template <typename T>
 T& Column::get(ID id) {

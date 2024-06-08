@@ -62,12 +62,12 @@ struct World {
 
 template <typename T>
 ID World::add(ID entity) {
-    add(entity, typeid(T).hash_code());
+    return add(entity, typeid(T).hash_code());
 }
 
 template <typename T>
 bool World::del(ID entity) {
-    del(entity, typeid(T).hash_code());
+    return del(entity, typeid(T).hash_code());
 }
 
 //

@@ -1,4 +1,4 @@
-# add_subdirectory(graphics)
+add_subdirectory(graphics)
 # add_subdirectory(audio)
 # add_subdirectory(engine)
 
@@ -6,4 +6,4 @@
 
 add_subdirectory(ecs)
 
-# add_subdirectory(games)
+add_subdirectory(games)
