@@ -1,7 +1,5 @@
 #include <Artifex/Mixer.hpp>
-#include <Artifex/AssetManager.hpp>
 
-#include <AL/alc.h>
 #include <AL/al.h>
 
 #include <stdexcept>
@@ -11,7 +9,7 @@
 #define TAG "Mixer"
 
 namespace Artifex {
-    Mixer::Mixer(AssetManager &asset, const char *deviceName) : m_asset(asset) {
+    Mixer::Mixer(const char *deviceName) {
         openDevice:
         if (!((m_device = alcOpenDevice(deviceName)))) {
             Log::error(TAG, "failed to open device");
@@ -32,68 +30,89 @@ namespace Artifex {
     }
 
     Mixer::~Mixer() {
-        use();
-
-        auto audio = m_asset.audio;
-        for (auto [key, _]: audio)
-            m_asset.unload(key);
-
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(m_context);
         alcCloseDevice(m_device);
     }
 
-    ID Mixer::create() {
+    unsigned int Mixer::load(int channels, int sample_rate, int samples, short *data) {
         use();
 
-        ID id;
-        auto &source = m_sources[id];
-        alGenSources(1, &source);
+        if (channels < 1 || channels > 2 || sample_rate < 1 || samples < 1 || !data) {
+            Log::error(TAG, "Load: invalid resources");
+            return nil;
+        }
+
+        // Size of audio data in bytes
+        const ALsizei size = channels * (int)sizeof(short) * samples;
+
+        // Generate buffer and source
+        ALuint id;
+        alGenBuffers(1, &id);
+
+        // TODO verify resources
+
+        // Load audio data into buffer
+        alBufferData(id, channels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, data, size, sample_rate);
+
         return id;
     }
 
-    void Mixer::destroy(ID source) {
+    void Mixer::unload(unsigned int id) {
         use();
-
-        alDeleteSources(1, &m_sources[source]);
+        alDeleteBuffers(1, &id);
     }
 
-    void Mixer::set(ID source, ID audio) {
+    unsigned int Mixer::create() {
         use();
 
-        alSourcei(m_sources[source], AL_BUFFER, (ALint) m_asset.audio[audio]);
+        unsigned int id;
+        alGenSources(1, &id);
+        return id;
     }
 
-    void Mixer::play(ID source) {
+    void Mixer::destroy(unsigned int source) {
         use();
 
-        alSourcePlay(m_sources[source]);
+        alDeleteSources(1, &source);
     }
 
-    void Mixer::pause(ID source) {
+    void Mixer::set(unsigned int source, unsigned int audio) {
         use();
 
-        alSourcePause(m_sources[source]);
+        alSourcei(source, AL_BUFFER, (int)audio);
     }
 
-    void Mixer::stop(ID source) {
+    void Mixer::play(unsigned int source) {
         use();
 
-        alSourceStop(m_sources[source]);
+        alSourcePlay(source);
     }
 
-    void Mixer::rewind(ID source) {
+    void Mixer::pause(unsigned int source) {
         use();
 
-        alSourceRewind(m_sources[source]);
+        alSourcePause(source);
     }
 
-    Mixer::State Mixer::state(ID source) {
+    void Mixer::stop(unsigned int source) {
         use();
 
-        int out;
-        alGetSourcei(m_sources[source], AL_SOURCE_STATE, &out);
-        return State(out);
+        alSourceStop(source);
+    }
+
+    void Mixer::rewind(unsigned int source) {
+        use();
+
+        alSourceRewind(source);
+    }
+
+    Mixer::State Mixer::state(unsigned int source) {
+        use();
+
+        int id;
+        alGetSourcei(source, AL_SOURCE_STATE, &id);
+        return State(id);
     }
 
     void Mixer::use() {
@@ -126,8 +145,6 @@ namespace Artifex {
     }
 
     int Mixer::checkErrors() {
-        use();
-
         int count = 0;
         ALenum errorCode;
         while ((errorCode = alGetError()) != AL_NO_ERROR) {

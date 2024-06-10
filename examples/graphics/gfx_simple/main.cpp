@@ -19,7 +19,7 @@ int main() {
   // Main Loop
   float past, now = time();
   while (engine.update()) {
-    engine.m_renderer.image({}, {0.5}, tex, {0, 0.5f});
+    engine.m_renderer.image({}, {0.5}, 1, {0, 0.5f});
       engine.m_renderer.color({0.4, -0.4}, {0.2}, {}, {0, 1});
 
     if (engine.m_window.key("esc"))

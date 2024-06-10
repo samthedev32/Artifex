@@ -20,10 +20,26 @@ namespace Artifex {
         // ...
     };
 
+    struct mesh_t {
+        unsigned int VAO, VBO, EBO;
+    };
+
     class Renderer {
     public:
-        Renderer(Window &window, AssetManager &asset); // NOLINT(*-explicit-constructor)
+        explicit Renderer(Window &window);
         ~Renderer();
+
+        // ---- Resource Management
+
+        unsigned int load(const char *vertex, const char *fragment, const char *geometry = nullptr); // Shader
+        unsigned int load(int width, int height, int channels, const unsigned char *data); // Texture
+        mesh_t load(const vec<2> *vertices, size_t v_size, const uint32_t *indices, size_t i_size); // Mesh
+
+        void unload_shader(unsigned int shader);
+        void unload(unsigned int texture);
+        void unload(mesh_t mesh);
+
+        // ....
 
         // Clear Screen
         void clear(vec<4> color = {});
@@ -39,24 +55,26 @@ namespace Artifex {
         // ---- Default Rendering (using default shader & mesh
 
         // Render Image
-        void image(vec<2> center, vec<2> size, UUID tex, const Visual &v = {}) const;
+        void image(vec<2> center, vec<2> size, unsigned int tex, const Visual &v = {}) const;
 
         // Render Color
         void color(const vec<2> &center, const vec<2> &size, const vec<3> &color, const Visual &v = {}) const;
 
         // TODO: render target support
 
+        // Use OpenGL Context of the Renderer/Window
+        void use();
+
         // Check for OpenGL Errors
-        int checkErrors();
+        static int checkErrors();
 
     private:
         Window &m_window;
-        AssetManager &m_asset;
 
         // Default Resources (for UI)
         struct {
-            UUID shader; // Default 2D Shader
-            UUID mesh; // Default Rectangle Mesh
+            unsigned int shader; // Default 2D Shader
+            mesh_t mesh; // Default Rectangle Mesh
 
             // Shader Uniform Locations
             struct {

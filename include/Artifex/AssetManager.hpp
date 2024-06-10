@@ -8,9 +8,10 @@
 #include <set>
 
 namespace Artifex {
-    class Window;
-
+    class Renderer;
     class Mixer;
+
+    struct mesh_t;
 
     struct Scene {
         // TODO world config stuff
@@ -22,13 +23,10 @@ namespace Artifex {
         // TODO path to resources, entities, etc
     };
 
-    struct mesh_t {
-        unsigned int VAO, VBO, EBO;
-    };
-
+    // Load Files & Manage Asset life-cycles
     class AssetManager {
     public:
-        AssetManager(Window &window, Mixer &mixer);
+        AssetManager(Renderer &renderer, Mixer &mixer);
 
         ~AssetManager();
 
@@ -47,7 +45,7 @@ namespace Artifex {
         };
 
         // Add Raw Asset
-        UUID add(const char *vertex, const char *fragment, const char *geometry); // Shader
+        UUID add(const char *vertex, const char *fragment, const char *geometry = nullptr); // Shader
         UUID add(int width, int height, int channels, const unsigned char *data); // Texture
         UUID add(const vec<2> *vertices, size_t v_size, const uint32_t *indices, size_t i_size); // Mesh
 
@@ -90,7 +88,7 @@ namespace Artifex {
         friend class Mixer;
 
     private:
-        Window &m_window;
+        Renderer &m_renderer;
         Mixer &m_mixer;
 
         // TODO temporary/placeholder assets

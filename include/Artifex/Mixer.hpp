@@ -6,39 +6,44 @@
 #include <unordered_map>
 #include <vector>
 
-struct ALCdevice;
-struct ALCcontext;
+#include <AL/alc.h>
 
 namespace Artifex {
-    class AssetManager;
-
     class Mixer {
     public:
-        Mixer(AssetManager &asset, const char *deviceName = nullptr); // NOLINT(*-explicit-constructor)
+        explicit Mixer(const char *deviceName = nullptr);
         ~Mixer();
+
+        // ---- Resource Management
+
+        // Load Audio Resource
+        unsigned int load(int channels, int sample_rate, int samples, short *data);
+
+        // Unload Audio Resource
+        void unload(unsigned int id);
 
         // ---- Source Management
 
         // Create Source
-        ID create();
+        unsigned int create();
 
         // Destroy Source
-        void destroy(ID source);
+        void destroy(unsigned int source);
 
         // Set Audio to Source
-        void set(ID source, ID audio);
+        void set(unsigned int source, unsigned int audio);
 
         // Play
-        void play(ID source);
+        void play(unsigned int source);
 
         // Pause
-        void pause(ID source);
+        void pause(unsigned int source);
 
         // Stop
-        void stop(ID source);
+        void stop(unsigned int source);
 
         // Rewind
-        void rewind(ID source);
+        void rewind(unsigned int source);
 
         enum State {
             INITIAL = 0x1011,
@@ -48,23 +53,21 @@ namespace Artifex {
         };
 
         // Get Source State
-        State state(ID source);
+        State state(unsigned int source);
 
         // Use OpenAL Context of the Mixer
         void use();
 
+        // Get Available Devices
         static std::vector<std::string> getDevices();
 
-        int checkErrors();
+        // Print OpenAL Errors
+        static int checkErrors();
 
     private:
-        AssetManager &m_asset;
+        ALCdevice *m_device{};
+        ALCcontext *m_context{};
 
-        struct ALCdevice *m_device{};
-        struct ALCcontext *m_context{};
-
-        std::unordered_map<ID, unsigned int> m_sources{};
-
-        // TODO audio input, source pool
+        // TODO audio input
     };
 }
