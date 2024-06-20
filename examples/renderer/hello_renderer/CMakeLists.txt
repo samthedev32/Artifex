@@ -1,0 +1,5 @@
+add_executable(hello_renderer main.c)
+target_link_libraries(hello_renderer axRenderer)
+
+add_executable(hello_renderer_cxx main.cpp)
+target_link_libraries(hello_renderer_cxx axRenderer)
