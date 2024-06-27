@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "Artifex/window.h"
 #include "res/meshes.h"
 #include "res/shaders.h"
 
@@ -267,6 +268,7 @@ unsigned int axRendererLoadTexture(axRenderer renderer, int width, int height, i
             mode = GL_RGBA;
             break;
     }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     // Create Texture
     glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
@@ -322,6 +324,8 @@ unsigned int axRendererUpdateTexture(axRenderer renderer, unsigned int texture, 
         return 0;
     }
 
+    axWindowMakeCurrent(renderer->window);
+
     // Select Color Mode
     GLint mode;
     switch (channels) {
@@ -344,7 +348,7 @@ unsigned int axRendererUpdateTexture(axRenderer renderer, unsigned int texture, 
     }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE0, texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, mode, GL_UNSIGNED_BYTE, data);
 
     return texture;
@@ -411,6 +415,8 @@ void axRendererDraw(axRenderer renderer, struct axRendererDrawInfo* drawInfo) {
     // Set Position & Size
     glUniform2f(renderer->ui.uni.v_center, drawInfo->center.x, drawInfo->center.y);
     glUniform2f(renderer->ui.uni.v_size, drawInfo->size.x, drawInfo->size.y);
+
+    glUniform1f(renderer->ui.uni.v_ratio, axWindowRatio(renderer->window));
 
     glUniform1f(renderer->ui.uni.v_rotation, rads(drawInfo->rotation));
     glUniform1i(renderer->ui.uni.f_look, drawInfo->style);

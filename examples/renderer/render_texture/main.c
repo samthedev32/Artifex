@@ -15,7 +15,6 @@ int main() {
 
     // Load Texture
     int w, h, ch;
-    stbi_set_flip_vertically_on_load(1);
     unsigned char* data = stbi_load("../../../../examples/resources/texture/milk.png", &w, &h, &ch, 0);
 
     if (!data) {
