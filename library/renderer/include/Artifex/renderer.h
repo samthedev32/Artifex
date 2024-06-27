@@ -47,6 +47,9 @@ unsigned int axRendererLoadTexture(axRenderer renderer, int width, int height, i
 // Load Mesh
 struct axMesh axRendererLoadMesh(axRenderer renderer, const axVector* vertices, long v_size, const unsigned int* indices, long i_size);
 
+// Update Texture Data
+unsigned int axRendererUpdateTexture(axRenderer renderer, unsigned int texture, int xoffset, int yoffset, int width, int height, int channels, const unsigned char* data);
+
 // Unload Shader
 void axRendererUnloadShader(axRenderer renderer, unsigned int shader);
 

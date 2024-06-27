@@ -316,6 +316,40 @@ struct axMesh axRendererLoadMesh(axRenderer renderer, const axVector* vertices, 
     return (struct axMesh){VAO, VBO, EBO};
 }
 
+unsigned int axRendererUpdateTexture(axRenderer renderer, unsigned int texture, int xoffset, int yoffset, int width, int height, int channels, const unsigned char* data) {
+    if (!axRendererIsValid(renderer)) {
+        ax_error(TAG, "invalid renderer");
+        return 0;
+    }
+
+    // Select Color Mode
+    GLint mode;
+    switch (channels) {
+        case 1:
+            mode = GL_RED;
+            break;
+
+        case 2:
+            mode = GL_RG;
+            break;
+
+        default:
+        case 3:
+            mode = GL_RGB;
+            break;
+
+        case 4:
+            mode = GL_RGBA;
+            break;
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE0, texture);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, mode, GL_UNSIGNED_BYTE, data);
+
+    return texture;
+}
+
 void axRendererUnloadShader(axRenderer renderer, unsigned int shader) {
     if (!axRendererIsValid(renderer)) {
         ax_warning(TAG, "invalid renderer");
