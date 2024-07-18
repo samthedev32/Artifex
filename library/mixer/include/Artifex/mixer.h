@@ -29,7 +29,14 @@ unsigned int axMixerLoad(axMixer mixer, int channels, int sample_rate, int sampl
 // Unload Audio
 void axMixerUnload(axMixer mixer, unsigned int audio);
 
-// TODO audio control
+// Start Playing Audio
+unsigned int axMixerPlay(axMixer mixer, unsigned int audio, int isBlocking);
+
+// Stop Playing Audio
+int axMixerStop(axMixer mixer, unsigned int id);
+
+// Get Audio State
+int axMixerState(axMixer mixer, unsigned int id);
 
 // Make OpenAL Context Current
 void axMixerMakeCurrent(axMixer mixer);

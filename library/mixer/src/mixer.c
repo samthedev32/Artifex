@@ -120,6 +120,54 @@ void axMixerUnload(axMixer mixer, unsigned int audio) {
     ax_verbose(TAG, "unloaded audio (%i)", audio);
 }
 
+unsigned int axMixerPlay(axMixer mixer, unsigned int audio, int isBlocking) {
+    if (!axMixerIsValid(mixer)) {
+        ax_warning(TAG, "invalid mixer");
+        return 0;
+    }
+
+    // Play the audio
+    ALuint source;
+    alGenSources(1, &source);
+    alSourcei(source, AL_BUFFER, audio);
+
+    alSourcePlay(source);
+
+    if (isBlocking) {
+        // Wait for the audio to finish playing
+        while (axMixerState(mixer, source) == AL_PLAYING);
+
+        axMixerStop(mixer, source);
+
+        return 0;
+    }
+
+    return source;
+}
+
+int axMixerStop(axMixer mixer, unsigned int id) {
+    if (!axMixerIsValid(mixer)) {
+        ax_warning(TAG, "invalid mixer");
+        return 1;
+    }
+
+    alDeleteSources(1, &id);
+
+    return 0;
+}
+
+int axMixerState(axMixer mixer, unsigned int id) {
+    if (!axMixerIsValid(mixer)) {
+        ax_warning(TAG, "invalid mixer");
+        return 1;
+    }
+
+    ALint state;
+    alGetSourcei(id, AL_SOURCE_STATE, &state);
+
+    return state;
+}
+
 void axMixerMakeCurrent(axMixer mixer) {
     if (!axMixerIsValid(mixer)) {
         ax_warning(TAG, "invalid mixer");

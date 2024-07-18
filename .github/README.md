@@ -27,6 +27,9 @@ but it can always be disabled completely.
 
 There is also a built-in 2D physics engine, which can also be overridden.
 
+## Components
+TODO
+
 ## Documentation
 
 ### Setup
@@ -39,7 +42,7 @@ I am using CLion to develop it, and I am trying to make it work out-of-the-box o
 Install Dependencies
 
 ```bash
-sudo apt install libglfw3-dev libopenal-dev
+sudo apt install libglfw3-dev libopenal-dev libuvc-dev
 ```
 
 #### Windows
