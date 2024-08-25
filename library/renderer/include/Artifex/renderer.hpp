@@ -1,7 +1,6 @@
 /**
  * @brief C++ Bindings for Artifex's Rendering Library
  *
- * @date 2024.06.xx
  * @author SamTheDev
  */
 

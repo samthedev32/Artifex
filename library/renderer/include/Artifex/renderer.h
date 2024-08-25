@@ -1,7 +1,6 @@
 /**
  * @brief C Rendering Library for Artifex
  *
- * @date 2024.06.xx TODO
  * @author SamTheDev
  */
 
@@ -14,6 +13,18 @@ extern "C" {
 #include <Artifex/color.h>
 #include <Artifex/vec.h>
 #include <Artifex/window.h>
+
+#define AX_RENDERER_DYNAMIC 0
+#define AX_RENDERER_COLOR 1
+#define AX_RENDERER_TEXTURE 2
+
+// TODO Renderer struct with function pointers to rendering functions
+// rather than rendering wrapper, become a rendering standard for libs to be based on
+// build UI lib & stuff on it
+
+typedef struct {
+    // TODO
+} axRendererPtr;
 
 // Artifex Renderer Type
 typedef struct axRenderer_* axRenderer;
@@ -76,13 +87,7 @@ struct axRendererDrawInfo {
     // Texture of rect
     unsigned int texture;
 
-    //    enum {
-    //        AX_RENDERER_DYNAMIC,
-    //        AX_RENDERER_COLOR,
-    //        AX_RENDERER_TEXTURE
-    //    } style;
-
-    // Style of rect (0: dynamic, 1: color, 2: texture)
+    // Style of rect
     int style;
 };
 

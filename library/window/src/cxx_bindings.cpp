@@ -38,8 +38,8 @@ int Window::getCursor(float& x, float& y) {
     return axWindowGetCursor((axWindow)m_window, &x, &y);
 }
 
-bool Window::getKeyState(axWindowKey key) {
-    return axWindowGetKeyState((axWindow)m_window, key);
+bool Window::getKeyState(Key key) {
+    return axWindowGetKeyState((axWindow)m_window, (enum axWindowKey)key);
 }
 
 Window::procAddr Window::getProcAddress(const char* procname) {

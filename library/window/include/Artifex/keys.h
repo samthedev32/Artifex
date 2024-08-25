@@ -1,3 +1,9 @@
+/**
+ * @brief C Windowing Library Key Definitions for Artifex
+ *
+ * @author SamTheDev
+ */
+
 #pragma once
 
 enum axWindowKey {
