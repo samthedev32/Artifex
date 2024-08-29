@@ -1,8 +1,7 @@
 /**
-* @brief C Color Library for Artifex
-*
-* @date 2024.06.xx TODO
-* @author SamTheDev
+ * @brief C Color Library for Artifex
+ *
+ * @author SamTheDev
  */
 
 #pragma once
@@ -18,6 +17,8 @@ extern "C" {
 typedef struct {
     AX_COLOR_TYPE r, g, b, a;
 } axColor;
+
+// TODO advanced color functions
 
 #ifdef __cplusplus
 }

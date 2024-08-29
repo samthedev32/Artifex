@@ -1,14 +1,18 @@
 /**
- * @brief C++ Vector, UV & Color Library for Artifex
+ * @brief C++ Vector, Color & UV Library for Artifex
  *
- * @date 2024.06.xx TODO
  * @author SamTheDev
  */
 
 #pragma once
 
+#define AX_VECTOR_SUPPORT_CLIB true
+
+#if AX_VECTOR_SUPPORT_CLIB
 #include <Artifex/color.h>
-#include <Artifex/vec.h>
+#include <Artifex/vec2.h>
+#include <Artifex/vec3.h>
+#endif
 
 #include <cmath>
 #include <cstdint>
@@ -24,7 +28,7 @@ struct vecC;
 }  // namespace internal
 
 // Variable Dimension Vector
-template <vec_t D = 3, typename T = float>
+template <vec_t D = 3, typename T = AX_VECTOR_TYPE>
 struct vec {
     static_assert(D != 0, "Null-Size Vectors are not supported");
 
@@ -44,9 +48,12 @@ struct vec {
     template <vec_t inD, typename inT>
     vec(vec<inD, inT> v);
 
-    vec(axVector v);
+#if AX_VECTOR_SUPPORT_CLIB
+    vec(vec2 v);
+    vec(vec3 v);
 
     vec(axColor c);
+#endif
 
     ~vec();
 
@@ -134,8 +141,11 @@ struct vec {
     internal::vecC<D, T>* operator->() { return &component; }
     const internal::vecC<D, T>* operator->() const { return &component; }
 
-    operator axVector() const;
+#if AX_VECTOR_SUPPORT_CLIB
+    operator vec2() const;
+    operator vec3() const;
     operator axColor() const;
+#endif
 
     // Functions (Instance Methods)
 
@@ -249,15 +259,22 @@ template <vec_t D, typename T>
 template <vec_t inD, typename inT>
 vec<D, T>::vec(vec<inD, inT> v) { *this = v; }
 
+#if AX_VECTOR_SUPPORT_CLIB
 template <vec_t D, typename T>
-vec<D, T>::vec(axVector v) {
+vec<D, T>::vec(vec2 v) {
     *this = vec(v.x, v.y);
+}
+
+template <vec_t D, typename T>
+vec<D, T>::vec(vec3 v) {
+    *this = vec(v.x, v.y, v.z);
 }
 
 template <vec_t D, typename T>
 vec<D, T>::vec(axColor c) {
     *this = vec(c.r, c.g, c.b);
 }
+#endif
 
 template <vec_t D, typename T>
 vec<D, T>::~vec() {
@@ -454,15 +471,22 @@ void vec<D, T>::operator++() { *this += 1.0f; }
 template <vec_t D, typename T>
 void vec<D, T>::operator--() { *this -= 1.0f; }
 
+#if AX_VECTOR_SUPPORT_CLIB
 template <vec_t D, typename T>
-vec<D, T>::operator axVector() const {
-    return (axVector){data[0], data[D < 2 ? 1 : 0]};
+vec<D, T>::operator vec2() const {
+    return (vec2){data[0], data[D < 2 ? 1 : 0]};
+}
+
+template <vec_t D, typename T>
+vec<D, T>::operator vec3() const {
+    return (vec3){data[0], data[D < 2 ? 1 : 0], D < 3 ? data[2] : 0};
 }
 
 template <vec_t D, typename T>
 vec<D, T>::operator axColor() const {
     return (axColor){data[0], data[D < 2 ? 0 : 1], D == 2 ? 0 : data[D < 2 ? 0 : 2]};
 }
+#endif
 
 // Functions (Instance Methods)
 
@@ -492,13 +516,8 @@ vec<D, T> vec<D, T>::clamp(vec<D, T> min, vec<D, T> max) const {
 
 template <vec_t D, typename T>
 T vec<D, T>::distance(vec a, vec b) {
-    T out;
-
     vec<D, T> dist = a - b;
-    for (vec_t i = 0; i < D; i++)
-        out += dist[i] * dist[i];
-
-    return sqrt(out);
+    return sqrt(dot(dist, dist));
 }
 
 template <vec_t D, typename T>
@@ -525,6 +544,6 @@ vec<D, T> vec<D, T>::lerp(vec<D, T> a, vec<D, T> b, T blend) {
 
 template <vec_t D, typename T>
 vec<3> vec<D, T>::cross(const vec<3>& a, const vec<3>& b) {
-    return std::vector<T>({a.data[1] * b.data[2] - a.data[2] * b.data[1], a.data[2] * b.data[0] - a.data[0] * b.data[2],
-                           a.data[0] * b.data[1] - a.data[1] * b.data[0]});
+    return {a.data[1] * b.data[2] - a.data[2] * b.data[1], a.data[2] * b.data[0] - a.data[0] * b.data[2],
+            a.data[0] * b.data[1] - a.data[1] * b.data[0]};
 }

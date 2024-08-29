@@ -1,7 +1,6 @@
 /**
  * @brief C Logging Library for Artifex
  *
- * @date 2024.06.xx TODO
  * @author SamTheDev
  */
 
