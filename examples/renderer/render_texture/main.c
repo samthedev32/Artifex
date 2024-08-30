@@ -34,7 +34,7 @@ int main() {
 
         struct axRendererDrawInfo drawInfo = {};
         drawInfo.style = 2;
-        drawInfo.size = (axVector){0.5f, 0.5f};
+        drawInfo.size = (vec2){0.5f, 0.5f};
         drawInfo.texture = tex;
         axWindowGetCursor(window, &drawInfo.center.x, &drawInfo.center.y);
 

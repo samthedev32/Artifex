@@ -27,7 +27,7 @@ int main() {
         renderer.update();
         renderer.clear({});
 
-        if (window.getKeyState(AX_WINDOW_KEY_ESCAPE))
+        if (window.getKeyState(Artifex::Window::Key::ESCAPE))
             window.exit();
 
         Artifex::Renderer::DrawInfo drawInfo{};

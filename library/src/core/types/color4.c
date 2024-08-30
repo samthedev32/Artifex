@@ -1,0 +1,1 @@
+#include <Artifex/core/types/color3.h>

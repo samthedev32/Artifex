@@ -15,6 +15,9 @@ It also enables having multiple renderers at once, each rendering a separate ent
 
 It is also cross-platform, currently supporting linux, windows and web builds.
 
+>[!NOTE]
+>I am still in the process of trying to find a good way to manage the parts of the library; as i have been doing \
+
 ### Basic Modules
 
 It has a built-in renderer, that uses...
@@ -26,41 +29,3 @@ It has a built-in renderer, that uses...
 but it can always be disabled completely.
 
 There is also a built-in 2D physics engine, which can also be overridden.
-
-## Components
-TODO
-
-## Documentation
-
-### Setup
-
-This Project is set up to work on both Linux and Windows with a few tweaks
-I am using CLion to develop it, and I am trying to make it work out-of-the-box on both platforms
-
-#### Linux (Debian Based)
-
-Install Dependencies
-
-```bash
-sudo apt install libglfw3-dev libopenal-dev libuvc-dev
-```
-
-#### Windows
-
-Every Include & Binary is in `/external`, should work as-is
-
-#### macOS & iOS
-
-I am not planning on making macOS & iOS Support, but I would appreciate if you did!
-
-#### Android
-
-I am planning on porting the engine to Android in the future, but it won't come anytime soon!
-
-#### WASM (Emscripten)
-
-WASM support is coming soon!
-
-### Usage
-
-...

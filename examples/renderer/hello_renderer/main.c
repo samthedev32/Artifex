@@ -33,7 +33,7 @@ int main() {
 
         struct axRendererDrawInfo drawInfo = {};
         drawInfo.style = 0;
-        drawInfo.size = (axVector){0.5f, 0.5f};
+        drawInfo.size = (vec2){0.5f, 0.5f};
 
         drawInfo.corner[0] = 0.4f, drawInfo.corner[1] = 0.4f, drawInfo.corner[2] = 0.4f, drawInfo.corner[3] = 0.4f;
 

@@ -1,8 +1,21 @@
-add_subdirectory(common)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_subdirectory(window)
-add_subdirectory(renderer)
+set(SOURCES
+    src/engine.c
+    
+    # core types
+    src/core/types/color3.c
+    src/core/types/color4.c
+    src/core/types/vec2.c
+    src/core/types/vec3.c
 
-add_subdirectory(mixer)
-# add_subdirectory(capture)
-add_subdirectory(camera)
+    # core utils
+    src/core/utils/clock.c
+    src/core/utils/log.c
+    )
+
+add_library(Artifex ${SOURCES})
+
+target_link_libraries(Artifex PRIVATE m)
+
+target_include_directories(Artifex PUBLIC include)
