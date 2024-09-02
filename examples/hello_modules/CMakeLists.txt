@@ -1,0 +1,2 @@
+add_executable(hello_modules main.c)
+target_link_libraries(hello_modules Artifex)

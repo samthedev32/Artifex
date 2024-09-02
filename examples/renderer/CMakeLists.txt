@@ -1,3 +1,0 @@
-add_subdirectory(hello_renderer)
-add_subdirectory(multi_context)
-add_subdirectory(render_texture)

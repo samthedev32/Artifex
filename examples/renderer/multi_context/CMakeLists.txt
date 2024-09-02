@@ -1,5 +1,0 @@
-add_executable(rederer_multi_context main.c)
-target_link_libraries(rederer_multi_context axRenderer)
-
-add_executable(rederer_multi_context_cxx main.cpp)
-target_link_libraries(rederer_multi_context_cxx axRenderer)

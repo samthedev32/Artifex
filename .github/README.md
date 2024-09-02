@@ -2,30 +2,13 @@
 
 ## About
 
-### Concept
+Artifex is a light-weight game engine "skeleton", meaning that it only does the bare minimum it (module, entity & resource management); the rest is up to you!
 
-The idea behind this engine is that instead of every system being baked in to the core of the engine, everything is a
-module.
+It comes with a default Renderer, Mixer & Physics Engine, but you can always just use your own.
 
-This means that everything - except the core - is a separate independent class.
-This may come with a slight performance loss, but enables this engine to be very flexible; one can write a custom
-renderer, physics engine and audio engine, while keeping the engine do its thing.
+## Operating Principle
 
-It also enables having multiple renderers at once, each rendering a separate entity or sequentially switching.
+When you create the engine, you specify the amount of threads it is allowed to use (use 0 for automatic), \
+then you can (and should) add modules and set up dependencies between them (the engine then allocates them to update threads)
 
-It is also cross-platform, currently supporting linux, windows and web builds.
-
->[!NOTE]
->I am still in the process of trying to find a good way to manage the parts of the library; as i have been doing \
-
-### Basic Modules
-
-It has a built-in renderer, that uses...
-
-- [GLFW](www.glfw.org) for Windowing
-- [OpenGL](www.opengl.org) for Rendering
-- [OpenAL](https://www.openal-soft.org/) for Audio
-
-but it can always be disabled completely.
-
-There is also a built-in 2D physics engine, which can also be overridden.
+...
