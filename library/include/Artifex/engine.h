@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 #include <Artifex/core/types/id.h>
+#include <Artifex/fundef.h>
 
 // Engine
 typedef struct _Artifex* Artifex;
@@ -21,9 +22,9 @@ struct axModuleDescriptor {
     void* user;
 
     // Callback Function Pointers
-    void (*onCreate)(void);
-    void (*onDestroy)(void);
-    void (*onUpdate)(void);
+    _ax_fn_create_t onCreate;
+    _ax_fn_destroy_t onDestroy;
+    _ax_fn_update_t onUpdate;
 
     // Dependencies
     id_t* dependencies;  // a value of 0 will be the whole update loop (for rendering, etc)
@@ -54,17 +55,17 @@ void axStartLoop(Artifex ax);
 // Register Module
 id_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor);
 
-// Enable Module
-int axEnable(Artifex ax, id_t moduleID);
+// // Enable Module
+// int axEnable(Artifex ax, id_t moduleID);
 
-// Enable Module (and all submodules)
-int axEnableTree(Artifex ax, id_t moduleID);
+// // Enable Module (and all submodules)
+// int axEnableTree(Artifex ax, id_t moduleID);
 
-// Disable Module
-int axDisable(Artifex ax, id_t moduleID);
+// // Disable Module
+// int axDisable(Artifex ax, id_t moduleID);
 
-// Disable Module (and all submodules)
-int axDisableTree(Artifex ax, id_t moduleID);
+// // Disable Module (and all submodules)
+// int axDisableTree(Artifex ax, id_t moduleID);
 
 #ifdef __cplusplus
 }

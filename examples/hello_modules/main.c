@@ -6,8 +6,8 @@
 // rename it to "somewhat scheduler" (SWS for short) xd
 // module callbacks
 
-void upd() {
-    printf("asd\n");
+void upd(uint64_t id, void* user) {
+    printf("module %lu: asd %i\n", id, (int)user);
 }
 
 int main() {

@@ -25,6 +25,8 @@ struct _Artifex {
     struct _ax_thread* threads;
     volatile int done;
 
+    // struct _ax_scheduler scheduler;
+
     // Main Thread's Modules (linked list)
     struct _ax_module* modules;
 };
@@ -108,12 +110,19 @@ void axStartLoop(Artifex ax) {
 id_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor) {
     if (!_ax_is_ok(ax))
         return 1;
-
+    static uint64_t cursor = 0;
     // TODO dependency check
 
     // Create Struct for new Module
     struct _ax_module* new = malloc(sizeof(struct _ax_module));
     new->user = descriptor->user;
+
+    new->onCreate = descriptor->onCreate;
+    new->onDestroy = descriptor->onDestroy;
+    new->onUpdate = descriptor->onUpdate;
+    new->id = cursor;
+    cursor++;
+
     new->next = NULL;
 
     // Handle single-thread case
@@ -195,6 +204,8 @@ void* _ax_thread_process(void* arg) {
         // Iterate Modules
         struct _ax_module* module = th->modules;
         while (module != NULL) {
+            if (module->onUpdate)
+                module->onUpdate(module->id, module->user);
             // TODO update module
             module = module->next;
         }

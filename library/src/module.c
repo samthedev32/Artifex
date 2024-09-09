@@ -1,3 +1,4 @@
+#include <Artifex/fundef.h>
 #include <malloc.h>
 #include <stdint.h>
 
@@ -6,8 +7,16 @@
 
 // Module Backend
 struct _ax_module {
+    uint64_t id;
     int enabled;
+
+    // User Data
     void* user;
+
+    // Callback Function Pointers
+    _ax_fn_create_t onCreate;
+    _ax_fn_destroy_t onDestroy;
+    _ax_fn_update_t onUpdate;
 
     // TODO data
 
