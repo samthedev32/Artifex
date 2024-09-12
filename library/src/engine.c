@@ -1,31 +1,31 @@
 #include <Artifex/engine.h>
 #include <malloc.h>
 #include <pthread.h>
-#include <unistd.h>
 
+#define __AX_SCHEDULER_IMPLEMENTATION__
 #include "module.c"
+#include "scheduler.c"
 
 // Thread Backend
 struct _ax_thread {
+    // Control Parameters
     pthread_t p;
     volatile int done, *gdone;
 
-    // Thread's Modules (linked list)
-    struct _ax_module* modules;
-
-    // Statistics for "scheduler"
-    uint32_t avg_time;
-    uint16_t module_count;
+    // Schedule
+    uint8_t id;
+    struct _ax_scheduler_thread* schedule;
 };
 
 // Engine Backend
 struct _Artifex {
-    // thread list
+    // Thread List
     uint16_t thread_count;
     struct _ax_thread* threads;
     volatile int done;
 
-    // struct _ax_scheduler scheduler;
+    // Module Scheduler
+    struct _ax_scheduler scheduler;
 
     // Main Thread's Modules (linked list)
     struct _ax_module* modules;
@@ -41,23 +41,51 @@ int _ax_is_ok(Artifex ax) {
 }
 
 int axInitialize(Artifex* ax, uint8_t threads) {
-    if (!ax)
-        return 1;
+    if (!ax) {
+        // TODO raise exception
+        return AX_INVALID_INPUT;
+    }
 
     // Allocate Engine
-    *ax = malloc(sizeof(struct _Artifex));
+    if (!(*ax = malloc(sizeof(struct _Artifex)))) {
+        // TODO raise exception
+        return AX_INSUFFICENT_MEMORY;
+    }
 
     // Allocate Threads
-    (*ax)->thread_count = (threads == 0) ? (sysconf(_SC_NPROCESSORS_ONLN) - 1) : threads;
-    (*ax)->threads = ((*ax)->thread_count == 0) ? NULL : malloc(sizeof(struct _ax_thread) * (*ax)->thread_count);
+    threads = threads == 0 ? /* get cpu thread c */ 4 : threads;
+    (*ax)->thread_count = threads;
+    (*ax)->threads = threads == 0 ? NULL : malloc(sizeof(struct _ax_thread) * (*ax)->thread_count);
+
+    if (!(*ax)->threads) {
+        // TODO
+        free(*ax);
+        *ax = NULL;
+        return AX_INSUFFICENT_MEMORY;
+    }
+
+    // Initialize Scheduler
+    int err = _ax_shceduler_init(&(*ax)->scheduler, threads);
+    if (err != AX_OK) {
+        // TODO raise exception
+        free((*ax)->threads);
+        free(*ax);
+        *ax = NULL;
+        return err;
+    }
 
     // Start Threads
     for (uint8_t i = 0; i < (*ax)->thread_count; i++) {
         struct _ax_thread* th = &(*ax)->threads[i];
-        th->module_count = 0, th->modules = NULL;
-        th->avg_time = 0;
         th->done = 1;  // make thread wait for update (TODO)
         th->gdone = &(*ax)->done;
+
+        th->id = 0;  // TODO generate ID
+        th->schedule = &(*ax)->scheduler.thread[i];
+
+        th->queue_size = 0;
+        th->queue = NULL;
+
         pthread_create(&th->p, NULL, _ax_thread_process, th);
     }
 
@@ -198,8 +226,23 @@ void* _ax_thread_process(void* arg) {
     if (!th)
         return NULL;
 
+    struct _ax_scheduler_thread* sch = th->schedule;
+
+    if (!sch)
+        return NULL;
+
     while (1) {
         while (th->done);
+
+        // Update Tasks
+        for (uint64_t i = 0; i < sch->task_length; i++) {
+            // TODO update task i
+        }
+
+        // Update Queue Items
+        for (uint64_t i = 0; i < sch->queue_size; i++) {
+            // TODO update queue item i
+        }
 
         // Iterate Modules
         struct _ax_module* module = th->modules;
