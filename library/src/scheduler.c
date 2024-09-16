@@ -51,7 +51,7 @@ int _ax_shceduler_init(struct _ax_scheduler* s, uint8_t threads) {
 
     // Allocate Thread Memory
     s->count = threads;
-    s->thread = calloc(sizeof(struct _ax_scheduler_thread) * threads);
+    s->thread = calloc(threads, sizeof(struct _ax_scheduler_thread));
 
     if (!s->thread)
         return AX_INSUFFICENT_MEMORY;
