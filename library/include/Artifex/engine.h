@@ -27,11 +27,11 @@ struct axModuleDescriptor {
     _ax_fn_update_t onUpdate;
 
     // Dependencies
-    id_t* dependencies;  // a value of 0 will be the whole update loop (for rendering, etc)
+    // id_t* dependencies;  // a value of 0 will be the whole update loop (for rendering, etc)
     // a module is quaranteed to be on the same thread as (and called after) its dependencies
 
     // Config
-    int synced;  // wait for it to finish before updating or not?
+    // int synced;  // wait for it to finish before updating or not?
 };
 
 // ---- Basic Control
@@ -48,7 +48,7 @@ int axUpdate(Artifex ax);
 // or
 
 // Start Game Loop
-void axStartLoop(Artifex ax);
+int axStartLoop(Artifex ax);
 
 // ---- Management
 

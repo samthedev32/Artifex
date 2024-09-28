@@ -1,13 +1,8 @@
 #include <Artifex/engine.h>
 #include <stdio.h>
 
-// global TODO
-// maybe scheduler to separate file
-// rename it to "somewhat scheduler" (SWS for short) xd
-// module callbacks
-
-void upd(uint64_t id, void* user) {
-    printf("module %lu: asd %i\n", id, (int)user);
+void upd(const struct axModuleInfo* info, void* user) {
+    printf("module %lu: asd %i\n", info->id, user);
 }
 
 int main() {

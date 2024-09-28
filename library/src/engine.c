@@ -1,38 +1,32 @@
 #include <Artifex/engine.h>
+#include <Artifex/error.h>
+#include <Artifex/fundef.h>
+
+//
 #include <malloc.h>
-#include <pthread.h>
+#include <stdint.h>
 
-#define __AX_SCHEDULER_IMPLEMENTATION__
-#include "module.c"
-#include "scheduler.c"
+// Module Backend
+struct _ax_module {
+    int enabled;
 
-// Thread Backend
-struct _ax_thread {
-    // Control Parameters
-    pthread_t p;
-    volatile int done, *gdone;
+    // User Data
+    void* user;
 
-    // Schedule
-    uint8_t id;
-    struct _ax_scheduler_thread* schedule;
+    // Callback Function Pointers
+    _ax_fn_create_t onCreate;
+    _ax_fn_destroy_t onDestroy;
+    _ax_fn_update_t onUpdate;
 };
 
 // Engine Backend
 struct _Artifex {
-    // Thread List
-    uint16_t thread_count;
-    struct _ax_thread* threads;
-    volatile int done;
-
-    // Module Scheduler
-    struct _ax_scheduler scheduler;
-
-    // Main Thread's Modules (linked list)
+    // Modules
+    uint64_t module_count;
     struct _ax_module* modules;
-};
 
-// Thread Process
-void* _ax_thread_process(void*);
+    // TODO ECS
+};
 
 // Check if Engine Struct is in-tact
 int _ax_is_ok(Artifex ax) {
@@ -52,46 +46,12 @@ int axInitialize(Artifex* ax, uint8_t threads) {
         return AX_INSUFFICENT_MEMORY;
     }
 
-    // Allocate Threads
-    threads = threads == 0 ? /* get cpu thread c */ 4 : threads;
-    (*ax)->thread_count = threads;
-    (*ax)->threads = threads == 0 ? NULL : malloc(sizeof(struct _ax_thread) * (*ax)->thread_count);
-
-    if (!(*ax)->threads) {
-        // TODO
-        free(*ax);
-        *ax = NULL;
-        return AX_INSUFFICENT_MEMORY;
-    }
-
-    // Initialize Scheduler
-    int err = _ax_shceduler_init(&(*ax)->scheduler, threads);
-    if (err != AX_OK) {
-        // TODO raise exception
-        free((*ax)->threads);
-        free(*ax);
-        *ax = NULL;
-        return err;
-    }
-
-    // Start Threads
-    for (uint8_t i = 0; i < (*ax)->thread_count; i++) {
-        struct _ax_thread* th = &(*ax)->threads[i];
-        th->done = 1;  // make thread wait for update (TODO)
-        th->gdone = &(*ax)->done;
-
-        th->id = 0;  // TODO generate ID
-        th->schedule = &(*ax)->scheduler.thread[i];
-
-        th->queue_size = 0;
-        th->queue = NULL;
-
-        pthread_create(&th->p, NULL, _ax_thread_process, th);
-    }
+    (*ax)->module_count = 0;
+    (*ax)->modules = NULL;
 
     // TODO
 
-    return 0;
+    return AX_OK;
 }
 
 void axDestroy(Artifex* ax) {
@@ -106,160 +66,97 @@ void axDestroy(Artifex* ax) {
 
 int axUpdate(Artifex ax) {
     if (!_ax_is_ok(ax)) {
-        return 1;
+        return AX_INVALID_INPUT;
     }
 
-    ax->done = 0;
-    for (int i = 0; i < ax->thread_count; i++)
-        ax->threads[i].done = 0;
+    // Update Modules
+    struct axModuleInfo info;
+    for (uint64_t i = 0; i < ax->module_count; i++) {
+        struct _ax_module* m = &ax->modules[i];
+        if (m->enabled) {
+            info.id = i;
+            info.engine = ax;
+            info.delta = 0;  // TODO
 
-    // TODO run modules...
+            m->onUpdate(&info, m->user);
+        }
+    }
 
-    while (ax->done < ax->thread_count);
-
-    // TODO run late stuff
-
-    return 0;
+    return AX_OK;
 }
 
-void axStartLoop(Artifex ax) {
-    printf("Load Balance:\n");
-    for (int i = 0; i < ax->thread_count; i++) {
-        printf("thread: %i | processes: %i\n", i, ax->threads[i].module_count);
-    }
+int axStartLoop(Artifex ax) {
+    if (!_ax_is_ok(ax))
+        return AX_INVALID_INPUT;
 
     while (!axUpdate(ax)) {
         // for (uint32_t i = 0; i < ax->thread_count; ax++)
         // ax->threads[i].done = 0;
         // TODO main thread loop
     }
+
+    return AX_OK;
 }
 
-id_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor) {
+uint64_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor) {
     if (!_ax_is_ok(ax))
-        return 1;
-    static uint64_t cursor = 0;
-    // TODO dependency check
+        return 0;
 
-    // Create Struct for new Module
-    struct _ax_module* new = malloc(sizeof(struct _ax_module));
-    new->user = descriptor->user;
-
-    new->onCreate = descriptor->onCreate;
-    new->onDestroy = descriptor->onDestroy;
-    new->onUpdate = descriptor->onUpdate;
-    new->id = cursor;
-    cursor++;
-
-    new->next = NULL;
-
-    // Handle single-thread case
-    if (ax->thread_count == 0)
-        return _ax_module_append(&ax->modules, new);
-
-    // Get best thread
-    int best = -1;
-    uint32_t value = 0;
-
-    for (uint32_t i = 0; i < ax->thread_count; i++) {
-        if (ax->threads[i].avg_time < value)
-            best = i, value = ax->threads[i].avg_time;
+    struct _ax_module* newp = realloc(ax->modules, sizeof(*ax->modules) * (ax->module_count + 1));
+    if (!newp) {
+        return 0;
     }
 
-    if (best == -1) {
-        best = 0;
-        value = ax->threads[0].module_count;
-        for (uint32_t i = 0; i < ax->thread_count; i++) {
-            if (ax->threads[i].module_count < value)
-                best = i, value = ax->threads[i].module_count;
-        }
-    }
+    uint64_t id = ax->module_count;
+    newp[id].enabled = 1;
+    newp[id].onCreate = descriptor->onCreate;
+    newp[id].onDestroy = descriptor->onDestroy;
+    newp[id].onUpdate = descriptor->onUpdate;
+    newp[id].user = descriptor->user;
 
-    // Append Module List
-    ax->threads[best].module_count++;
-    return _ax_module_append(&ax->threads[best].modules, new);
+    // TODO impl dependencies
+
+    ax->module_count++;
+    ax->modules = newp;
+    return ax->module_count;
 }
 
 int axEnable(Artifex ax, id_t moduleID) {
     if (!_ax_is_ok(ax)) {
-        return 1;
+        return AX_INVALID_INPUT;
     }
 
     // TODO
 
-    return 0;
+    return AX_OK;
 }
 
 int axEnableTree(Artifex ax, id_t moduleID) {
     if (!_ax_is_ok(ax)) {
-        return 1;
+        return AX_INVALID_INPUT;
     }
 
     // TODO
 
-    return 0;
+    return AX_OK;
 }
 
 int axDisable(Artifex ax, id_t moduleID) {
     if (!_ax_is_ok(ax)) {
-        return 1;
+        return AX_INVALID_INPUT;
     }
 
     // TODO
 
-    return 0;
+    return AX_OK;
 }
 
 int axDisableTree(Artifex ax, id_t moduleID) {
     if (!_ax_is_ok(ax)) {
-        return 1;
+        return AX_INVALID_INPUT;
     }
 
     // TODO
 
-    return 0;
-}
-
-void* _ax_thread_process(void* arg) {
-    struct _ax_thread* th = arg;
-
-    if (!th)
-        return NULL;
-
-    struct _ax_scheduler_thread* sch = th->schedule;
-
-    if (!sch)
-        return NULL;
-
-    while (1) {
-        while (th->done);
-
-        // Update Tasks
-        for (uint64_t i = 0; i < sch->task_length; i++) {
-            // TODO update task i
-        }
-
-        // Update Queue Items
-        for (uint64_t i = 0; i < sch->queue_size; i++) {
-            // TODO update queue item i
-        }
-
-        // Iterate Modules
-        struct _ax_module* module = th->modules;
-        while (module != NULL) {
-            if (module->onUpdate)
-                module->onUpdate(module->id, module->user);
-            // TODO update module
-            module = module->next;
-        }
-
-        th->done = 1;
-        (*th->gdone)++;
-
-        // TODO create & update modules, time it
-    }
-
-    // TODO destroy modules
-
-    return NULL;
+    return AX_OK;
 }
