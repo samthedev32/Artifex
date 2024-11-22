@@ -9,5 +9,8 @@ add_subdirectory(external)
 # main library
 add_subdirectory(library)
 
+# modules
+add_subdirectory(modules)
+
 # example programs
 add_subdirectory(examples)

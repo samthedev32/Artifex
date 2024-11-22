@@ -2,15 +2,20 @@
 #include <Artifex/error.h>
 #include <Artifex/fundef.h>
 
+#include <Artifex/ecs/typeless.h>
+
 //
 #include <malloc.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 
 // Module Backend
 struct _ax_module {
     int enabled;
+    float last_upd;
 
-    // User Data
+    // Global User Data
     void* user;
 
     // Callback Function Pointers
@@ -24,9 +29,15 @@ struct _Artifex {
     // Modules
     uint64_t module_count;
     struct _ax_module* modules;
-
-    // TODO ECS
+ 
+    Typeless ecs;
 };
+
+uint64_t _ax_now() {
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+    return t.tv_sec * 1000000 + t.tv_nsec / 1000;
+}
 
 // Check if Engine Struct is in-tact
 int _ax_is_ok(Artifex ax) {
@@ -49,6 +60,8 @@ int axInitialize(Artifex* ax, uint8_t threads) {
     (*ax)->module_count = 0;
     (*ax)->modules = NULL;
 
+    tlInitialize((*ax)->ecs);
+
     // TODO
 
     return AX_OK;
@@ -60,6 +73,7 @@ void axDestroy(Artifex* ax) {
     }
 
     // TODO
+    tlDestroy((*ax)->ecs);
 
     return;
 }
@@ -70,15 +84,24 @@ int axUpdate(Artifex ax) {
     }
 
     // Update Modules
+    uint64_t time = _ax_now();
     struct axModuleInfo info;
     for (uint64_t i = 0; i < ax->module_count; i++) {
         struct _ax_module* m = &ax->modules[i];
         if (m->enabled) {
             info.id = i;
             info.engine = ax;
-            info.delta = 0;  // TODO
 
-            m->onUpdate(&info, m->user);
+            // Initialize Module if first run
+            if (m->last_upd == 0) {
+                m->onCreate ? m->onCreate(&info, m->user) : NULL;
+                m->last_upd = time;
+                continue;
+            }
+
+            info.delta = time - m->last_upd;
+            m->last_upd = time;
+            m->onUpdate ? m->onUpdate(&info, m->user) : NULL;
         }
     }
 
@@ -89,11 +112,7 @@ int axStartLoop(Artifex ax) {
     if (!_ax_is_ok(ax))
         return AX_INVALID_INPUT;
 
-    while (!axUpdate(ax)) {
-        // for (uint32_t i = 0; i < ax->thread_count; ax++)
-        // ax->threads[i].done = 0;
-        // TODO main thread loop
-    }
+    while (!axUpdate(ax));
 
     return AX_OK;
 }
@@ -109,6 +128,8 @@ uint64_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor) {
 
     uint64_t id = ax->module_count;
     newp[id].enabled = 1;
+    newp[id].last_upd = 0;
+
     newp[id].onCreate = descriptor->onCreate;
     newp[id].onDestroy = descriptor->onDestroy;
     newp[id].onUpdate = descriptor->onUpdate;
@@ -131,27 +152,7 @@ int axEnable(Artifex ax, id_t moduleID) {
     return AX_OK;
 }
 
-int axEnableTree(Artifex ax, id_t moduleID) {
-    if (!_ax_is_ok(ax)) {
-        return AX_INVALID_INPUT;
-    }
-
-    // TODO
-
-    return AX_OK;
-}
-
 int axDisable(Artifex ax, id_t moduleID) {
-    if (!_ax_is_ok(ax)) {
-        return AX_INVALID_INPUT;
-    }
-
-    // TODO
-
-    return AX_OK;
-}
-
-int axDisableTree(Artifex ax, id_t moduleID) {
     if (!_ax_is_ok(ax)) {
         return AX_INVALID_INPUT;
     }

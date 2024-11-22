@@ -24,8 +24,8 @@ int main() {
     info.user = (void*)2;
     axRegister(ax, &info);
 
-    info.user = (void*)2;
     axRegister(ax, &info);
+    info.user = (void*)2;
 
     info.user = (void*)2;
     axRegister(ax, &info);

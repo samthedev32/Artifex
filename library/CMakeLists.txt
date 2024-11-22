@@ -12,6 +12,10 @@ set(SOURCES
     # core utils
     src/core/utils/clock.c
     src/core/utils/log.c
+
+    # ecs
+    src/ecs/typeless.c
+    src/ecs/freelist.c
     )
 
 add_library(Artifex ${SOURCES})
@@ -19,3 +23,4 @@ add_library(Artifex ${SOURCES})
 target_link_libraries(Artifex PRIVATE m)
 
 target_include_directories(Artifex PUBLIC include)
+target_include_directories(Artifex PRIVATE src/include)

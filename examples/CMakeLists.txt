@@ -1,1 +1,2 @@
 add_subdirectory(hello_modules)
+add_subdirectory(hello_ecs)

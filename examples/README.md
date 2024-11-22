@@ -1,6 +1,5 @@
-# Examples
+<!-- # Quick Start
 
-- [audio](audio): Examples for the Audio Engine
-- [graphics](graphics): Examples for the Graphics Engine
-- [engine](engine): Examples using the whole engine
-- [games](games): Simple games made with this engine
+There are both bare bones examples, useful if you want to quickly learn the API,
+
+and full games if you just want a code template to base your project off of. -->

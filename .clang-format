@@ -1,7 +1,0 @@
-BasedOnStyle: Google
-IndentWidth: 4
-ColumnLimit: 0
-AllowShortFunctionsOnASingleLine: true
-DerivePointerAlignment: false
-PointerAlignment: Left
-BreakBeforeBraces: Attach

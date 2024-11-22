@@ -19,7 +19,7 @@ typedef struct _Artifex* Artifex;
 // Module Descriptor
 struct axModuleDescriptor {
     // User Data
-    void* user;
+    void* user;  // pass NULL to make it entity-only
 
     // Callback Function Pointers
     _ax_fn_create_t onCreate;
@@ -58,14 +58,12 @@ id_t axRegister(Artifex ax, const struct axModuleDescriptor* descriptor);
 // // Enable Module
 // int axEnable(Artifex ax, id_t moduleID);
 
-// // Enable Module (and all submodules)
-// int axEnableTree(Artifex ax, id_t moduleID);
-
 // // Disable Module
 // int axDisable(Artifex ax, id_t moduleID);
 
-// // Disable Module (and all submodules)
-// int axDisableTree(Artifex ax, id_t moduleID);
+// ---- ECS
+
+// id_t axEntityAdd();
 
 #ifdef __cplusplus
 }

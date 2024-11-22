@@ -12,6 +12,7 @@ extern "C" {
 
 #include <stdint.h>
 
+// ERROR also defined in stdlib; remove
 typedef uint64_t id_t;
 
 #ifdef __cplusplus
